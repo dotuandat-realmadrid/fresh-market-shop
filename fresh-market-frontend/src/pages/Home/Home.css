@@ -1,0 +1,458 @@
+.home-container {
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1400px;
+    padding: 20px 0;
+}
+
+/* Hero Slider Styles */
+.hero-slider {
+    width: 100%;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+.hero-slide {
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-slide img {
+    width: 100%;
+    display: block;
+}
+
+
+
+.promo-slide {
+    padding: 10px;
+}
+
+.promo-card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background: #fff;
+}
+
+.promo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.promo-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 15px;
+}
+
+/* Custom Navigation Buttons */
+.custom-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    user-select: none;
+    pointer-events: auto;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.hero-slider:hover .custom-nav,
+.promo-slider-container:hover .custom-nav,
+.hot-deal-slider-container:hover .custom-nav {
+    opacity: 1;
+    visibility: visible;
+}
+
+.custom-nav svg {
+    font-size: 18px;
+}
+
+.custom-nav:hover {
+    background-color: #fff;
+    color: #28a745;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.custom-nav.hero-prev,
+.custom-nav.promo-prev {
+    left: 15px;
+}
+
+.custom-nav.hero-next,
+.custom-nav.promo-next {
+    right: 15px;
+}
+
+/* Specific to Promo Slider */
+.promo-slider-container {
+    position: relative;
+    padding: 0 40px;
+    margin-top: 20px;
+}
+
+
+
+.promo-slider-container:hover .custom-nav {
+    opacity: 1;
+}
+
+.promo-slider-container .custom-nav.promo-prev {
+    left: 0;
+}
+
+.promo-slider-container .custom-nav.promo-next {
+    right: 0;
+}
+
+/* Hide Swiper Default Buttons */
+.swiper-button-next,
+.swiper-button-prev {
+    display: none !important;
+}
+
+.swiper-pagination-bullet-active {
+    background: #28a745 !important;
+}
+
+/* Categories Section */
+.categories-section {
+    padding: 20px 10px;
+    margin-bottom: 30px;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 15px;
+    width: 100%;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.category-item:hover {
+    transform: translateY(-3px);
+}
+
+.category-icon {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.category-icon img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+}
+
+.category-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Hot Deal Style */
+.category-item.hot-deal .category-icon {
+    background-color: #ffcc00;
+    /* Yellow background */
+    border: none;
+}
+
+.hot-deal-box {
+    color: #cc0000;
+    font-weight: 900;
+    font-size: 24px;
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-style: italic;
+}
+
+@media (max-width: 1200px) {
+    .categories-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .categories-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .category-icon {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-slider {
+        border-radius: 0;
+    }
+
+    .custom-nav {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .category-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .category-name {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .categories-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Hot Deal Section Styles */
+.hot-deal-section {
+    padding: 20px 10px;
+    /* margin-bottom: 40px; */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.see-more {
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.see-more:hover {
+    text-decoration: underline;
+}
+
+.hot-deal-slider-container {
+    position: relative;
+    padding: 0 10px;
+}
+
+
+
+.hot-deal-slider-container:hover .custom-nav {
+    opacity: 1;
+}
+
+.hot-deal-slider-container .custom-nav.hot-deal-prev {
+    left: 0;
+}
+
+.hot-deal-slider-container .custom-nav.hot-deal-next {
+    right: 0;
+}
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 18px;
+    }
+
+    .hot-deal-slider-container {
+        padding: 0 30px;
+    }
+}
+
+/* Featured News Section Styles */
+.featured-news-section {
+    padding: 10px;
+    /* margin-bottom: 40px; */
+}
+
+.news-section-title {
+    font-size: 42px;
+    font-weight: 400;
+    color: #333;
+    /* margin-bottom: 40px !important; */
+}
+
+.news-slider-container {
+    position: relative;
+    padding: 0 10px;
+}
+
+.news-card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.news-image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.news-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.news-card:hover .news-image-wrap img {
+    transform: scale(1.05);
+}
+
+.news-date-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #fff;
+    color: #888;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.news-content {
+    padding: 0 5px;
+}
+
+.news-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 50px;
+}
+
+.news-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 45px;
+}
+
+.news-read-more {
+    display: flex;
+    align-items: center;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.news-read-more:hover {
+    /* color: #28a745; */
+    text-decoration: underline;
+}
+
+/* News Slider Navigation Hover */
+.news-slider-container .custom-nav {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.news-slider-container:hover .custom-nav {
+    opacity: 1;
+    visibility: visible;
+}
+
+.news-slider-container .custom-nav.news-prev {
+    left: 0;
+}
+
+.news-slider-container .custom-nav.news-next {
+    right: 0;
+}
+
+@media (max-width: 768px) {
+    .news-section-title {
+        font-size: 24px;
+    }
+
+    .news-title {
+        font-size: 16px;
+    }
+}

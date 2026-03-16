@@ -1,0 +1,326 @@
+/* =============================================
+   MENU WRAPPER - bao gồm cả sidebar + submenu
+   ============================================= */
+.menu-wrapper {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+/* =============================================
+   SIDEBAR CONTAINER
+   ============================================= */
+.menu-container {
+    width: 100%;
+    height: 100%;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ẩn scrollbar nhưng vẫn cuộn được */
+.menu-categories::-webkit-scrollbar {
+    display: none;
+}
+
+.menu-categories {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: auto;
+}
+
+/* =============================================
+   MENU ITEMS
+   ============================================= */
+.menu-item {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.15s ease;
+}
+
+.menu-item:last-child {
+    border-bottom: none !important;
+}
+
+.menu-item.active-hover,
+.menu-item:hover {
+    background-color: #eaf3ff;
+}
+
+.menu-item.active-hover .menu-item-text,
+.menu-item:hover .menu-item-text {
+    color: #004aad !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* =============================================
+   MEGA MENU PANEL (sub-menu)
+   ============================================= */
+.mega-menu-panel {
+    position: fixed;
+    /* top & height được set bởi inline style từ prop headerHeight */
+    top: 0;
+    /* left mặc định trên desktop */
+    left: 16.6667%;
+    width: 33.3333vw;
+    height: 100vh;
+    border-left: 1px solid #e8e8e8;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    overflow-y: auto;
+    /* z-index cao hơn overlay (1035) để mega menu nổi trên lớp tối */
+    z-index: 1050;
+    animation: slideInPanel 0.15s ease-out;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+@keyframes slideInPanel {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.mega-menu-header {
+    background-color: #f8fbff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* =============================================
+   MEGA MENU GRID - lưới 4 cột
+   ============================================= */
+.mega-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px 10px;
+    padding: 20px 15px !important;
+}
+
+/* Các breakpoint cho mega menu grid */
+@media (max-width: 1500px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =============================================
+   SUB ITEMS - ảnh tròn
+   ============================================= */
+.sub-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.sub-item:hover {
+    background-color: #f0f7ff;
+    transform: translateY(-2px);
+}
+
+.sub-item-img-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    flex-shrink: 0;
+    border: 2px solid #e8e8e8;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sub-item:hover .sub-item-img-wrap {
+    border-color: #004aad;
+    box-shadow: 0 4px 12px rgba(0, 74, 173, 0.2);
+}
+
+.sub-item-title {
+    margin-top: 10px;
+    margin-bottom: 12px;
+    max-width: 90px;
+    /* Khớp với chiều rộng ảnh */
+    font-size: 13px !important;
+    line-height: 1.4;
+    min-height: 39.2px;
+    /* 14px * 1.4 * 2 lines = 39.2px */
+    text-align: left;
+    width: 100%;
+    word-wrap: break-word;
+    /* Đảm bảo xuống dòng nếu quá dài */
+    display: flex;
+    align-items: flex-start;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sub-item-product-list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.product-link {
+    display: block;
+    font-size: 12.5px;
+    color: #555;
+    text-decoration: none;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+    max-width: 90px;
+    /* Khớp với chiều rộng ảnh */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-link:hover {
+    color: #004aad;
+    text-decoration: underline;
+}
+
+.view-more-btn {
+    display: block;
+    font-size: 13px;
+    color: #2b78e4;
+    text-decoration: none;
+    margin-top: 4px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.view-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* Scrollbar của mega menu panel */
+.mega-menu-panel::-webkit-scrollbar {
+    width: 5px;
+}
+
+.mega-menu-panel::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+.mega-menu-panel::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 4px;
+}
+
+.mega-menu-panel::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.mega-menu-panel {
+    scrollbar-width: thin;
+    scrollbar-color: #c0c0c0 #f5f5f5;
+}
+
+/* =============================================
+   RESPONSIVE - Layout menu và main
+   ============================================= */
+@media (min-width: 992px) {
+    .layout-menu-wrapper {
+        width: 16.666667% !important;
+        display: block !important;
+    }
+
+    .layout-main-wrapper {
+        margin-left: 16.666667% !important;
+        width: 83.333333% !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .layout-menu-wrapper {
+        width: 280px !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        visibility: hidden;
+    }
+
+    .layout-menu-wrapper.mobile-menu-open {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .layout-main-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .mega-menu-panel {
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 2000;
+        border-left: none;
+    }
+
+    .mega-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px 10px;
+    }
+
+    .sub-item-img-wrap {
+        width: 80px;
+        height: 80px;
+    }
+
+    .sub-item-title {
+        max-width: 80px;
+        font-size: 12px !important;
+        min-height: auto;
+    }
+
+    .product-link {
+        max-width: 80px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mega-menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sub-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        text-align: left;
+    }
+
+    .sub-item-img-wrap {
+        width: 60px;
+        height: 60px;
+    }
+
+    .sub-item-title {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .sub-item-product-list {
+        display: none;
+    }
+}

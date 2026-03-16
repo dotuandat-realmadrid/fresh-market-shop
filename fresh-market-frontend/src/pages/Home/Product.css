@@ -1,0 +1,449 @@
+.product-page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 15px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Category Cards Section */
+.product-category-cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.category-card {
+    min-width: 120px;
+    flex: 0 0 auto;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-card:hover {
+    border-color: #2b67f6;
+    box-shadow: 0 4px 12px rgba(43, 103, 246, 0.1);
+}
+
+.category-card.active {
+    border-color: #2b67f6;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #2b67f6;
+}
+
+.category-card-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-card-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.category-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Filter Chips Section */
+.filter-chips-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.filter-chip {
+    padding: 8px 14px;
+    background: #f5f5f5;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-chip:hover {
+    background: #e0e0e0;
+}
+
+.filter-chip.active {
+    background: #2b67f6;
+    color: #fff;
+}
+
+/* Filter Toolbar Section */
+.filter-toolbar-wrapper {
+    margin-bottom: 20px;
+}
+
+.filter-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    letter-spacing: 0.5px;
+    padding-right: 15px;
+    border-right: 1px solid #eee;
+}
+
+/* Custom Dropdown Styling */
+.custom-dropdown {
+    position: relative;
+    width: 250px;
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-dropdown:hover .dropdown-header {
+    border-color: #2b67f6;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    display: none;
+    padding: 10px 0;
+}
+
+.custom-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.custom-dropdown:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-arrow {
+    transition: transform 0.2s;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Price Filter Item */
+.price-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.price-filter-item:hover {
+    background: #f9f9f9;
+}
+
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.price-filter-item.active .custom-checkbox {
+    background: #2b67f6;
+    border-color: #2b67f6;
+}
+
+.check-icon {
+    color: #fff;
+    font-size: 10px;
+    display: none;
+}
+
+.price-filter-item.active .check-icon {
+    display: block;
+}
+
+.price-text {
+    font-size: 14px;
+    color: #444;
+}
+
+/* Sort Item */
+.sort-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sort-item:hover {
+    background: #f9f9f9;
+    color: #2b67f6;
+}
+
+.sort-item.active {
+    color: #2b67f6;
+    font-weight: 500;
+}
+
+.tick-icon {
+    color: #2b67f6;
+    font-size: 14px;
+    visibility: hidden;
+    /* Use visibility instead of display: none to reserve space for the icon */
+    width: 14px;
+}
+
+.sort-item.active .tick-icon {
+    visibility: visible;
+}
+
+/* Active Filter Tags */
+.active-filters-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 15px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.filter-tag:hover {
+    border-color: #2b67f6;
+    color: #2b67f6;
+}
+
+.tag-label {
+    color: #999;
+}
+
+.tag-value {
+    font-weight: 500;
+}
+
+.remove-tag {
+    cursor: pointer;
+    font-size: 14px;
+    color: #999;
+    display: flex;
+    align-items: center;
+}
+
+.remove-tag:hover {
+    color: #ff4d4d;
+}
+
+/* Page Title & Sort Section */
+.page-title-sort {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-main-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-select-wrapper {
+    position: relative;
+    min-width: 150px;
+}
+
+.sort-select {
+    width: 100%;
+    padding: 8px 30px 8px 30px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    background: #fff;
+    appearance: none;
+    cursor: pointer;
+}
+
+.sort-icon-left {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    display: flex;
+}
+
+.sort-icon-right {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+}
+
+/* Pagination Styling */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    padding-bottom: 20px;
+}
+
+.pagination-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.page-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.page-btn:hover {
+    border-color: #2b67f6;
+    color: #2b67f6;
+}
+
+.page-btn.active {
+    background: #2b67f6;
+    border-color: #2b67f6;
+    color: #fff;
+}
+
+.page-btn.disabled {
+    cursor: not-allowed;
+    color: #ccc;
+    background: #f9f9f9;
+}
+
+.page-btn.disabled:hover {
+    border-color: #e0e0e0;
+}
+
+/* Product Grid Adjustments */
+.product-list-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1400px) {
+    .product-list-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .product-list-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .product-list-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-list-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .filter-dropdown-container {
+        width: 100%;
+    }
+}
