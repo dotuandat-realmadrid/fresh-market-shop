@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaUndo } from "react-icons/fa";
 import { ClockCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Space, Typography, Tag, Tooltip, Modal, Table, App } from "antd";
+import { Space, Typography, Tag, Tooltip, Modal, Table, App } from "antd";
 import { searchTrashBin, restoreTrashBin } from "../../api/categoryTrashBin";
 import { useCategories } from "../../context/CategoryContext.jsx";
 import "./AccountAdmin.css";
+import MyButton from "../../components/MyButton";
 
 const { Text } = Typography;
 
@@ -148,7 +149,7 @@ const CategoryTrashBinAdmin = () => {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Khôi phục">
-            <Button
+            <MyButton
               type="link"
               icon={<FaUndo />}
               style={{ color: "#52c41a" }}
@@ -187,13 +188,13 @@ const CategoryTrashBinAdmin = () => {
               Tổng số: <span className="count">{trashData.length}</span> bản ghi đã xóa
             </div>
             {selectedIds.length > 0 && (
-              <button
+              <MyButton
                 className="btn-primary"
                 onClick={restoreSelectedCategories}
                 style={{ backgroundColor: "#52c41a", color: "white" }}
               >
                 <FaUndo /> Khôi phục {selectedIds.length} danh mục
-              </button>
+              </MyButton>
             )}
           </div>
         </div>

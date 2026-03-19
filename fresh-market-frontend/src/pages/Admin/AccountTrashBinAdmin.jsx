@@ -6,7 +6,8 @@ import {
   ExclamationCircleOutlined,
   ClockCircleOutlined
 } from '@ant-design/icons';
-import { Avatar, Button, Space, Typography, Tag, Tooltip, Modal, Table } from 'antd';
+import { Avatar, Space, Typography, Tag, Tooltip, Modal, Table } from 'antd';
+import MyButton from '../../components/MyButton';
 import './AccountAdmin.css';
 import { Link } from 'react-router-dom';
 import CustomPagination from '../../components/CustomPagination/CustomPagination';
@@ -209,7 +210,7 @@ const AccountTrashBinAdmin = () => {
       align: "center",
       render: (_, record) => (
         <Tooltip title="Khôi phục">
-          <Button
+          <MyButton
             type="link"
             icon={<FaUndo />}
             style={{ color: "#52c41a" }}
@@ -247,13 +248,13 @@ const AccountTrashBinAdmin = () => {
               Tổng số: <span className="count">{trashData.totalElements}</span> bản ghi đã xóa
             </div>
             {selectedIds.length > 0 && (
-              <button
+              <MyButton
                 className="btn-primary"
                 onClick={restoreSelectedUsers}
                 style={{ backgroundColor: '#52c41a', color: 'white' }}
               >
                 <FaUndo /> Khôi phục {selectedIds.length} tài khoản
-              </button>
+              </MyButton>
             )}
           </div>
         </div>

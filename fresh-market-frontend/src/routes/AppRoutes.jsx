@@ -20,6 +20,9 @@ import CategoryTrashBinAdmin from "../pages/Admin/CategoryTrashBinAdmin";
 import ProductAdmin from "../pages/Admin/ProductAdmin";
 import ProductTrashBinAdmin from "../pages/Admin/ProductTrashBinAdmin";
 import ProductDetailAdmin from "../pages/Admin/ProductDetailAdmin";
+import InventoryReceiptAdmin from "../pages/Admin/InventoryReceiptAdmin";
+import InventoryReceiptDetailAdmin from "../pages/Admin/InventoryReceiptDetailAdmin";
+import InventorySearchAdmin from "../pages/Admin/InventorySearchAdmin";
 import PrivateRoute from "./PrivateRoutes";
 
 const AppRoutes = () => {
@@ -54,6 +57,10 @@ const AppRoutes = () => {
             <Route path="products" element={<ProductAdmin />} />
             <Route path="products/trash" element={<ProductTrashBinAdmin />} />
             <Route path="products/:code" element={<ProductDetailAdmin />} />
+            <Route path="inventory-receipts" element={<InventoryReceiptAdmin />} />
+            <Route path="inventory-receipts/create" element={<InventoryReceiptDetailAdmin />} />
+            <Route path="inventory-receipts/:id" element={<InventoryReceiptDetailAdmin />} />
+            <Route path="inventory-receipts/search" element={<InventorySearchAdmin />} />
           </Route>
           {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />

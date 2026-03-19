@@ -22,7 +22,8 @@ import {
   EyeOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons';
-import { Avatar, Space, Typography, Tag, Tooltip, Button, message, Modal, Table, Pagination } from 'antd';
+import { App, Avatar, Space, Typography, Tag, Tooltip, Table, Pagination, Modal } from 'antd';
+import MyButton from '../../components/MyButton';
 const { Text } = Typography;
 import './AccountAdmin.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -35,6 +36,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
 const AccountAdmin = () => {
+  const { modal, message } = App.useApp();
   const [showFilter, setShowFilter] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -199,7 +201,7 @@ const AccountAdmin = () => {
   };
 
   const deleteSelectedUsers = () => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Xác nhận xóa tài khoản',
       icon: <ExclamationCircleOutlined />,
       content: `Bạn có chắc chắn muốn xóa ${selectedIds.length} người dùng đã chọn? Hành động này không thể hoàn tác.`,
@@ -212,7 +214,9 @@ const AccountAdmin = () => {
           await deleteUser(selectedIds);
           setSelectedIds([]);
           fetchUsers();
+          message.success(`Đã xóa ${selectedIds.length} người dùng`);
         } catch (error) {
+          message.error("Có lỗi xảy ra khi xóa người dùng!");
           console.error("Bulk delete failed:", error);
         } finally {
           setLoading(false);
@@ -376,33 +380,33 @@ const AccountAdmin = () => {
               </div>
             </div>
             <div className="filter-actions">
-              <button className="btn-secondary" onClick={handleReset}>
+              <MyButton className="btn-secondary" onClick={handleReset}>
                 <FaTrashAlt /> Xóa bộ lọc
-              </button>
-              <button className="btn-primary" onClick={handleSearch}>
+              </MyButton>
+              <MyButton className="btn-primary" onClick={handleSearch}>
                 <FaSearch /> Tìm kiếm
-              </button>
+              </MyButton>
             </div>
           </div>
         )}
 
         {/* Action Row */}
         <div className="table-actions-row">
-          <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div>Tổng số: <span className="count">{userData.totalElements}</span> người dùng</div>
             {selectedIds.length > 0 && (
-              <Button className='btn-remove'
+              <MyButton className='btn-remove'
                 danger 
                 type="primary" 
                 onClick={deleteSelectedUsers}
               >
                 <FaTrashAlt /> Xóa {selectedIds.length} người dùng
-              </Button>
+              </MyButton>
             )}
           </div>
-          <button className="btn-add" onClick={() => setShowAddModal(true)}>
+          <MyButton className="btn-add" onClick={() => setShowAddModal(true)}>
             <FaPlus /> Thêm mới
-          </button>
+          </MyButton>
         </div>
 
         {/* Data Table */}
@@ -496,7 +500,7 @@ const AccountAdmin = () => {
                 align: 'center',
                 render: (_, item) => (
                   <Tooltip title="Xem chi tiết">
-                    <Button
+                    <MyButton
                       type="link"
                       icon={<FaEye />}
                       onClick={() => navigate(`/admin/accounts/${item.id}`)}
@@ -643,13 +647,13 @@ const AccountAdmin = () => {
             </div>
 
             <div className="modal-footer-actions">
-              <button
+              <MyButton
                 type="submit"
                 className="btn-modal-add"
                 disabled={loading}
               >
                 {loading ? "Đang xử lý..." : "Thêm mới"}
-              </button>
+              </MyButton>
             </div>
           </form>
         </div>

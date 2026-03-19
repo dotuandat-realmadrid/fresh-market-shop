@@ -8,10 +8,6 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './store/store.js'
 import { ConfigProvider, message, App as AntApp } from 'antd'
 
-message.config({
-  zIndex: 10000,
-});
-
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
     <Provider store={store}>

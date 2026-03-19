@@ -385,3 +385,55 @@ export const restoreProducts = async (ids) => {
         throw error;
     }
 };
+
+export const exportProductsExcel = async () => {
+    try {
+        const response = await fetch(`${API}/products/export-excel`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Xuất file Excel thất bại!");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `products_${new Date().getTime()}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const exportProductsPDF = async () => {
+    try {
+        const response = await fetch(`${API}/products/export-pdf`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Xuất file PDF thất bại!");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `products_${new Date().getTime()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        throw error;
+    }
+};

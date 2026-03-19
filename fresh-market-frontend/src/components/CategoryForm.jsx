@@ -31,13 +31,6 @@ export default function CategoryForm({
     key: supplier.code,
   }));
 
-  const categoryOptions = categories
-    .filter((cat) => !initValues || cat.code !== initValues.code)
-    .map((cat) => ({
-      value: cat.code,
-      label: `${cat.name} (Cấp ${cat.level})`,
-      key: cat.code,
-    }));
 
   useEffect(() => {
     if (initValues) {
@@ -47,11 +40,15 @@ export default function CategoryForm({
         description: initValues.description,
         level: initValues.level,
         parentCodes: initValues.parents
-          ? initValues.parents.map((p) => p.code)
-          : [],
+          ? initValues.parents.map((p) => p.code || p)
+          : initValues.parent
+            ? [initValues.parent.code || initValues.parent]
+            : [],
         supplierCodes: initValues.suppliers
-          ? initValues.suppliers.map((supplier) => supplier.code)
-          : [],
+          ? initValues.suppliers.map((supplier) => supplier.code || supplier)
+          : initValues.supplier
+            ? [initValues.supplier.code || initValues.supplier]
+            : [],
       });
       if (initValues.imagePath) {
         setPreviewUrl(`${IMAGE_URL}/${initValues.imagePath}`);
@@ -67,9 +64,7 @@ export default function CategoryForm({
   }, [initValues, form, isUpdate]);
 
   const handleLevelChange = (value) => {
-    if (value === 1) {
-      form.setFieldsValue({ parentCodes: [] });
-    }
+    form.setFieldsValue({ parentCodes: [] });
   };
 
   const handleImageClick = () => {
@@ -244,7 +239,7 @@ export default function CategoryForm({
         {/* Các trường mở rộng nằm ở dưới cùng cùng hàng để tiết kiệm diện tích */}
         {isCategory && (
           <Row gutter={16}>
-            <Col span={14}>
+            <Col span={10}>
               <Form.Item name="supplierCodes" label="Nhà cung cấp hỗ trợ" style={{ marginBottom: 0 }}>
                 <Select
                   mode="multiple"
@@ -253,17 +248,25 @@ export default function CategoryForm({
                   optionFilterProp="label"
                   allowClear
                   showSearch
-                  maxTagCount="responsive"
                 />
               </Form.Item>
             </Col>
-             <Col span={10}>
+             <Col span={14}>
               <Form.Item
                 noStyle
                 shouldUpdate={(prevValues, currentValues) => prevValues.level !== currentValues.level}
               >
-                {({ getFieldValue }) =>
-                  getFieldValue("level") > 1 ? (
+                {({ getFieldValue }) => {
+                  const currentLevel = getFieldValue("level");
+                  const filteredOptions = categories
+                    .filter((cat) => (!initValues || cat.code !== initValues.code) && cat.level === currentLevel - 1)
+                    .map((cat) => ({
+                      value: cat.code,
+                      label: `${cat.name} (Cấp ${cat.level})`,
+                      key: cat.code,
+                    }));
+
+                  return currentLevel > 1 ? (
                     <Form.Item
                       name="parentCodes"
                       label="Danh mục cha trực tiếp"
@@ -273,15 +276,14 @@ export default function CategoryForm({
                       <Select
                         mode="multiple"
                         placeholder="Chọn cha phù hợp"
-                        options={categoryOptions}
+                        options={filteredOptions}
                         allowClear
                         showSearch
                         optionFilterProp="label"
-                        maxTagCount="responsive"
                       />
                     </Form.Item>
-                  ) : null
-                }
+                  ) : null;
+                }}
               </Form.Item>
             </Col>
           </Row>

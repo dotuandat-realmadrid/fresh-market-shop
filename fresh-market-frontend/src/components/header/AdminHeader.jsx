@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getToken } from "../../services/localStorageService";
 import { Button, Input, Space } from "antd";
 import { introspect, logout as logoutAction } from "../../api/auth";
+import icons from "../../assets/images/icon-1.png"
 import "./AdminHeader.css";
 
 export default function AdminHeader({ collapsed, toggleSidebar }) {
@@ -116,7 +117,7 @@ export default function AdminHeader({ collapsed, toggleSidebar }) {
             style={{ display: "flex", alignItems: "center", textDecoration: 'none' }}
           >
             <img
-              src="src/assets/images/icon-1.png"
+              src={icons}
               alt="Fresh Market Icon"
               style={{ height: '32px', objectFit: 'contain', marginRight: '8px' }}
             />

@@ -4,6 +4,7 @@ import { Dropdown } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken } from '../../services/localStorageService';
 import { introspect, logout, login } from '../../api/auth';
+import icons from "../../assets/images/icon-1.png"
 import './Header.css';
 
 // Dữ liệu giỏ hàng mẫu để demo
@@ -143,7 +144,7 @@ const Header = ({ onMenuToggle }) => {
                 </svg>
               </div>
               <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
-                <img src='src/assets/images/icon-1.png' alt="Fresh Market Icon" style={{ height: '40px', objectFit: 'contain' }} />
+                <img src={icons} alt="Fresh Market Icon" style={{ height: '40px', objectFit: 'contain' }} />
                 <div className="d-flex flex-column" style={{ lineHeight: '1.1' }}>
                   <span className="fw-900" style={{ color: '#004aad', fontSize: '24px', fontWeight: '900', letterSpacing: '0.5px' }}>BICH THUY</span>
                   <span className="fw-bold" style={{ color: '#ff6600', fontSize: '15px', letterSpacing: '2px', paddingLeft: '2px' }}>MARKET</span>

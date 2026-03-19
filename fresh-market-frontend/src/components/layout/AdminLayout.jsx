@@ -72,7 +72,7 @@ const AdminLayout = () => {
       ...(isAdminOrUser ? [getItem("Quản Lý Kho", "inventory-manager", <ShoppingOutlined />, 0, 
             [
               getItem("Danh sách phiếu nhập", "/admin/inventory-receipts", <HistoryOutlined />),
-              getItem("Tạo phiếu nhập kho", "/admin/add-inventory-receipt", <ShoppingCartOutlined />),
+              getItem("Tạo phiếu nhập kho", "/admin/inventory-receipts/create", <ShoppingCartOutlined />),
             ]
         )] : []),
       ...(isAdminOrUser ? [

@@ -1,15 +1,30 @@
-import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { 
+  DeleteOutlined, 
+  EditOutlined, 
+  ExclamationCircleOutlined 
+} from "@ant-design/icons";
 import {
-  Button,
   Modal,
   Space,
   Table,
   Tooltip,
   App,
+  Select,
+  Input,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaPlus } from 'react-icons/fa';
+import { 
+  FaPlus, 
+  FaFilter, 
+  FaChevronDown, 
+  FaTrashAlt, 
+  FaSearch, 
+  FaRedo,
+  FaIdCard,
+  FaTag
+} from 'react-icons/fa';
 import './AccountAdmin.css';
 import {
   createCategory,
@@ -18,11 +33,13 @@ import {
   uploadCategoryImage,
   updateCategoryImage,
   getCategoryTree,
-  getCategoryTreePaged
+  getCategoryTreePaged,
+  getCategoryByCode
 } from "../../api/category";
 import CategoryForm from "../../components/CategoryForm";
 import { useCategories } from "../../context/CategoryContext.jsx";
 import { IMAGE_URL } from "../../api/auth";
+import CustomPagination from '../../components/CustomPagination/CustomPagination';
 
 /**
  * Làm phẳng cây category, gắn số thứ tự dạng 1, 1.1, 1.1.1 ...
@@ -30,13 +47,21 @@ import { IMAGE_URL } from "../../api/auth";
  * @param {string} prefix - tiền tố số thứ tự cha ("" với root)
  * @returns {Array} mảng phẳng với thuộc tính stt
  */
-function flattenTree(nodes, prefix = "") {
+function flattenTree(nodes, prefix = "", parentNode = null) {
   const result = [];
   nodes.forEach((node, idx) => {
     const stt = prefix ? `${prefix}.${idx + 1}` : `${idx + 1}`;
-    result.push({ ...node, stt, children: undefined });
+    // Gắn thông tin cha vào node để Modal Update có thể hiển thị danh mục cha đã có
+    const nodeWithParent = { 
+      ...node, 
+      stt, 
+      children: undefined, 
+      parents: parentNode ? [parentNode] : [] 
+    };
+    result.push(nodeWithParent);
+    
     if (node.children && node.children.length > 0) {
-      result.push(...flattenTree(node.children, stt));
+      result.push(...flattenTree(node.children, stt, node));
     }
   });
   return result;
@@ -48,20 +73,31 @@ export default function CategoryAdmin() {
   const [flatCategories, setFlatCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pendingImageFile, setPendingImageFile] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [isLevelOpen, setIsLevelOpen] = useState(false);
+  const [selectedLevelLabel, setSelectedLevelLabel] = useState("Tất cả cấp độ");
+  
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 5,
     total: 0
+  });
+  const [filters, setFilters] = useState({
+    code: "",
+    name: "",
+    level: 1
   });
 
   const { modal, message } = App.useApp();
   const categoryContext = useCategories();
   const refreshCategoriesContext = categoryContext?.refreshCategories;
 
-  const fetchCategories = async (page = pagination.current, pageSize = pagination.pageSize) => {
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const fetchCategories = async (page = pagination.current, pageSize = pagination.pageSize, currentFilters = filters) => {
     setLoading(true);
     try {
-      const response = await getCategoryTreePaged(page, pageSize, "", "");
+      const response = await getCategoryTreePaged(page, pageSize, currentFilters.code, currentFilters.name, currentFilters.level);
       if (response && response.data) {
         setFlatCategories(flattenTree(response.data));
         setPagination({
@@ -80,8 +116,47 @@ export default function CategoryAdmin() {
     }
   };
 
+  const deleteSelectedCategories = () => {
+    modal.confirm({
+      title: 'Xác nhận xóa',
+      icon: <ExclamationCircleOutlined />,
+      content: `Bạn có chắc chắn muốn xóa ${selectedIds.length} danh mục đã chọn? Hành động này không thể hoàn tác.`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        setLoading(true);
+        try {
+          // Change to individual deletes if backend doesn't support bulk joined string
+          const deletePromises = selectedIds.map(code => deleteCategory(code));
+          await Promise.all(deletePromises);
+          
+          message.success(`Đã xóa ${selectedIds.length} danh mục`);
+          setSelectedIds([]);
+          if (refreshCategoriesContext) await refreshCategoriesContext();
+          fetchCategories();
+        } catch (error) {
+          message.error(error.message || "Xóa danh mục thất bại!");
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
+  };
+
   const handleTableChange = (newPagination) => {
     fetchCategories(newPagination.current, newPagination.pageSize);
+  };
+
+  const handleSearch = () => {
+    fetchCategories(1, pagination.pageSize);
+  };
+
+  const handleReset = () => {
+    const defaultFilters = { code: "", name: "", level: 1 };
+    setFilters(defaultFilters);
+    setSelectedLevelLabel("Tất cả cấp độ");
+    fetchCategories(1, pagination.pageSize, defaultFilters);
   };
 
 
@@ -99,10 +174,20 @@ export default function CategoryAdmin() {
     setPendingImageFile(null);
   };
 
-  const showUpdateModal = (category) => {
-    setEditingCategory(category);
-    setPendingImageFile(null);
-    setIsModalVisible(true);
+  const showUpdateModal = async (category) => {
+    try {
+      setLoading(true);
+      const fullCategory = await getCategoryByCode(category.code);
+      if (fullCategory) {
+        setEditingCategory(fullCategory);
+        setPendingImageFile(null);
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      message.error("Không thể lấy thông tin chi tiết danh mục");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreate = async (data) => {
@@ -221,7 +306,7 @@ export default function CategoryAdmin() {
       dataIndex: "level",
       key: "level",
       align: 'center',
-      // width: 80,
+      width: 80,
       render: (level) => (
         <span style={{
           background: level === 1 ? '#e6f4ff' : level === 2 ? '#f6ffed' : '#fff7e6',
@@ -240,7 +325,7 @@ export default function CategoryAdmin() {
       dataIndex: "imagePath",
       key: "imagePath",
       align: "center",
-      // width: 70,
+      width: 70,
       render: (imagePath) => imagePath
         ? <img src={`${IMAGE_URL}/${imagePath}`} alt="category" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6 }} />
         : <span style={{ color: '#bfbfbf', fontSize: 12 }}>N/A</span>
@@ -253,14 +338,14 @@ export default function CategoryAdmin() {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Cập nhật">
-            <Button
+            <MyButton
               type="link"
               icon={<EditOutlined />}
               onClick={() => showUpdateModal(record)}
             />
           </Tooltip>
           <Tooltip title="Xóa">
-            <Button
+            <MyButton
               type="link"
               danger
               icon={<DeleteOutlined />}
@@ -282,29 +367,128 @@ export default function CategoryAdmin() {
       </div>
 
       <div className="admin-card">
+        {/* Filter Section Header */}
+        <div 
+          className={`filter-header ${showFilter ? 'active' : ''}`} 
+          onClick={() => setShowFilter(!showFilter)}
+        >
+          <div className="filter-title">
+            <FaFilter className="icon" /> Bộ lọc tìm kiếm
+          </div>
+          <FaChevronDown className={`arrow-icon ${showFilter ? 'up' : ''}`} />
+        </div>
+
+        {/* Filter Content */}
+        {showFilter && (
+          <div className="filter-content">
+            <div className="filter-grid">
+              <div className="form-group">
+                <label>Mã danh mục</label>
+                <div className="input-wrapper">
+                  <FaIdCard className="field-icon" />
+                  <input 
+                    type="text" 
+                    placeholder="Nhập mã code" 
+                    value={filters.code}
+                    onChange={(e) => setFilters({...filters, code: e.target.value})}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Tên danh mục</label>
+                <div className="input-wrapper">
+                  <FaTag className="field-icon" />
+                  <input 
+                    type="text" 
+                    placeholder="Nhập tên danh mục" 
+                    value={filters.name}
+                    onChange={(e) => setFilters({...filters, name: e.target.value})}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Cấp độ</label>
+                <div 
+                  className={`custom-dropdown-wrapper ${isLevelOpen ? 'active' : ''}`}
+                  onClick={() => setIsLevelOpen(!isLevelOpen)}
+                  onBlur={() => setTimeout(() => setIsLevelOpen(false), 200)}
+                  tabIndex="0"
+                >
+                  <div className="dropdown-selected">
+                    {selectedLevelLabel}
+                    <FaChevronDown className={`select-arrow ${isLevelOpen ? 'open' : ''}`} />
+                  </div>
+                  {isLevelOpen && (
+                    <ul className="dropdown-list">
+                      <li key="all-levels" onClick={() => { setSelectedLevelLabel("Tất cả cấp độ"); setFilters({...filters, level: null}); }}>Tất cả cấp độ</li>
+                      <li key="level-1" onClick={() => { setSelectedLevelLabel("Cấp 1"); setFilters({...filters, level: 1}); }}>Cấp 1</li>
+                      <li key="level-2" onClick={() => { setSelectedLevelLabel("Cấp 2"); setFilters({...filters, level: 2}); }}>Cấp 2</li>
+                      <li key="level-3" onClick={() => { setSelectedLevelLabel("Cấp 3"); setFilters({...filters, level: 3}); }}>Cấp 3</li>
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="filter-actions">
+              <MyButton className="btn-secondary" onClick={handleReset}>
+                <FaTrashAlt /> Xóa bộ lọc
+              </MyButton>
+              <MyButton className="btn-primary" onClick={handleSearch}>
+                <FaSearch /> Tìm kiếm
+              </MyButton>
+            </div>
+          </div>
+        )}
 
         <div className="table-actions-row">
-          <div className="stats">
-            Tổng số: <span className="count">{pagination.total}</span> danh mục gốc
+          <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div>Tổng số: <span className="count">{pagination.total}</span> danh mục</div>
+            {selectedIds.length > 0 && (
+              <MyButton
+                className="btn-remove"
+                danger
+                type="primary"
+                onClick={deleteSelectedCategories}
+                icon={<FaTrashAlt />}
+              >
+                Xóa {selectedIds.length} danh mục
+              </MyButton>
+            )}
           </div>
-          <button className="btn-add" onClick={showModal}>
+          <MyButton className="btn-add" onClick={showModal}>
             <FaPlus /> Thêm mới
-          </button>
+          </MyButton>
         </div>
 
         <div className="table-responsive" style={{ paddingTop: '10px' }}>
           <Table
+            rowSelection={{
+              selectedRowKeys: selectedIds,
+              onChange: (keys) => setSelectedIds(keys),
+            }}
             dataSource={flatCategories}
             columns={columns}
-            rowKey={(record) => `${record.code}-${record.stt}`}
+            rowKey="stt"
             loading={loading}
             pagination={false}
-            onChange={handleTableChange}
             bordered
             size="middle"
             rowClassName={(record) =>
               record.level === 1 ? 'row-level-1' : record.level === 2 ? 'row-level-2' : 'row-level-3'
             }
+          />
+
+          <CustomPagination
+            current={pagination.current}
+            pageSize={pagination.pageSize}
+            total={pagination.total}
+            onChange={(page) => fetchCategories(page, pagination.pageSize)}
+            onPageSizeChange={(size) => {
+              fetchCategories(1, size);
+            }}
+            layout="right"
           />
         </div>
       </div>

@@ -18,7 +18,6 @@ import {
 import {
   App as AntApp,
   Breadcrumb,
-  Button,
   Card,
   Col,
   DatePicker,
@@ -38,6 +37,7 @@ import {
   Typography,
   Upload,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
@@ -410,29 +410,29 @@ export default function ProductDetailAdmin() {
             extra={
               <Space>
                 <Tooltip title="Hủy thay đổi">
-                  <Button onClick={handleCancel} icon={<ReloadOutlined />}>
+                  <MyButton onClick={handleCancel} icon={<ReloadOutlined />}>
                     Hủy
-                  </Button>
+                  </MyButton>
                 </Tooltip>
                 <Tooltip title="Cập nhật sản phẩm">
-                  <Button
+                  <MyButton
                     type="primary"
                     icon={<SaveOutlined />}
                     loading={saveLoading}
                     onClick={() => form.submit()}
                   >
                     Cập nhật
-                  </Button>
+                  </MyButton>
                 </Tooltip>
                 <Tooltip title="Xóa sản phẩm">
-                  <Button
+                  <MyButton
                     danger
                     icon={<DeleteOutlined />}
                     onClick={handleDelete}
                     loading={deleteLoading}
                   >
                     Xóa
-                  </Button>
+                  </MyButton>
                 </Tooltip>
                 {productDetail && (
                   <Tooltip title="Xem lịch sử nhập kho">
@@ -443,21 +443,21 @@ export default function ProductDetailAdmin() {
                         productName: productDetail.name,
                       }}
                     >
-                      <Button type="primary" ghost icon={<HistoryOutlined />}>
+                      <MyButton type="primary" ghost icon={<HistoryOutlined />}>
                         
-                      </Button>
+                      </MyButton>
                     </Link>
                   </Tooltip>
                 )}
                 {productDetail && (
                   <Tooltip title="Báo cáo lợi nhuận">
-                    <Button
+                    <MyButton
                       type="primary"
                       icon="💰"
                       onClick={() => handleReport(productDetail.code)}
                     >
                       Lợi nhuận
-                    </Button>
+                    </MyButton>
                   </Tooltip>
                 )}
               </Space>
@@ -560,7 +560,7 @@ export default function ProductDetailAdmin() {
                 variant="outlined"
                 style={{ marginBottom: 24 }}
                 extra={
-                  <Button
+                  <MyButton
                     type="primary"
                     icon={<SaveOutlined />}
                     onClick={handleSaveImages}
@@ -571,7 +571,7 @@ export default function ProductDetailAdmin() {
                     }
                   >
                     Lưu ảnh
-                  </Button>
+                  </MyButton>
                 }
               >
                 <Upload {...uploadProps}>
@@ -607,7 +607,7 @@ export default function ProductDetailAdmin() {
                         }
                         parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                       />
-                      <Button disabled style={{ width: "60px" }}>VNĐ</Button>
+                      <MyButton disabled style={{ width: "60px" }}>VNĐ</MyButton>
                     </Space.Compact>
                   </Form.Item>
                 </Col>
@@ -623,7 +623,7 @@ export default function ProductDetailAdmin() {
                           `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         }
                       />
-                      <Button disabled style={{ width: "60px" }}>VNĐ</Button>
+                      <MyButton disabled style={{ width: "60px" }}>VNĐ</MyButton>
                     </Space.Compact>
                   </Form.Item>
                 </Col>

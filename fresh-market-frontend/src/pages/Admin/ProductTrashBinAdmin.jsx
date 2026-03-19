@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaUndo } from "react-icons/fa";
 import { ClockCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Space, Typography, Tag, Tooltip, Modal, Table, App } from "antd";
+import { Space, Typography, Tag, Tooltip, Modal, Table, App } from "antd";
 import { getTrashBinProducts, restoreProducts } from "../../api/product";
 import { IMAGE_URL, DEFAULT_IMAGE } from "../../api/auth";
 import "./AccountAdmin.css";
 import "./ProductAdmin.css";
 import dayjs from "dayjs";
 import CustomPagination from "../../components/CustomPagination/CustomPagination";
+import MyButton from "../../components/MyButton";
 
 const { Text } = Typography;
 
@@ -182,7 +183,7 @@ const ProductTrashBinAdmin = () => {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Khôi phục">
-            <Button
+            <MyButton
               type="link"
               icon={<FaUndo />}
               style={{ color: "#52c41a" }}
@@ -227,13 +228,13 @@ const ProductTrashBinAdmin = () => {
               <span className="count">{totalElements}</span> sản phẩm đã xóa
             </div>
             {selectedIds.length > 0 && (
-              <button
+              <MyButton
                 className="btn-primary"
                 onClick={restoreSelectedProducts}
                 style={{ backgroundColor: "#52c41a", color: "white", display: "flex", alignItems: "center", gap: "8px" }}
               >
                 <FaUndo /> Khôi phục {selectedIds.length} sản phẩm
-              </button>
+              </MyButton>
             )}
           </div>
         </div>

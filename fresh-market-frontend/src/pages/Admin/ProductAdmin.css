@@ -278,9 +278,16 @@
     border-radius: 8px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     font-size: 14px;
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-success:active,
+.btn-danger:active {
+    transform: scale(0.97);
 }
 
 .btn-primary {
@@ -753,6 +760,15 @@
     border: none;
     cursor: pointer;
     font-size: 16px;
+    transition: all 0.2s;
+}
+
+.btn-gray-foot:hover {
+    background: #4b5563;
+}
+
+.btn-gray-foot:active {
+    transform: scale(0.97);
 }
 
 .btn-blue-foot {
@@ -767,6 +783,16 @@
     align-items: center;
     gap: 8px;
     font-size: 16px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-blue-foot:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.btn-blue-foot:active {
+    transform: scale(0.97);
 }
 
 .btn-green-download {
@@ -782,4 +808,14 @@
     gap: 8px;
     margin: 0 auto 20px;
     font-size: 16px;
+    transition: all 0.2s;
+}
+
+.btn-green-download:hover {
+    background: #166534;
+    box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.2);
+}
+
+.btn-green-download:active {
+    transform: scale(0.97);
 }

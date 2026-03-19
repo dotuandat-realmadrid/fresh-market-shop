@@ -7,11 +7,70 @@ export const getAll = async () => {
   try {
     const response = await fetch(`${API}/suppliers`, {
       method: "GET",
+      // headers: {
+      //   Authorization: `Bearer ${getToken()}`,
+      // },
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Tải nhà cung cấp thất bại!");
+    }
+
+    const result = await response.json();
+
+    if (result.code !== 1000) {
+      throw new Error(result.message);
+    }
+
+    return result.result;
+  } catch (error) {
+    message.error(error.message);
+  }
+};
+
+export const searchSuppliers = async (page, size) => {
+  try {
+    const params = new URLSearchParams();
+    params.append("page", page || 1);
+    params.append("size", size || 5);
+
+    const response = await fetch(`${API}/suppliers/search?${params.toString()}`, {
+      method: "GET",
+      // headers: {
+      //   Authorization: `Bearer ${getToken()}`,
+      // },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Tải nhà cung cấp thất bại!");
+    }
+
+    const result = await response.json();
+
+    if (result.code !== 1000) {
+      throw new Error(result.message);
+    }
+
+    return result.result;
+  } catch (error) {
+    message.error(error.message);
+  }
+};
+
+export const getSupplierByCode = async (code) => {
+  try {
+    const response = await fetch(`${API}/suppliers/${code}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Tải thông tin nhà cung cấp thất bại!");
     }
 
     const result = await response.json();
@@ -48,7 +107,6 @@ export const createSupplier = async (data) => {
       throw new Error(result.message);
     }
 
-    window.location.reload();
     message.success("Thêm mới nhà cung cấp thành công");
     return result.result;
   } catch (error) {
@@ -105,8 +163,8 @@ export const deleteSupplier = async (id) => {
       throw new Error(result.message);
     }
 
-    message.success("Xóa nhà cung cấp thành công");
+    // Backend doesn't return much, handled in individual or bulk delete by page
   } catch (error) {
-    message.error(error.message);
+    throw error; // Rethrow to handle in loops if needed
   }
 };

@@ -29,6 +29,62 @@ export const getAllDiscount = async () => {
   }
 };
 
+export const searchDiscounts = async (page, size) => {
+  try {
+    const params = new URLSearchParams();
+    params.append("page", page || 1);
+    params.append("size", size || 5);
+
+    const response = await fetch(`${API}/discounts/search?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Tải danh sách thất bại!");
+    }
+
+    const result = await response.json();
+
+    if (result.code !== 1000) {
+      throw new Error(result.message);
+    }
+
+    return result.result;
+  } catch (error) {
+    message.error(error.message);
+  }
+};
+
+export const getDiscountById = async (id) => {
+  try {
+    const response = await fetch(`${API}/discounts/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Tải thông tin mã giảm giá thất bại!");
+    }
+
+    const result = await response.json();
+
+    if (result.code !== 1000) {
+      throw new Error(result.message);
+    }
+
+    return result.result;
+  } catch (error) {
+    message.error(error.message);
+  }
+};
+
 export const createDiscount = async (data) => {
   try {
     const response = await fetch(`${API}/discounts`, {
@@ -135,9 +191,7 @@ export const deleteDiscount = async (id) => {
     if (result.code !== 1000) {
       throw new Error(result.message);
     }
-
-    message.success("Xóa thành công");
   } catch (error) {
-    message.error(error.message);
+    throw error;
   }
 };

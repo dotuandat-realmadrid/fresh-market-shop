@@ -1,9 +1,7 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import {
-  Breadcrumb,
-  Button,
+  App,
   DatePicker,
-  Divider,
   Form,
   Input,
   InputNumber,
@@ -13,17 +11,19 @@ import {
   Tooltip,
   Typography,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaPlus } from 'react-icons/fa';
 import './AccountAdmin.css';
 import {
-  createDiscount,
   deleteDiscount,
-  getAllDiscount,
+  searchDiscounts,
   updateDiscount,
+  getDiscountById,
 } from "../../api/discount";
+import CustomPagination from "../../components/CustomPagination/CustomPagination";
 
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
@@ -31,25 +31,40 @@ const { Text } = Typography;
 export default function DiscountAdmin() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState(null);
-  const [discountData, setDiscountData] = useState([]);
+  const [discountData, setDiscountData] = useState({
+    data: [],
+    totalElements: 0,
+    totalPage: 0,
+    pageSize: 10,
+    currentPage: 1
+  });
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
+  const { modal, message } = App.useApp();
+  const [selectedIds, setSelectedIds] = useState([]);
 
-  // Fetch data
-  useEffect(() => {
-    const getDiscounts = async () => {
-      setLoading(true);
-      try {
-        const data = await getAllDiscount();
-        setDiscountData(data || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+  const fetchDiscounts = async (page = discountData.currentPage, size = discountData.pageSize) => {
+    setLoading(true);
+    try {
+      const result = await searchDiscounts(page, size);
+      if (result) {
+        setDiscountData({
+          data: result.data || [],
+          totalElements: result.totalElements || 0,
+          totalPage: result.totalPage || 0,
+          pageSize: size,
+          currentPage: page
+        });
       }
-    };
+    } catch (error) {
+      console.error("Fetch discounts failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    getDiscounts();
+  useEffect(() => {
+    fetchDiscounts();
   }, []);
 
   // Mở modal cho "Thêm mới"
@@ -62,18 +77,28 @@ export default function DiscountAdmin() {
   };
 
   // Mở modal cho "Cập nhật"
-  const showUpdateModal = (discount) => {
-    setEditingDiscount(discount);
-    setIsModalVisible(true);
-    setTimeout(() => {
-      form.setFieldsValue({
-        ...discount,
-        range:
-          discount.startDate && discount.endDate
-            ? [dayjs(discount.startDate), dayjs(discount.endDate)]
-            : [],
-      });
-    }, 0);
+  const showUpdateModal = async (discount) => {
+    setLoading(true);
+    try {
+      const fullDiscount = await getDiscountById(discount.id);
+      if (fullDiscount) {
+        setEditingDiscount(fullDiscount);
+        setIsModalVisible(true);
+        setTimeout(() => {
+          form.setFieldsValue({
+            ...fullDiscount,
+            range:
+              fullDiscount.startDate && fullDiscount.endDate
+                ? [dayjs(fullDiscount.startDate), dayjs(fullDiscount.endDate)]
+                : [],
+          });
+        }, 0);
+      }
+    } catch (error) {
+      message.error("Không thể lấy thông tin chi tiết mã giảm giá");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Đóng modal và reset form
@@ -96,28 +121,50 @@ export default function DiscountAdmin() {
       await createDiscount(formattedValues);
     }
 
-    // Reload data after update
-    setLoading(true);
-    const data = await getAllDiscount();
-    setDiscountData(data || []);
-    setLoading(false);
-
+    fetchDiscounts();
     setIsModalVisible(false);
     form.resetFields();
   };
 
   const handleDelete = async (discount) => {
-    await deleteDiscount(discount.id);
+    try {
+      await deleteDiscount(discount.id);
+      message.success("Xóa mã giảm giá thành công");
+      fetchDiscounts();
+    } catch (error) {
+      message.error("Xóa mã giảm giá thất bại!");
+    }
+  };
 
-    // Reload data after delete
-    setLoading(true);
-    const data = await getAllDiscount();
-    setDiscountData(data || []);
-    setLoading(false);
+  const deleteSelectedDiscounts = () => {
+    modal.confirm({
+      title: 'Xác nhận xóa',
+      icon: <ExclamationCircleOutlined />,
+      content: `Bạn có chắc chắn muốn xóa ${selectedIds.length} mã giảm giá đã chọn? Hành động này không thể hoàn tác.`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        setLoading(true);
+        try {
+          const deletePromises = selectedIds.map(id => deleteDiscount(id));
+          await Promise.all(deletePromises);
+          
+          message.success(`Đã xóa ${selectedIds.length} mã giảm giá`);
+          setSelectedIds([]);
+          fetchDiscounts();
+        } catch (error) {
+          message.error("Có lỗi xảy ra khi xóa mã giảm giá!");
+          console.error("Bulk delete failed:", error);
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   const showDeleteConfirm = (discount) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Xác nhận xóa',
       icon: <ExclamationCircleOutlined />,
       content: 'Bạn có chắc chắn muốn xóa mã giảm giá này? Hành động này không thể hoàn tác.',
@@ -136,7 +183,7 @@ export default function DiscountAdmin() {
       key: "stt",
       width: 60,
       align: "center",
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) => (discountData.currentPage - 1) * discountData.pageSize + index + 1,
     },
     {
       title: "Tên mã giảm giá",
@@ -174,21 +221,19 @@ export default function DiscountAdmin() {
       render: (discount) => (
         <Space size="small">
           <Tooltip title="Cập nhật">
-            <Button
+            <MyButton
               type="link"
               icon={<EditOutlined />}
               onClick={() => showUpdateModal(discount)}
-            >
-            </Button>
+            />
           </Tooltip>
           <Tooltip title="Xóa">
-            <Button
+            <MyButton
               type="link"
               danger
               icon={<DeleteOutlined />}
               onClick={() => showDeleteConfirm(discount)}
-            >
-            </Button>
+            />
           </Tooltip>
         </Space>
       ),
@@ -207,23 +252,46 @@ export default function DiscountAdmin() {
       <div className="admin-card">
         {/* Action Row */}
         <div className="table-actions-row">
-          <div className="stats">
-            Tổng số: <span className="count">{discountData?.length || 0}</span> mã giảm giá
+          <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div>Tổng số: <span className="count">{discountData.totalElements}</span> mã giảm giá</div>
+            {selectedIds.length > 0 && (
+              <MyButton className='btn-remove'
+                danger 
+                type="primary" 
+                onClick={deleteSelectedDiscounts}
+                icon={<DeleteOutlined />}
+              >
+                Xóa {selectedIds.length} mã giảm giá
+              </MyButton>
+            )}
           </div>
-          <button className="btn-add" onClick={showCreateModal}>
+          <MyButton className="btn-add" onClick={showCreateModal}>
             <FaPlus /> Thêm mới
-          </button>
+          </MyButton>
         </div>
 
         <div className="table-responsive" style={{ paddingTop: '10px' }}>
           <Table
-            dataSource={discountData}
+            rowSelection={{
+              selectedRowKeys: selectedIds,
+              onChange: (keys) => setSelectedIds(keys),
+            }}
+            dataSource={discountData.data}
             columns={columns}
             rowKey="id"
             pagination={false}
             bordered
             size="middle"
             loading={loading}
+          />
+
+          <CustomPagination
+            current={discountData.currentPage}
+            pageSize={discountData.pageSize}
+            total={discountData.totalElements}
+            onChange={(page) => fetchDiscounts(page, discountData.pageSize)}
+            onPageSizeChange={(size) => fetchDiscounts(1, size)}
+            layout="right"
           />
         </div>
       </div>
@@ -292,9 +360,9 @@ export default function DiscountAdmin() {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" style={{ width: "100%" }} htmlType="submit">
+            <MyButton type="primary" style={{ width: "100%" }} htmlType="submit">
               {editingDiscount ? "Cập nhật" : "Thêm mới"}
-            </Button>
+            </MyButton>
           </Form.Item>
         </Form>
       </Modal>

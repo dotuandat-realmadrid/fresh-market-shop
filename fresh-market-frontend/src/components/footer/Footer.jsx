@@ -1,4 +1,5 @@
 import React from 'react';
+import { IMAGE_URL } from '../../api/auth';
 
 const Footer = () => {
   return (
@@ -15,7 +16,7 @@ const Footer = () => {
           </div>
           <div className="col-md-3 col-lg-2 text-md-end mt-3 mt-md-0">
             <img 
-              src="https://theme.hstatic.net/200000065270/1000923013/14/logo-bct.png?v=976" 
+              src={`${IMAGE_URL}/bo_cong_thuong.png`} 
               alt="Đã thông báo bộ công thương" 
               style={{ maxHeight: '45px' }}
               onError={(e) => { e.target.style.display = 'none'; }}
