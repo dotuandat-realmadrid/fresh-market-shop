@@ -22,7 +22,6 @@ public class OrderResponse {
     Long totalPrice;
     PaymentMethod paymentMethod;
     String note;
-    String paymentRef;
     String userId;
     String username;
     String fullName;

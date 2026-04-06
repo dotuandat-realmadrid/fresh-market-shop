@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,45 +29,134 @@ import java.util.Map;
 @Slf4j
 public class PaymentController {
 
-    @Autowired
-    private PaymentService paymentService;
+    @Autowired private PaymentService paymentService;
+    @Autowired private OrderService   orderService;
+    @Autowired private CartService    cartService;
+    @Autowired private PaymentUtil    paymentUtil;
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private CartService cartService;
-
-    @Autowired
-    private PaymentUtil paymentUtil;
-
+    /**
+     * Bước 1: Frontend gọi để tạo order + lấy VNPay payment URL.
+     *
+     * @param orderData  JSON string của OrderRequest (giữ nguyên như cũ)
+     * @param amount     số tiền
+     * @param redirectTo URL trang frontend muốn nhận kết quả (ví dụ: http://localhost:3001/confirm)
+     */
     @PostMapping("/vnpay/pay")
     public ApiResponse<String> pay(
             @RequestParam String amount,
             @RequestParam(required = false) String bankCode,
             @RequestParam(required = false) String language,
-            @RequestParam(required = false) String orderData,
+            @RequestParam String orderData,
+            @RequestParam String redirectTo,
             HttpServletRequest request) {
         try {
-            log.info("VNPay payment request - Amount: {}, BankCode: {}, Language: {}, OrderData: {}",
-                    amount, bankCode, language, orderData);
+            // Parse orderData như cũ
+            OrderRequest orderRequest = new com.fasterxml.jackson.databind.ObjectMapper()
+                    .readValue(orderData, OrderRequest.class);
 
-            String paymentUrl = paymentService.pay(amount, bankCode, language, orderData, request);
+            // Tạo order PENDING trước khi redirect sang VNPay
+            OrderResponse order = orderService.create(orderRequest, OrderStatus.PENDING);
 
-            log.info("VNPay pay initiated successfully - PaymentUrl: {}", paymentUrl);
+            if (order == null || order.getId() == null) {
+                return ApiResponse.<String>builder()
+                        .code(5000)
+                        .message("Không thể tạo đơn hàng")
+                        .build();
+            }
+
+            log.info("Order created PENDING - OrderId: {}", order.getId());
+
+            // Tạo payment URL, truyền orderId làm TxnRef
+            String paymentUrl = paymentService.pay(order.getId(), amount, redirectTo, request);
 
             return ApiResponse.<String>builder()
                     .code(1000)
-                    .message("Payment initiated successfully")
+                    .message("Tạo payment URL thành công")
                     .result(paymentUrl)
                     .build();
+
         } catch (Exception e) {
             log.error("Payment error: {}", e.getMessage(), e);
             return ApiResponse.<String>builder()
                     .code(5000)
-                    .message("Payment error: " + e.getMessage())
+                    .message("Lỗi tạo thanh toán: " + e.getMessage())
                     .build();
         }
+    }
+
+    /**
+     * Bước 2: VNPay redirect browser về đây sau khi thanh toán.
+     * Verify signature → clear cart nếu thành công → redirect về frontend.
+     *
+     * Logic đơn giản vì order đã tạo sẵn rồi, chỉ cần clear cart + redirect.
+     */
+    @GetMapping("/vnpay-return")
+    public ResponseEntity<Void> handleVnPayReturn(HttpServletRequest request,
+                                                  HttpServletResponse response) throws IOException {
+        String redirectTo = request.getParameter("redirectTo");
+        String baseUrl = (redirectTo != null && !redirectTo.isEmpty())
+                ? redirectTo : "http://localhost:3001/confirm";
+
+        // Collect fields để verify (bỏ vnp_SecureHash và redirectTo)
+        Map<String, String> fields = new HashMap<>();
+        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements(); ) {
+            String fieldName = params.nextElement();
+            if ("vnp_SecureHash".equals(fieldName) || "redirectTo".equals(fieldName)) continue;
+            String fieldValue = request.getParameter(fieldName);
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                fields.put(fieldName, fieldValue);
+            }
+        }
+
+        String vnp_SecureHash   = request.getParameter("vnp_SecureHash");
+        String signValue        = paymentUtil.hashAllFields(fields);
+        String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
+        String vnp_TxnRef       = request.getParameter("vnp_TxnRef"); // orderId
+
+        log.info("VNPay return - OrderId: {}, ResponseCode: {}", vnp_TxnRef, vnp_ResponseCode);
+
+        String finalUrl;
+
+        if (!signValue.equals(vnp_SecureHash)) {
+            log.warn("Invalid signature - OrderId: {}", vnp_TxnRef);
+            finalUrl = baseUrl + "?error=invalid_signature";
+
+        } else if (!"00".equals(vnp_ResponseCode)) {
+            log.warn("Payment failed/cancelled - OrderId: {}, Code: {}", vnp_TxnRef, vnp_ResponseCode);
+
+            // Hủy order, hoàn lại inventory
+            try {
+                orderService.cancelBySystem(vnp_TxnRef);
+            } catch (Exception e) {
+                log.warn("Failed to cancel order - OrderId: {}, Error: {}", vnp_TxnRef, e.getMessage());
+            }
+
+            if ("24".equals(vnp_ResponseCode)) {
+                // 24 = user chủ động bấm hủy trên VNPay
+                finalUrl = baseUrl + "?error=payment_cancelled";
+            } else {
+                // Các lỗi khác: hết hạn, sai OTP, ngân hàng từ chối...
+                finalUrl = baseUrl + "?error=payment_failed&code=" + vnp_ResponseCode;
+            }
+        } else {
+            log.info("Payment success - OrderId: {}", vnp_TxnRef);
+            try {
+                // getById có sẵn, OrderResponse đã có userId
+                OrderResponse order = orderService.getById(vnp_TxnRef);
+                if (order.getUserId() != null && !order.getUserId().isEmpty()) {
+                    cartService.clearCart(order.getUserId());
+                    log.info("Cart cleared for user: {}", order.getUserId());
+                }
+            } catch (Exception e) {
+                log.warn("Failed to clear cart - OrderId: {}, Error: {}", vnp_TxnRef, e.getMessage());
+            }
+            finalUrl = baseUrl + "?orderId=" + vnp_TxnRef;
+        }
+
+        log.info("Redirecting to: {}", finalUrl);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(finalUrl))
+                .build();
     }
 
     @PostMapping("/vnpay/refund")
@@ -78,17 +168,12 @@ public class PaymentController {
             @RequestParam String user,
             HttpServletRequest request) {
         try {
-            String response = paymentService.refund(trantype, order_id, amount, trans_date, user, request);
+            String result = paymentService.refund(trantype, order_id, amount, trans_date, user, request);
             return ApiResponse.<String>builder()
-                    .code(1000)
-                    .message("Refund processed successfully")
-                    .result(response)
-                    .build();
+                    .code(1000).message("Refund processed").result(result).build();
         } catch (Exception e) {
             return ApiResponse.<String>builder()
-                    .code(5000)
-                    .message("Refund error: " + e.getMessage())
-                    .build();
+                    .code(5000).message("Refund error: " + e.getMessage()).build();
         }
     }
 
@@ -98,97 +183,12 @@ public class PaymentController {
             @RequestParam String trans_date,
             HttpServletRequest request) {
         try {
-            String response = paymentService.query(order_id, trans_date, request);
+            String result = paymentService.query(order_id, trans_date, request);
             return ApiResponse.<String>builder()
-                    .code(1000)
-                    .message("Query executed successfully")
-                    .result(response)
-                    .build();
+                    .code(1000).message("Query success").result(result).build();
         } catch (Exception e) {
             return ApiResponse.<String>builder()
-                    .code(5000)
-                    .message("Query error: " + e.getMessage())
-                    .build();
+                    .code(5000).message("Query error: " + e.getMessage()).build();
         }
-    }
-
-    @GetMapping("/vnpay-return")
-    public ResponseEntity<Void> handleVnPayReturn(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-        Map<String, String> fields = new HashMap<>();
-        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements(); ) {
-            String fieldName = params.nextElement();
-            String fieldValue = request.getParameter(fieldName);
-            if (fieldValue != null && fieldValue.length() > 0) {
-                fields.put(fieldName, fieldValue);
-            }
-        }
-
-        String vnp_SecureHash = fields.remove("vnp_SecureHash");
-        String signValue = paymentUtil.hashAllFields(fields);
-
-        String vnp_ResponseCode = fields.get("vnp_ResponseCode");
-        String vnp_TxnRef = fields.get("vnp_TxnRef");
-
-        log.info("VNPay return - ResponseCode: {}, TxnRef: {}, SecureHash: {}, SignValue: {}",
-                vnp_ResponseCode, vnp_TxnRef, vnp_SecureHash, signValue);
-
-        String redirectUrl;
-
-        if (signValue.equals(vnp_SecureHash)) {
-            if ("00".equals(vnp_ResponseCode)) {
-                try {
-                    OrderRequest orderRequest = paymentService.retrieveAndRemoveOrderData(vnp_TxnRef);
-
-                    if (orderRequest == null) {
-                        log.error("Cannot find order data for TxnRef: {}", vnp_TxnRef);
-                        redirectUrl = "http://localhost:3001/confirm?error=invalid_order_info";
-                    } else {
-                        // Gắn paymentRef = vnp_TxnRef để lưu vào DB
-                        orderRequest.setPaymentRef(vnp_TxnRef);
-
-                        log.info("Creating order with paymentRef (VNPay TxnRef): {}", vnp_TxnRef);
-
-                        OrderResponse orderResponse = orderService.create(orderRequest, OrderStatus.PENDING);
-
-                        if (orderResponse != null && orderResponse.getId() != null) {
-                            log.info("Order created successfully - OrderId: {}, PaymentRef: {}",
-                                    orderResponse.getId(), vnp_TxnRef);
-
-                            String userId = orderRequest.getUserId();
-                            if (userId != null && !userId.isEmpty()) {
-                                try {
-                                    cartService.clearCart(userId);
-                                    log.info("Cart cleared successfully for user: {}", userId);
-                                } catch (Exception e) {
-                                    log.warn("Failed to clear cart for user: {}, Error: {}", userId, e.getMessage());
-                                }
-                            }
-
-                            redirectUrl = "http://localhost:3001/confirm?orderId=" + orderResponse.getId();
-                        } else {
-                            log.error("Failed to create order, paymentRef: {}", vnp_TxnRef);
-                            redirectUrl = "http://localhost:3001/confirm?error=create_order_failed";
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("Error processing successful payment - TxnRef: {}, Error: {}",
-                            vnp_TxnRef, e.getMessage(), e);
-                    redirectUrl = "http://localhost:3001/confirm?error=processing_failed";
-                }
-            } else {
-                log.warn("Payment failed - ResponseCode: {}, TxnRef: {}", vnp_ResponseCode, vnp_TxnRef);
-                redirectUrl = "http://localhost:3001/confirm?error=payment_failed&responseCode=" + vnp_ResponseCode;
-            }
-        } else {
-            log.warn("Invalid signature - Expected: {}, Actual: {}", vnp_SecureHash, signValue);
-            redirectUrl = "http://localhost:3001/confirm?error=invalid_signature";
-        }
-
-        log.info("Redirecting to: {}", redirectUrl);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(java.net.URI.create(redirectUrl))
-                .build();
     }
 }

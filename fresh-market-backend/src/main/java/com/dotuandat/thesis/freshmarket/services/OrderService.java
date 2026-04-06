@@ -7,6 +7,7 @@ import com.dotuandat.thesis.freshmarket.dtos.response.PageResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.order.OrderResponse;
 import com.dotuandat.thesis.freshmarket.enums.OrderStatus;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface OrderService {
     PageResponse<OrderResponse> search(OrderSearchRequest request, Pageable pageable);
@@ -30,4 +31,7 @@ public interface OrderService {
     OrderResponse updateStatus(String orderId, OrderStatusRequest request);
 
     int countTotalPendingOrders();
+
+    @Transactional
+    void cancelBySystem(String orderId);
 }

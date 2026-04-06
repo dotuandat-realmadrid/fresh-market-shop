@@ -25,6 +25,7 @@ import com.dotuandat.thesis.freshmarket.utils.PointCalculator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,6 +39,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderServiceImpl implements OrderService {
     OrderRepository orderRepository;
@@ -122,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse getById(String orderId) {
-        Order order = orderRepository.getReferenceById(orderId);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
         return orderConverter.toResponse(order);
     }
 
@@ -238,6 +241,25 @@ public class OrderServiceImpl implements OrderService {
         }
 
         updateInventoryQuantity(order.getOrderDetails(), true); // + inventory quantity
+    }
+
+    @Transactional
+    @Override
+    public void cancelBySystem(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
+
+        // Chỉ cancel nếu đang PENDING, tránh double cancel
+        if (order.getStatus() != OrderStatus.PENDING) {
+            log.warn("Cannot cancel order - not in PENDING status, OrderId: {}", orderId);
+            return;
+        }
+
+        updateInventoryQuantity(order.getOrderDetails(), true); // hoàn inventory
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setModifiedDate(LocalDateTime.now());
+        orderRepository.save(order);
+        log.info("Order cancelled by system - OrderId: {}", orderId);
     }
 
     private void handleConfirm(Order order) {
