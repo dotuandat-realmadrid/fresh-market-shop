@@ -31,6 +31,7 @@ const MyOrders = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
+    const [messageApi, contextHolder] = message.useMessage();
     
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -63,13 +64,11 @@ const MyOrders = () => {
         setLoading(true);
         try {
             const result = await getOrdersByUser(user.id, status, page, pageSize);
-            if (result && result.code === 1000) {
-                setOrders(result.result.data || []);
-                setTotalOrders(result.result.totalElements || 0);
-            }
+            setOrders(result.data || []);
+            setTotalOrders(result.totalElements || 0);
         } catch (error) {
             console.error("Fetch orders error:", error);
-            message.error("Không thể tải danh sách đơn hàng");
+            messageApi.error("Không thể tải danh sách đơn hàng");
         } finally {
             setLoading(false);
         }
@@ -96,11 +95,11 @@ const MyOrders = () => {
     const handleCancelOrder = async (orderId) => {
         try {
             await cancelOrder(orderId);
-            message.success("Đã hủy đơn hàng thành công");
+            messageApi.success("Đã hủy đơn hàng thành công");
             fetchOrders(activeStatus, currentPage);
             setDetailModalVisible(false);
         } catch (error) {
-            message.error(error.message || "Không thể hủy đơn hàng");
+            messageApi.error(error.message || "Không thể hủy đơn hàng");
         }
     };
 
@@ -108,12 +107,10 @@ const MyOrders = () => {
         try {
             setLoading(true);
             const result = await getOneByOrderId(orderId);
-            if (result && result.code === 1000) {
-                setSelectedOrder(result.result);
-                setDetailModalVisible(true);
-            }
+            setSelectedOrder(result);
+            setDetailModalVisible(true);
         } catch (error) {
-            message.error("Không thể lấy chi tiết đơn hàng");
+            messageApi.error("Không thể lấy chi tiết đơn hàng");
         } finally {
             setLoading(false);
         }
@@ -144,7 +141,7 @@ const MyOrders = () => {
         const finalReason = reason === 'Khác' ? otherReason : reason;
         
         if (!finalReason) {
-            message.warning("Vui lòng chọn hoặc nhập lý do hoàn tiền");
+            messageApi.warning("Vui lòng chọn hoặc nhập lý do hoàn tiền");
             return;
         }
 
@@ -159,7 +156,7 @@ const MyOrders = () => {
             };
             const result = await createRefund(payload);
             if (result.code === 1000) {
-                message.success("Gửi yêu cầu hoàn tiền thành công!");
+                messageApi.success("Gửi yêu cầu hoàn tiền thành công!");
                 setRefundModalVisible(false);
                 if (selectedOrder.status === 'PENDING') {
                     await cancelOrder(selectedOrder.id).catch(() => {});
@@ -167,13 +164,13 @@ const MyOrders = () => {
                 fetchOrders(activeStatus, currentPage);
             }
         } catch (error) {
-            message.error(error.message || "Lỗi khi gửi yêu cầu hoàn tiền");
+            messageApi.error(error.message || "Lỗi khi gửi yêu cầu hoàn tiền");
         }
     };
 
     const submitReviewForm = async () => {
         if (reviewData.rating === 0) {
-            message.warning("Vui lòng chọn số sao đánh giá");
+            messageApi.warning("Vui lòng chọn số sao đánh giá");
             return;
         }
 
@@ -187,12 +184,12 @@ const MyOrders = () => {
                 comment: reviewData.comment
             };
             await createReview(payload);
-            message.success("Đánh giá sản phẩm thành công!");
+            messageApi.success("Đánh giá sản phẩm thành công!");
             setReviewModalVisible(false);
             handleOpenDetail(selectedOrder.id);
             fetchOrders(activeStatus, currentPage);
         } catch (error) {
-            message.error(error.message || "Lỗi khi gửi đánh giá");
+            messageApi.error(error.message || "Lỗi khi gửi đánh giá");
         }
     };
 
@@ -293,8 +290,9 @@ const MyOrders = () => {
 
     return (
         <div className="address-list-container">
+            {contextHolder}
             <div className="address-list-title">
-                <h1>Đơn hàng của tôi</h1>
+                <h1>Thông tin đơn hàng</h1>
                 <div className="title-underline"></div>
             </div>
 
@@ -333,7 +331,13 @@ const MyOrders = () => {
                                     <CustomPagination total={totalOrders} current={currentPage} pageSize={pageSize} onChange={handlePageChange} layout='center' />
                                 </div>
                             </div>
-                        ) : <Empty description="Không có đơn hàng nào" className="empty-orders" />}
+                        ) : (
+                            <Empty 
+                                image={Empty.PRESENTED_IMAGE_SIMPLE} 
+                                description="Không có đơn hàng nào" 
+                                className="empty-orders" 
+                            />
+                        )}
                     </div>
                 </Col>
             </Row>
@@ -370,7 +374,7 @@ const MyOrders = () => {
                             <Steps 
                                 current={getStatusStep(selectedOrder.status)} 
                                 size="small" 
-                                labelPlacement="vertical"
+                                titlePlacement="vertical"
                                 status={selectedOrder.status === 'FAILED' ? 'error' : 'finish'}
                                     items={[
                                         { 
@@ -499,7 +503,7 @@ const MyOrders = () => {
                 <div className="form-group mb-3">
                     <label className="bold mb-1 d-block text-start">Lý do hoàn tiền</label>
                     <Radio.Group style={{textAlign: 'left'}} value={refundData.reason} onChange={(e) => setRefundData({...refundData, reason: e.target.value})}>
-                        <Space direction="vertical" style={{textAlign: 'left', display: 'flex', alignItems: 'flex-start'}}>
+                        <Space orientation="vertical" style={{textAlign: 'left', display: 'flex', alignItems: 'flex-start'}}>
                             <Radio value="Sản phẩm lỗi">Sản phẩm lỗi</Radio>
                             <Radio value="Không đúng mô tả">Không đúng mô tả</Radio>
                             <Radio value="Muốn đổi hàng">Muốn đổi hàng</Radio>

@@ -125,7 +125,35 @@ const AdminLayout = () => {
 
   // Tìm menu key được chọn và submenu mở
   const getSelectedKeys = () => {
-    return [location.pathname];
+    const path = location.pathname;
+    
+    // Nếu là các trang con của Đơn hàng (search, create, detail) thì active menu chính "Quản lý đơn hàng"
+    if (path.startsWith("/admin/orders")) {
+      return ["/admin/orders"];
+    }
+
+    // Các mục có submenu (Inventory, Products, Accounts, etc.)
+    // Ưu tiên khớp chính xác key con (create, trash) trước, 
+    // nếu không khớp (như trang chi tiết :id) thì khớp với danh sách chính
+    const managers = [
+      { base: "/admin/accounts", key: "/admin/accounts" },
+      { base: "/admin/products", key: "/admin/products" },
+      { base: "/admin/discounts", key: "/admin/discounts" },
+      { base: "/admin/suppliers", key: "/admin/suppliers" },
+      { base: "/admin/categories", key: "/admin/categories" },
+      { base: "/admin/inventory-receipts", key: "/admin/inventory-receipts" },
+    ];
+
+    for (const manager of managers) {
+      if (path.startsWith(manager.base)) {
+        // Kiểm tra các trang con cụ thể (trash, create)
+        if (path.includes("/trash")) return [`${manager.base}/trash`];
+        if (path.includes("/create")) return [`${manager.base}/create`];
+        return [manager.key];
+      }
+    }
+
+    return [path];
   };
 
   const getDefaultOpenKeys = () => {

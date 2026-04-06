@@ -20,39 +20,50 @@ const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
   const user = useSelector((state) => state.user);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      const code = searchParams.get('code');
+      let errorMsg = "Thanh toán thất bại!";
+      if (errorParam === 'invalid_signature') errorMsg = "Chữ ký không hợp lệ!";
+      else if (errorParam === 'payment_failed') errorMsg = `Thanh toán thất bại! Mã lỗi: ${code}`;
+      
+      messageApi.error(errorMsg);
+      navigate('/checkout'); // Redirect back to checkout or show error page
+      return;
+    }
+
     const fetchOrder = async () => {
       if (!orderId) {
-        message.error("Không tìm thấy mã đơn hàng!");
+        messageApi.error("Không tìm thấy mã đơn hàng!");
         navigate('/');
         return;
       }
 
       try {
-        let response;
+        let orderData;
         const token = getToken();
 
         if (token) {
           try {
-            response = await getOneByOrderId(orderId);
+            orderData = await getOneByOrderId(orderId);
           } catch (error) {
-            // Fallback for case where order might be a guest order even if user is logged in
-            // or if token expired
-            response = await getOrderById(orderId);
+            orderData = await getOrderById(orderId);
           }
         } else {
-          response = await getOrderById(orderId);
+          orderData = await getOrderById(orderId);
         }
 
-        if (response.code === 1000) {
-          setOrder(response.result);
+        if (orderData) {
+          setOrder(orderData);
         } else {
-          throw new Error(response.message);
+          throw new Error("Không có dữ liệu đơn hàng");
         }
       } catch (error) {
         console.error("Lỗi khi tải đơn hàng:", error);
-        message.error("Không thể tải thông tin đơn hàng.");
+        messageApi.error("Không thể tải thông tin đơn hàng.");
       } finally {
         setLoading(false);
       }
@@ -60,22 +71,11 @@ const Confirm = () => {
 
     fetchOrder();
     
-    // Clear cart if successful VNPay payment
-    const vnpCode = searchParams.get('vnp_ResponseCode');
-    if (vnpCode === '00') {
-      const clearAfterPayment = async () => {
-        if (getToken() && user?.id) {
-          try { await clearCart(user.id); } catch(e) {}
-        } else {
-          localStorage.removeItem('guestCart');
-        }
-        window.dispatchEvent(new Event('cartUpdated'));
-      };
-      clearAfterPayment();
-    } else if (!getToken() && orderId) {
-      // For guest COD or successful landing, clear if not done yet
-      // To prevent clearing on every refresh, we could check if it was just created
-      localStorage.removeItem('guestCart');
+    // Clear cart if successful landing with orderId
+    if (orderId) {
+      if (!getToken()) {
+        localStorage.removeItem('guestCart');
+      }
       window.dispatchEvent(new Event('cartUpdated'));
     }
 
@@ -97,7 +97,7 @@ const Confirm = () => {
 
   const handleExportInvoice = async () => {
     try {
-      message.loading({ content: 'Đang chuẩn bị hóa đơn...', key: 'exporting' });
+      messageApi.loading({ content: 'Đang chuẩn bị hóa đơn...', key: 'exporting' });
       const blob = await exportInvoicePdf(order.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -107,15 +107,16 @@ const Confirm = () => {
       link.click();
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
-      message.success({ content: 'Tạo hóa đơn thành công!', key: 'exporting' });
+      messageApi.success({ content: 'Tạo hóa đơn thành công!', key: 'exporting' });
     } catch (error) {
       console.error("Lỗi tạo hóa đơn:", error);
-      message.error({ content: 'Không thể tạo hóa đơn. Vui lòng thử lại!', key: 'exporting' });
+      messageApi.error({ content: 'Không thể tạo hóa đơn. Vui lòng thử lại!', key: 'exporting' });
     }
   };
 
   return (
     <div className="confirm-container">
+      {contextHolder}
       {/* 1. Header Banner - Matching Image 1 */}
       <div className="confirm-header-banner">
         <div className="success-icon-circle">

@@ -9,6 +9,8 @@ import {
   ShoppingCartOutlined
 } from '@ant-design/icons';
 
+import { Link } from 'react-router-dom';
+
 const HomeAdmin = () => {
   const columns = [
     { title: 'Mã khách hàng', dataIndex: 'customerCode', key: 'customerCode' },
@@ -27,8 +29,13 @@ const HomeAdmin = () => {
   ];
 
   return (
-    <div className="admin-dashboard">
-      <h3 className="mb-4">Tổng quan hệ thống</h3>
+    <div className="admin-dashboard account-admin-container">
+      <div className="page-header">
+        <h1 className="page-title">Dashboard</h1>
+        <div className="breadcrumbs">
+          <Link to="/admin">Dashboard</Link> / <span className="active">Tổng quan</span>
+        </div>
+      </div>
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
           <Card variant="borderless" className="shadow-sm">

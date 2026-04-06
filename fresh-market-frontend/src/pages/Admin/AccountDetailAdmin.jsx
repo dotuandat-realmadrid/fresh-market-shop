@@ -251,15 +251,12 @@ export default function AccountDetailAdmin() {
 
   return (
     <div className="account-detail-admin">
-      <Breadcrumb
-        style={{ marginBottom: 20 }}
-        items={[
-          { title: <Link to="/admin">Dashboard</Link> },
-          { title: <Link to="/admin/accounts">Quản lý tài khoản</Link> },
-          { title: "Chi tiết tài khoản" },
-          { title: user?.fullName },
-        ]}
-      />
+      <div className="page-header">
+        <h1 className="page-title">Thông tin tài khoản</h1>
+        <div className="breadcrumbs">
+          <Link to="/admin">Dashboard</Link> / <Link to="/admin/accounts">Quản lý tài khoản</Link> / <span className="active">{user.fullName}</span>
+        </div>
+      </div>
 
       <Row gutter={[24, 24]}>
         {/* User Information */}

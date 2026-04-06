@@ -15,6 +15,7 @@ const ProductCard = ({ product }) => {
   const userId = useSelector((state) => state.user.id);
   const [isFavorite, setIsFavorite] = React.useState(false);
   const [wishlistInited, setWishlistInited] = React.useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const displayImage = product.image ||
     (product.images && product.images.length > 0 ? `${IMAGE_URL}/${product.images[0]}` : DEFAULT_IMAGE);
@@ -66,11 +67,11 @@ const ProductCard = ({ product }) => {
         }
         window.dispatchEvent(new Event('wishlistUpdated'));
         newFav
-          ? message.success('Đã thêm vào danh sách yêu thích')
-          : message.error('Đã xóa khỏi danh sách yêu thích');
+          ? messageApi.success('Đã thêm vào danh sách yêu thích')
+          : messageApi.error('Đã xóa khỏi danh sách yêu thích');
       } catch {
         setIsFavorite(!newFav); // Hoàn lại nếu lỗi
-        message.error('Có lỗi xảy ra, vui lòng thử lại!');
+        messageApi.error('Có lỗi xảy ra, vui lòng thử lại!');
       }
     } else {
       const guestWishlist = JSON.parse(localStorage.getItem('guestWishlist')) || {};
@@ -79,8 +80,8 @@ const ProductCard = ({ product }) => {
       localStorage.setItem('guestWishlist', JSON.stringify(guestWishlist));
       window.dispatchEvent(new Event('wishlistUpdated'));
       newFav
-        ? message.success('Đã thêm vào danh sách yêu thích')
-        : message.error('Đã xóa khỏi danh sách yêu thích');
+        ? messageApi.success('Đã thêm vào danh sách yêu thích')
+        : messageApi.error('Đã xóa khỏi danh sách yêu thích');
     }
   };
 
@@ -90,7 +91,7 @@ const ProductCard = ({ product }) => {
       const existingItem = guestCart.items.find((item) => item.productId === p.id);
       if (existingItem) {
         if (existingItem.quantity >= p.inventoryQuantity) {
-          message.warning(`Bạn đã chọn tối đa số lượng có trong kho (${p.inventoryQuantity})`);
+          messageApi.warning(`Bạn đã chọn tối đa số lượng có trong kho (${p.inventoryQuantity})`);
           return;
         }
         existingItem.quantity += 1;
@@ -108,7 +109,7 @@ const ProductCard = ({ product }) => {
       }
       localStorage.setItem('guestCart', JSON.stringify(guestCart));
       window.dispatchEvent(new Event('cartUpdated'));
-      message.success('Đã thêm vào giỏ hàng');
+      messageApi.success('Đã thêm vào giỏ hàng');
       return;
     }
 
@@ -121,9 +122,9 @@ const ProductCard = ({ product }) => {
       };
       await addCartItem(data);
       window.dispatchEvent(new Event('cartUpdated'));
-      message.success('Đã thêm vào giỏ hàng');
+      messageApi.success('Đã thêm vào giỏ hàng');
     } catch {
-      message.error('Có lỗi xảy ra, vui lòng thử lại!');
+      messageApi.error('Có lỗi xảy ra, vui lòng thử lại!');
     }
   }, 500);
 
@@ -133,7 +134,7 @@ const ProductCard = ({ product }) => {
 
     // Kiểm tra tồn kho
     if (product.inventoryQuantity !== undefined && product.inventoryQuantity <= 0) {
-      message.warning('Sản phẩm đã hết hàng!');
+      messageApi.warning('Sản phẩm đã hết hàng!');
       return;
     }
 
@@ -165,6 +166,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <Link to={`/products/${product.code}`} className="product-card-container">
+      {contextHolder}
       <div className="product-card">
         <div className="product-badges">
           {product.discount > 0 && <span className="discount-badge">-{product.discount}%</span>}

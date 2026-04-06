@@ -218,7 +218,8 @@ const Checkout = () => {
                     // Thanh toán qua VNPay
                     const paymentResp = await initiateVNPay({
                         amount: total,
-                        orderData: JSON.stringify(orderRequest)
+                        orderData: JSON.stringify(orderRequest),
+                        redirectTo: window.location.origin + '/confirm'
                     });
 
                     if (paymentResp.code === 1000 && paymentResp.result) {
@@ -229,7 +230,7 @@ const Checkout = () => {
                 } else {
                     // Thanh toán COD hoặc Tiền mặt
                     const orderResp = await createOrder(orderRequest);
-                    if (orderResp?.result?.id) {
+                    if (orderResp?.id) {
                         messageApi.success("Đặt hàng thành công!");
                         // Xóa giỏ hàng sau khi đặt thành công
                         if (token && user.id) {
@@ -238,7 +239,7 @@ const Checkout = () => {
                             localStorage.removeItem('guestCart');
                         }
                         window.dispatchEvent(new Event('cartUpdated'));
-                        navigate(`/confirm?orderId=${orderResp.result.id}`);
+                        navigate(`/confirm?orderId=${orderResp.id}`);
                     } else {
                         throw new Error("Không thể tạo đơn hàng");
                     }

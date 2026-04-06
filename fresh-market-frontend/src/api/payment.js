@@ -12,6 +12,7 @@ export const initiateVNPay = async (paymentData) => {
     params.append('bankCode', paymentData.bankCode || '');
     params.append('language', paymentData.language || 'vn');
     params.append('orderData', paymentData.orderData);
+    params.append('redirectTo', paymentData.redirectTo);
 
     const response = await fetch(`${API}/payment/vnpay/pay`, {
         method: "POST",

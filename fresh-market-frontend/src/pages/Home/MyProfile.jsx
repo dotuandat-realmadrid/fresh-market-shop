@@ -19,6 +19,7 @@ const MyProfile = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
+    const [messageApi, contextHolder] = message.useMessage();
     const [isEditing, setIsEditing] = useState(false);
     const [isChangingPass, setIsChangingPass] = useState(false);
 
@@ -45,7 +46,7 @@ const MyProfile = () => {
         dispatch(logout());
         localStorage.removeItem('token');
         navigate('/login');
-        message.success('Đăng xuất thành công');
+        messageApi.success('Đăng xuất thành công');
     };
 
     const handleEdit = () => {
@@ -67,7 +68,7 @@ const MyProfile = () => {
         try {
             const currentUsername = user.username;
             if (!currentUsername) {
-                message.error("Thiếu thông tin người dùng!");
+                messageApi.error("Thiếu thông tin người dùng!");
                 return;
             }
 
@@ -87,13 +88,13 @@ const MyProfile = () => {
             }
         } catch (error) {
             console.error("Update profile error:", error);
-            message.error("Cập nhật thất bại. Vui lòng thử lại!");
+            messageApi.error("Cập nhật thất bại. Vui lòng thử lại!");
         }
     };
 
     const handleChangePassSubmit = async (values) => {
         if (values.newPassword !== values.confirmPassword) {
-            message.error("Mật khẩu mới và mật khẩu nhập lại không khớp!");
+            messageApi.error("Mật khẩu mới và mật khẩu nhập lại không khớp!");
             return;
         }
         try {
@@ -104,7 +105,7 @@ const MyProfile = () => {
             setIsChangingPass(false);
         } catch (error) {
             console.error("Change password error:", error);
-            message.error("Đổi mật khẩu thất bại!");
+            messageApi.error("Đổi mật khẩu thất bại!");
         }
     };
 
@@ -269,6 +270,7 @@ const MyProfile = () => {
 
     return (
         <div className="address-list-container">
+            {contextHolder}
             <div className="address-list-title">
                 <h1>Thông tin tài khoản</h1>
                 <div className="title-underline"></div>

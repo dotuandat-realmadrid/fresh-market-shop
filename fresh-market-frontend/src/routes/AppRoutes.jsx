@@ -29,6 +29,11 @@ import ProductDetailAdmin from "../pages/Admin/ProductDetailAdmin";
 import InventoryReceiptAdmin from "../pages/Admin/InventoryReceiptAdmin";
 import InventoryReceiptDetailAdmin from "../pages/Admin/InventoryReceiptDetailAdmin";
 import InventorySearchAdmin from "../pages/Admin/InventorySearchAdmin";
+import OrderAdmin from "../pages/Admin/OrderAdmin";
+import OrderSearchAdmin from "../pages/Admin/OrderSearchAdmin";
+import OrderCreationAdmin from "../pages/Admin/OrderCreationAdmin";
+import OrderDetailAdmin from "../pages/Admin/OrderDetailAdmin";
+import OrderByUser from "../pages/Admin/OrderByUser";
 import PrivateRoute from "./PrivateRoutes";
 
 const AppRoutes = () => {
@@ -73,6 +78,12 @@ const AppRoutes = () => {
             <Route path="inventory-receipts/create" element={<InventoryReceiptDetailAdmin />} />
             <Route path="inventory-receipts/:id" element={<InventoryReceiptDetailAdmin />} />
             <Route path="inventory-receipts/search" element={<InventorySearchAdmin />} />
+            <Route path="orders" element={<OrderAdmin />} />
+            <Route path="orders/search" element={<OrderSearchAdmin />} />
+            <Route path="orders/create" element={<OrderCreationAdmin />} />
+            <Route path="orders/:orderId" element={<OrderDetailAdmin />} />
+            <Route path="orders/user/:userId" element={<OrderByUser />} />
+            <Route path="orders/user/:userId/status/:status" element={<OrderByUser />} />
           </Route>
           {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />

@@ -113,40 +113,27 @@ export default function ProductDetailAdmin() {
   }, [code, navigate]);
 
   useEffect(() => {
-    if (productDetail && Array.isArray(discountData)) {
+    if (productDetail) {
       const price = Number(productDetail.price) || 0;
-      let discountPrice = Number(productDetail.discountPrice);
+      
+      const initialValues = {
+        ...productDetail,
+        price: price,
+        discountPrice: Number(productDetail.discountPrice) || price,
+        createdDate: productDetail.createdDate ? dayjs(productDetail.createdDate) : null,
+        modifiedDate: productDetail.modifiedDate ? dayjs(productDetail.modifiedDate) : null,
+      };
 
-      // Nếu chưa có giá sau giảm hoặc muốn tính lại dựa trên mã giảm giá hiện có
-      if (productDetail.discountName) {
+      // Cập nhật chi tiết hơn nếu có discountData
+      if (Array.isArray(discountData) && productDetail.discountName) {
         const discount = discountData.find(d => d.name === productDetail.discountName);
         if (discount) {
           const percent = Number(discount.percent) || 0;
-          discountPrice = price - (price * percent / 100);
+          initialValues.discountPrice = Math.round(price - (price * percent / 100));
         }
       }
 
-      // Nếu vẫn không có giá giảm thì lấy giá gốc
-      if (!discountPrice) discountPrice = price;
-
-      form.setFieldsValue({
-        ...productDetail,
-        price: price,
-        discountPrice: Math.round(discountPrice),
-        createdBy: productDetail.createdBy,
-        createdDate: productDetail.createdDate ? dayjs(productDetail.createdDate) : null,
-        modifiedDate: productDetail.modifiedDate ? dayjs(productDetail.modifiedDate) : null,
-        modifiedBy: productDetail.modifiedBy,
-      });
-    } else if (productDetail) {
-      // Trường hợp chưa có discountData nhưng đã có productDetail
-      form.setFieldsValue({
-        ...productDetail,
-        price: Number(productDetail.price) || 0,
-        discountPrice: Number(productDetail.discountPrice) || Number(productDetail.price) || 0,
-        createdDate: productDetail.createdDate ? dayjs(productDetail.createdDate) : null,
-        modifiedDate: productDetail.modifiedDate ? dayjs(productDetail.modifiedDate) : null,
-      });
+      form.setFieldsValue(initialValues);
     }
   }, [productDetail, discountData, form]);
 
@@ -270,18 +257,30 @@ export default function ProductDetailAdmin() {
   }, []);
 
   useEffect(() => {
-    const price = typeof priceWatch === 'number' ? priceWatch : Number(priceWatch?.toString().replace(/,/g, '')) || 0;
+    const currentPrice = typeof priceWatch === 'number' 
+      ? priceWatch 
+      : (priceWatch ? Number(priceWatch.toString().replace(/,/g, '')) : (productDetail?.price || 0));
+      
     const discount = Array.isArray(discountData) ? discountData.find(d => d.name === discountNameWatch) : null;
     
-    let newDiscountPrice = price;
+    let newDiscountPrice = currentPrice;
     if (discount) {
       const percent = Number(discount.percent) || 0;
-      newDiscountPrice = price - (price * percent / 100);
+      newDiscountPrice = currentPrice - (currentPrice * percent / 100);
+    }
+    
+    // Nếu chưa chọn mã mới, dùng % từ mã cũ của sản phẩm
+    if (!discount && !discountNameWatch && productDetail?.discountName) {
+        const originalDiscount = Array.isArray(discountData) ? discountData.find(d => d.name === productDetail.discountName) : null;
+        if (originalDiscount) {
+            const percent = Number(originalDiscount.percent) || 0;
+            newDiscountPrice = currentPrice - (currentPrice * percent / 100);
+        }
     }
     
     const finalPrice = Math.round(newDiscountPrice);
     setCalculatedDiscountPrice(finalPrice);
-  }, [priceWatch, discountNameWatch, discountData]);
+  }, [priceWatch, discountNameWatch, discountData, productDetail]);
 
   const handleReport = async (productCode) => {
     const data = await revenueByProduct(productCode);
@@ -389,14 +388,12 @@ export default function ProductDetailAdmin() {
 
   return (
     <>
-      <Breadcrumb
-        style={{ marginBottom: 16 }}
-        items={[
-          { title: <Link to="/admin">Admin</Link> },
-          { title: <Link to="/admin/products">Quản lý sản phẩm</Link> },
-          { title: productDetail?.name || "Chi tiết sản phẩm" },
-        ]}
-      />
+      <div className="page-header">
+        <h1 className="page-title">Thông tin sản phẩm</h1>
+        <div className="breadcrumbs">
+          <Link to="/admin">Dashboard</Link> / <Link to="/admin/products">Quản lý sản phẩm</Link> / <span className="active">{productDetail?.name}</span>
+        </div>
+      </div>
 
       <Row gutter={[16]}>
         <Col xl={18}>
@@ -405,7 +402,7 @@ export default function ProductDetailAdmin() {
             title={
               <Space>
                 <Title level={4} style={{ margin: 0 }}>
-                  {productDetail?.name || "Chi tiết sản phẩm"}
+                  Thông tin cơ bản
                 </Title>
               </Space>
             }
@@ -615,19 +612,17 @@ export default function ProductDetailAdmin() {
                     name="price"
                     rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
                   >
-                    <Space.Compact style={{ width: "100%" }}>
-                      <InputNumber
-                        min={0}
-                        max={1e9}
-                        placeholder="Nhập giá"
-                        style={{ width: "calc(100% - 60px)" }}
-                        formatter={(value) =>
-                          `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        }
-                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                      />
-                      <MyButton disabled style={{ width: "60px" }}>VNĐ</MyButton>
-                    </Space.Compact>
+                    <InputNumber
+                      min={0}
+                      max={1e9}
+                      placeholder="Nhập giá"
+                      style={{ width: "100%" }}
+                      suffix="VNĐ"
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    />
                   </Form.Item>
                 </Col>
 
@@ -668,7 +663,7 @@ export default function ProductDetailAdmin() {
                 </Col>
               </Row>
 
-              {productDetail?.discountPrice && productDetail?.price && (
+              {calculatedDiscountPrice < (typeof priceWatch === 'number' ? priceWatch : Number(priceWatch?.toString().replace(/,/g, '')) || productDetail?.price) && (
                 <div style={{ marginBottom: 24 }}>
                   <Card
                     size="small"
@@ -680,17 +675,17 @@ export default function ProductDetailAdmin() {
                     <div style={{ fontSize: "15px" }}>
                       Giá gốc:{" "}
                       <Text strong>
-                        {productDetail.price.toLocaleString()} VNĐ
+                        {(typeof priceWatch === 'number' ? priceWatch : (priceWatch ? Number(priceWatch.toString().replace(/,/g, '')) : (productDetail?.price || 0))).toLocaleString()} VNĐ
                       </Text>
                       <ArrowRightOutlined style={{ margin: "0 12px", color: "#64748b" }} />
                       Giá khuyến mãi:{" "}
                       <Text strong style={{ color: "#ef4444" }}>
-                        {productDetail.discountPrice.toLocaleString()} VNĐ
+                        {calculatedDiscountPrice.toLocaleString()} VNĐ
                       </Text>
                       <span style={{ color: "#64748b", marginLeft: "8px" }}>
                         (Tiết kiệm:{" "}
                         {(
-                          productDetail.price - productDetail.discountPrice
+                          (typeof priceWatch === 'number' ? priceWatch : (priceWatch ? Number(priceWatch.toString().replace(/,/g, '')) : (productDetail?.price || 0))) - calculatedDiscountPrice
                         ).toLocaleString()}{" "}
                         VNĐ)
                       </span>

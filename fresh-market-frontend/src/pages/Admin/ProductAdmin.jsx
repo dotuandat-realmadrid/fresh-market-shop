@@ -336,9 +336,9 @@ const ProductAdmin = () => {
   return (
     <div className="account-admin-container product-admin-container">
       <div className="page-header">
-        <h1 className="page-title">Danh sách sản phẩm</h1>
+        <h1 className="page-title">Quản lý sản phẩm</h1>
         <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <span>Quản lý sản phẩm</span> / <span className="active">Danh sách sản phẩm</span>
+          <Link to="/admin">Dashboard</Link> / <Link to="/admin/products">Quản lý sản phẩm</Link> / <span className="active">Danh sách sản phẩm</span>
         </div>
       </div>
 
@@ -484,7 +484,7 @@ const ProductAdmin = () => {
               </MyButton>
             )}
           </div>
-          <div className="action-buttons">
+          <div className="table-action-buttons">
 
             <MyButton className="btn-primary" onClick={() => setIsAddModalVisible(true)}>
               <FaPlus /> Thêm mới

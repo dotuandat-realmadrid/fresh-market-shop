@@ -216,7 +216,7 @@ const ProductTrashBinAdmin = () => {
   return (
     <div className="account-admin-container">
       <div className="page-header">
-        <h1 className="page-title">Thùng rác sản phẩm</h1>
+        <h1 className="page-title">Quản lý sản phẩm</h1>
         <div className="breadcrumbs">
           <Link to="/admin">Dashboard</Link> /{" "}
           <Link to="/admin/products">Quản lý sản phẩm</Link> /{" "}

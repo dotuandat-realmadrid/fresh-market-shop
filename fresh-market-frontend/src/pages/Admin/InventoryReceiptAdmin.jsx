@@ -393,7 +393,7 @@ export default function InventoryReceiptAdmin() {
       <div className="page-header">
         <h1 className="page-title">Quản lý nhập kho</h1>
         <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <span>Quản lý nhập kho</span> / <span className="active">Danh sách phiếu nhập</span>
+          <Link to="/admin">Dashboard</Link> / <Link to="/admin/inventory-receipts">Quản lý nhập kho</Link> / <span className="active">Danh sách phiếu nhập</span>
         </div>
       </div>
 
