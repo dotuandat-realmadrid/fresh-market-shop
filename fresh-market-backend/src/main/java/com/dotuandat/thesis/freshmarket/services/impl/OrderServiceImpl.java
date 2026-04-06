@@ -82,8 +82,13 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        activityLogService.create(username, "CREATE", "Tài khoản " + username + " vừa thêm đơn hàng");
+        // Handle anonymous (VNPay callback không có token)
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+            String username = authentication.getName();
+            activityLogService.create(username, "CREATE", "Tài khoản " + username + " vừa thêm đơn hàng");
+        }
 
         return orderConverter.toResponse(order);
     }
@@ -112,6 +117,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse getOneByOrderId(String orderId) {
         Order order = validatePermission(orderId);
+        return orderConverter.toResponse(order);
+    }
+
+    @Override
+    public OrderResponse getById(String orderId) {
+        Order order = orderRepository.getReferenceById(orderId);
         return orderConverter.toResponse(order);
     }
 

@@ -29,6 +29,7 @@ public class OrderRequest {
 
     PaymentMethod paymentMethod;
     String note;
+    String paymentRef;
     String addressId;
 
     @Valid

@@ -53,23 +53,24 @@ public class ExportExcelProdHelper {
         textStyle.setBorderRight(BorderStyle.THIN);
         textStyle.setAlignment(HorizontalAlignment.LEFT);
         textStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        textStyle.setWrapText(true); // Cho phép văn bản xuống dòng
+        textStyle.setWrapText(true);
 
         // Header row
         String[] headers = {
-            "Mã danh mục",
-            "Mã nhà cung cấp",
-            "Mã sản phẩm",
-            "Tên sản phẩm",
-            "Mô tả",
-            "Giá",
-            "Giá giảm",
-            "Số lượng tồn",
-            "Số lượng bán",
-            "Điểm",
-            "Đánh giá trung bình",
-            "Số lượng đánh giá",
-            "Tên giảm giá"
+                "Mã danh mục",
+                "Mã nhà cung cấp",
+                "Mã sản phẩm",
+                "Tên sản phẩm",
+                "Thương hiệu",   // thêm branch
+                "Mô tả",
+                "Giá",
+                "Giá giảm",
+                "Số lượng tồn",
+                "Số lượng bán",
+                "Điểm",
+                "Đánh giá trung bình",
+                "Số lượng đánh giá",
+                "Tên giảm giá"
         };
 
         Row headerRow = sheet.createRow(0);
@@ -85,7 +86,8 @@ public class ExportExcelProdHelper {
             Row row = sheet.createRow(rowCount++);
             int col = 0;
 
-            row.createCell(col).setCellValue(p.getCategoryCode() != null ? p.getCategoryCode() : "");
+            row.createCell(col).setCellValue(p.getCategoryCodes() != null && !p.getCategoryCodes().isEmpty()
+                    ? String.join(", ", p.getCategoryCodes()) : "");
             row.getCell(col++).setCellStyle(textStyle);
 
             row.createCell(col).setCellValue(p.getSupplierCode() != null ? p.getSupplierCode() : "");
@@ -97,7 +99,9 @@ public class ExportExcelProdHelper {
             row.createCell(col).setCellValue(p.getName() != null ? p.getName() : "");
             row.getCell(col++).setCellStyle(textStyle);
 
-            // Ghi toàn bộ mô tả, cho phép xuống dòng
+            row.createCell(col).setCellValue(p.getBranch() != null ? p.getBranch() : ""); // thêm branch
+            row.getCell(col++).setCellStyle(textStyle);
+
             row.createCell(col).setCellValue(p.getDescription() != null ? p.getDescription() : "");
             row.getCell(col++).setCellStyle(textStyle);
 
@@ -135,11 +139,10 @@ public class ExportExcelProdHelper {
             row.getCell(col++).setCellStyle(textStyle);
         }
 
-        sheet.setColumnWidth(4, 50 * 256);
+        sheet.setColumnWidth(5, 50 * 256); // cột Mô tả dời sang index 5
 
-        // Auto-size other columns
         for (int i = 0; i < headers.length; i++) {
-            if (i != 4) { // Bỏ qua cột "Mô tả"
+            if (i != 5) {
                 sheet.autoSizeColumn(i);
             }
         }

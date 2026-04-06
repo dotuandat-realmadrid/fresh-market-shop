@@ -208,7 +208,8 @@ export default function InventoryReceiptDetailAdmin() {
             modal.success({ content: "Cập nhật phiếu nhập kho thành công!" });
           } else {
             await createInventoryReceipt(payload);
-            modal.success({ content: "Tạo phiếu nhập kho thành công!" });
+            // modal.success({ content: "Tạo phiếu nhập kho thành công!" });
+            message.success("Tạo phiếu nhập kho thành công!");
             navigate("/admin/inventory-receipts");
           }
         } catch (error) {

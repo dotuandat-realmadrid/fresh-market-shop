@@ -138,7 +138,15 @@ const ProductTrashBinAdmin = () => {
       width: 150,
       render: (_, record) => (
         <div className="tag-stack">
-          <Tag color="blue" className="pill-tag">{record.product?.categoryCode || 'N/A'}</Tag>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
+            {record.product?.categoryCodes && record.product.categoryCodes.length > 0 ? (
+              record.product.categoryCodes.map(catCode => (
+                <Tag key={catCode} color="blue" className="pill-tag" style={{ margin: 0 }}>{catCode}</Tag>
+              ))
+            ) : (
+              <Tag color="default" className="pill-tag">N/A</Tag>
+            )}
+          </div>
           <Tag color="green" className="pill-tag">{record.product?.supplierCode || 'N/A'}</Tag>
         </div>
       ),

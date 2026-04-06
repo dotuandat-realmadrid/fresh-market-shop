@@ -13,6 +13,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class ProductConverter {
     @Autowired
@@ -30,18 +34,27 @@ public class ProductConverter {
     public ProductResponse toResponse(Product product) {
         ProductResponse response = modelMapper.map(product, ProductResponse.class);
 
-        if (product.getCategory() != null) {
-            response.setCategoryCode(product.getCategory().getCode());
+        // Đổi từ single category sang list
+        if (product.getCategories() != null && !product.getCategories().isEmpty()) {
+            response.setCategoryCodes(
+                    product.getCategories().stream()
+                            .map(Category::getCode)
+                            .toList()
+            );
         } else {
-            response.setCategoryCode("Không có danh mục"); // Giá trị mặc định
+            response.setCategoryCodes(List.of());
         }
+
         if (product.getSupplier() != null) {
             response.setSupplierCode(product.getSupplier().getCode());
         } else {
             response.setSupplierCode("Không có nhà cung cấp");
         }
-        if (product.getDiscount() != null)
+
+        if (product.getDiscount() != null) {
             response.setDiscountName(product.getDiscount().getName());
+            response.setPercent(product.getDiscount().getPercent());
+        }
 
         if (product.getImages() != null) {
             response.setImages(
@@ -54,7 +67,7 @@ public class ProductConverter {
     // create
     public Product toEntity(ProductCreateRequest request) {
         Product product = modelMapper.map(request, Product.class);
-        return getProduct(product, request.getCategoryCode(), request.getSupplierCode());
+        return getProduct(product, request.getCategoryCodes(), request.getSupplierCode());
     }
 
     // update
@@ -67,7 +80,6 @@ public class ProductConverter {
                     .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_EXISTED));
 
             existedProduct.setDiscount(discount);
-
             existedProduct.setDiscountPrice(Math.round(existedProduct.getPrice()
                     * (100 - existedProduct.getDiscount().getPercent())
                     / 100.0));
@@ -76,14 +88,17 @@ public class ProductConverter {
             existedProduct.setDiscountPrice(null);
         }
 
-        return getProduct(existedProduct, request.getCategoryCode(), request.getSupplierCode());
+        return getProduct(existedProduct, request.getCategoryCodes(), request.getSupplierCode());
     }
 
-    private Product getProduct(Product product, String categoryCode, String supplierCode) {
-        Category category = categoryRepository
-                .findByCode(categoryCode)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
-        product.setCategory(category);
+    // Đổi String categoryCode -> List<String> categoryCodes
+    private Product getProduct(Product product, List<String> categoryCodes, String supplierCode) {
+        List<Category> categories = categoryCodes.stream()
+                .map(code -> categoryRepository
+                        .findByCode(code)
+                        .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED)))
+                .collect(Collectors.toCollection(ArrayList::new)); // đổi từ .toList()
+        product.setCategories(categories);
 
         Supplier supplier = supplierRepository
                 .findByCode(supplierCode)

@@ -1,6 +1,7 @@
 package com.dotuandat.thesis.freshmarket.services.impl;
 
 import com.dotuandat.thesis.freshmarket.converters.OrderConverter;
+import com.dotuandat.thesis.freshmarket.converters.ProductConverter;
 import com.dotuandat.thesis.freshmarket.dtos.response.home.SaleStatistic;
 import com.dotuandat.thesis.freshmarket.dtos.response.home.TimeSeriesStatistic;
 import com.dotuandat.thesis.freshmarket.dtos.response.order.OrderResponse;
@@ -37,6 +38,7 @@ public class HomeServiceImpl implements HomeService {
     HomeRepository homeRepository;
     ProductRepository productRepository;
     OrderConverter orderConverter;
+    ProductConverter productConverter;
 
     @Override
     public List<SaleStatistic> getSaleStatistics() {
@@ -117,18 +119,18 @@ public class HomeServiceImpl implements HomeService {
 
         switch (period) {
             case "today":
-                startDate = now.with(LocalTime.MIN); // 00:00:00 hôm nay
-                endDate = now.with(LocalTime.MAX); // 23:59:59 hôm nay
+                startDate = now.with(LocalTime.MIN);
+                endDate = now.with(LocalTime.MAX);
                 return getHourlyStatistics(startDate, endDate);
             case "thisMonth":
-                startDate = now.withDayOfMonth(1).with(LocalTime.MIN); // Ngày 1 tháng hiện tại
+                startDate = now.withDayOfMonth(1).with(LocalTime.MIN);
                 endDate = now.withDayOfMonth(
                                 now.getMonth().length(now.toLocalDate().isLeapYear()))
-                        .with(LocalTime.MAX); // Ngày cuối tháng
+                        .with(LocalTime.MAX);
                 return getDailyStatistics(startDate, endDate);
             case "thisYear":
-                startDate = now.withDayOfYear(1).with(LocalTime.MIN); // 01/01/2025
-                endDate = now.withMonth(12).withDayOfMonth(31).with(LocalTime.MAX); // 31/12/2025
+                startDate = now.withDayOfYear(1).with(LocalTime.MIN);
+                endDate = now.withMonth(12).withDayOfMonth(31).with(LocalTime.MAX);
                 return getMonthlyStatistics(startDate, endDate);
             default:
                 throw new IllegalArgumentException("Invalid period: " + period);
@@ -151,7 +153,7 @@ public class HomeServiceImpl implements HomeService {
                 .map(row -> TimeSeriesStatistic.builder()
                         .timestamp((String) row[0])
                         .totalProductsSold(((Number) row[1]).longValue())
-                        .totalRevenue(((Number) row[2]).doubleValue() / 1_000_000.0) // Chia cho 1 triệu để ra triệu VNĐ
+                        .totalRevenue(((Number) row[2]).doubleValue() / 1_000_000.0)
                         .totalCustomers(((Number) row[3]).longValue())
                         .build())
                 .collect(Collectors.toList());
@@ -162,7 +164,7 @@ public class HomeServiceImpl implements HomeService {
                 .map(row -> TimeSeriesStatistic.builder()
                         .timestamp((String) row[0])
                         .totalProductsSold(((Number) row[1]).longValue())
-                        .totalRevenue(((Number) row[2]).doubleValue() / 1_000_000_000.0) // Chia cho 1 tỷ để ra tỷ VNĐ
+                        .totalRevenue(((Number) row[2]).doubleValue() / 1_000_000_000.0)
                         .totalCustomers(((Number) row[3]).longValue())
                         .build())
                 .collect(Collectors.toList());
@@ -195,7 +197,6 @@ public class HomeServiceImpl implements HomeService {
         LocalDateTime startDate;
         LocalDateTime endDate;
 
-        // Tính toán startDate và endDate dựa trên filter
         switch (filter) {
             case "today":
                 startDate = LocalDate.now().atStartOfDay();
@@ -214,35 +215,51 @@ public class HomeServiceImpl implements HomeService {
                         "Invalid filter: " + filter + ". Valid options: today, thisMonth, thisYear");
         }
 
-        List<ProductResponse> products =
-                switch (filter) {
-                    case "today" -> productRepository.findTop5BestSellersToday(startDate, endDate, topFive);
-                    case "thisMonth" -> productRepository.findTop5BestSellersThisMonth(startDate, endDate, topFive);
-                    case "thisYear" -> productRepository.findTop5BestSellersThisYear(startDate, endDate, topFive);
-                    default -> throw new IllegalArgumentException(
-                            "Invalid filter: " + filter + ". Valid options: today, thisMonth, thisYear");
-                };
+        // Query trả về Object[]: [0] = Product, [1] = SUM(od.quantity)
+        List<Object[]> rows = switch (filter) {
+            case "today" -> productRepository.findTop5BestSellersToday(startDate, endDate, topFive);
+            case "thisMonth" -> productRepository.findTop5BestSellersThisMonth(startDate, endDate, topFive);
+            case "thisYear" -> productRepository.findTop5BestSellersThisYear(startDate, endDate, topFive);
+            default -> throw new IllegalArgumentException(
+                    "Invalid filter: " + filter + ". Valid options: today, thisMonth, thisYear");
+        };
 
-        // Ánh xạ danh sách hình ảnh
-        return mapImages(products);
+        return rows.stream()
+                .map(this::mapBestSellerRow)
+                .collect(Collectors.toList());
     }
 
-    private List<ProductResponse> mapImages(List<ProductResponse> products) {
-        products.forEach(product -> {
-            Product entity = productRepository.findById(product.getId()).orElse(null);
-            if (entity != null && entity.getImages() != null) {
-                List<String> imageUrls = entity.getImages().stream()
-                        .map(ProductImage::getImagePath)
-                        .collect(Collectors.toList());
-                product.setImages(imageUrls);
-            }
-        });
-        return products;
+    /**
+     * Map Object[] từ findTop5BestSellers* sang ProductResponse.
+     * row[0] = Product, row[1] = SUM(od.quantity) as totalSold
+     */
+    private ProductResponse mapBestSellerRow(Object[] row) {
+        Product product = (Product) row[0];
+        int totalSold = ((Long) row[1]).intValue();
+        ProductResponse response = productConverter.toResponse(product);
+        response.setSoldQuantity(totalSold);
+        return response;
+    }
+
+    /**
+     * Map Object[] từ findProductsByExpiryDateRange sang ProductResponse.
+     * row[0] = Product, row[1] = SUM(d.quantity) as totalQuantity
+     */
+    private ProductResponse mapExpiryProductRow(Object[] row) {
+        Product product = (Product) row[0];
+        int totalQuantity = ((Long) row[1]).intValue();
+        ProductResponse response = productConverter.toResponse(product);
+        response.setInventoryQuantity(totalQuantity);
+        return response;
     }
 
     @Override
     public List<ProductResponse> getLowStockProducts(int threshold) {
-        return productRepository.findLowStockProducts(threshold);
+        // findLowStockProducts trả về List<Product> trực tiếp
+        return productRepository.findLowStockProducts(threshold)
+                .stream()
+                .map(productConverter::toResponse)
+                .toList();
     }
 
     @Override
@@ -292,6 +309,10 @@ public class HomeServiceImpl implements HomeService {
                         "Invalid filter: " + filter + ". Valid options: today, thisMonth, thisYear");
         }
 
-        return productRepository.findProductsByExpiryDateRange(startDate, endDate);
+        // findProductsByExpiryDateRange trả về Object[]: [0] = Product, [1] = SUM(d.quantity)
+        return productRepository.findProductsByExpiryDateRange(startDate, endDate)
+                .stream()
+                .map(this::mapExpiryProductRow)
+                .collect(Collectors.toList());
     }
 }

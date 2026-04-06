@@ -1,0 +1,247 @@
+.address-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.address-list-title {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.address-list-title h1 {
+  font-size: 28px;
+  font-weight: 500;
+  text-transform: none;
+  margin-bottom: 10px;
+}
+
+.address-list-title .title-underline {
+  width: 50px;
+  height: 3px;
+  background-color: #000;
+  margin: 0 auto;
+}
+
+.account-sidebar h2 {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.account-sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.account-sidebar-menu li {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.account-sidebar-menu li a {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.account-sidebar-menu li a:hover,
+.account-sidebar-menu li a.active {
+  color: #000;
+  font-weight: 500;
+}
+
+.sidebar-icon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid #666;
+  margin-right: 10px;
+}
+
+.address-card {
+  border: 1px solid #f0f0f0;
+  background-color: #fff;
+  height: 100%;
+}
+
+.address-card-header {
+  background-color: #f9f9f9;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.address-card-header .name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+.address-card-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.address-card-actions span {
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  transition: color 0.3s;
+}
+
+/* .address-card-actions span:hover {
+  color: #ff4d4f;
+} */
+
+.address-card-body {
+  padding: 15px;
+  font-size: 14px;
+}
+
+.address-info-row {
+  margin-bottom: 8px;
+  display: flex;
+}
+
+.address-info-label {
+  font-weight: 600;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* New Inline Form UI */
+.address-form-inline {
+  border: 1px solid #f0f0f0;
+  background-color: #fff;
+  height: 100%;
+}
+
+.address-form-body {
+    padding: 14px;
+}
+
+.address-form-body .ant-form-item,
+.select-with-icon {
+  margin-bottom: 10px !important; /* Spacing even and small between inputs */
+}
+
+.address-form-body .ant-input-affix-wrapper {
+  padding-left: 0;
+  border-radius: 0;
+  margin-bottom: 0; /* Let Form.Item handle margin */
+  overflow: hidden;
+  border: 1px solid #d9d9d9;
+}
+
+.address-form-body .ant-input {
+  padding: 10px 12px;
+  border-radius: 0;
+  border: none;
+  font-size: 14px;
+}
+
+.address-form-body .ant-input:focus {
+    box-shadow: none;
+}
+
+.input-icon-box {
+  background-color: #f5f5f5;
+  color: #888;
+  width: 50px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #d9d9d9;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.select-with-icon {
+  position: relative;
+  display: flex;
+  border: 1px solid #d9d9d9;
+}
+
+.select-with-icon .ant-input {
+    border: none !important;
+    border-radius: 0 !important;
+    height: 44px !important;
+    box-shadow: none !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+}
+
+.address-form-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-update, .btn-cancel {
+  border: none;
+  padding: 0 30px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0;
+  height: 45px;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.btn-update {
+  background-color: #333;
+  color: #fff;
+}
+
+.btn-update:hover {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+.btn-cancel {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #d9d9d9;
+}
+
+.btn-cancel:hover {
+    background-color: #e8e8e8 !important;
+    color: #000 !important;
+    border-color: #bfbfbf !important;
+}
+
+.empty-address {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+}
+
+.btn-add-new-address {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+  transition: background-color 0.3s;
+}
+
+.btn-add-new-address:hover {
+  background-color: #000 !important;
+  color: #fff !important;
+}

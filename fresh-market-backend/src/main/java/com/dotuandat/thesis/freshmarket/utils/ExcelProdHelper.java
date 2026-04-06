@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ import java.util.UUID;
 @Slf4j
 public class ExcelProdHelper {
     private static final String SHEET_NAME = "products";
-    private static final int IMAGE_COLUMN_INDEX = 6; // Cột imagePath
+    private static final int IMAGE_COLUMN_INDEX = 7; // Cột imagePath
 
     @NonFinal
     @Value("${app.file.storage-dir}")
@@ -58,25 +59,30 @@ public class ExcelProdHelper {
 
     private Pair<ProductCreateRequest, List<String>> parseCreateRow(Row row, XSSFWorkbook workbook) {
         try {
-            String categoryCode = getStringCellValue(row, 0);
+            String categoryCodes = getStringCellValue(row, 0);
+            List<String> listCategoryCodes = (categoryCodes == null || categoryCodes.isEmpty())
+                    ? List.of()
+                    : Arrays.stream(categoryCodes.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
             String code = getStringCellValue(row, 2);
             String name = getStringCellValue(row, 3);
 
-            // Bỏ qua dòng nếu các trường bắt buộc là null hoặc rỗng
-            if (isEmpty(categoryCode) || isEmpty(code) || isEmpty(name)) {
+            if (isEmpty(categoryCodes) || isEmpty(code) || isEmpty(name)) {
                 log.warn("Bỏ qua dòng {} do thiếu các trường bắt buộc", row.getRowNum());
                 return null;
             }
 
-            // Lấy danh sách hình ảnh từ cột imagePath
             List<String> imagePaths = extractImagesFromCell(row, workbook);
             ProductCreateRequest request = ProductCreateRequest.builder()
-                    .categoryCode(categoryCode)
+                    .categoryCodes(listCategoryCodes)
                     .supplierCode(getStringCellValue(row, 1))
                     .code(code)
                     .name(name)
-                    .description(getStringCellValue(row, 4))
-                    .price((long) getNumericCellValue(row, 5))
+                    .branch(getStringCellValue(row, 4))       // thêm branch
+                    .description(getStringCellValue(row, 5))  // dời xuống col 5
+                    .price((long) getNumericCellValue(row, 6)) // dời xuống col 6
                     .build();
 
             return Pair.of(request, imagePaths);
@@ -207,27 +213,34 @@ public class ExcelProdHelper {
 
     private Pair<String, ProductUpdateRequest> parseUpdateRow(Row row) {
         try {
-            String categoryCode = getStringCellValue(row, 0);
+            String categoryCodes = getStringCellValue(row, 0);
+            List<String> listCategoryCodes = (categoryCodes == null || categoryCodes.isEmpty())
+                    ? List.of()
+                    : Arrays.stream(categoryCodes.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
             String supplierCode = getStringCellValue(row, 1);
             String code = getStringCellValue(row, 2);
             String name = getStringCellValue(row, 3);
 
-            if (isEmpty(categoryCode) || isEmpty(supplierCode) || isEmpty(code) || isEmpty(name)) {
+            if (isEmpty(categoryCodes) || isEmpty(supplierCode) || isEmpty(code) || isEmpty(name)) {
                 log.warn("Bỏ qua dòng {} do thiếu các trường bắt buộc", row.getRowNum());
                 return null;
             }
 
-            String discountId = getStringCellValue(row, 6);
+            String discountId = getStringCellValue(row, 7); // dời xuống col 7
             if (isEmpty(discountId)) {
                 discountId = null;
             }
 
             ProductUpdateRequest request = ProductUpdateRequest.builder()
-                    .categoryCode(categoryCode)
+                    .categoryCodes(listCategoryCodes)
                     .supplierCode(supplierCode)
                     .name(name)
-                    .description(getStringCellValue(row, 4))
-                    .price((long) getNumericCellValue(row, 5))
+                    .branch(getStringCellValue(row, 4))        // thêm branch
+                    .description(getStringCellValue(row, 5))   // dời xuống col 5
+                    .price((long) getNumericCellValue(row, 6)) // dời xuống col 6
                     .discountId(discountId)
                     .build();
 

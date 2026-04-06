@@ -154,6 +154,17 @@
     margin-top: auto;
 }
 
+.product-sold {
+    display: flex;
+    justify-content: space-between;
+}
+
+.inventory-count {
+    font-size: 12px;
+    color: #666;
+    display: block;
+}
+
 .sold-count {
     font-size: 12px;
     color: #666;

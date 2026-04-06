@@ -22,6 +22,8 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     String name;
 
+    String branch;
+
     @Lob // Large Object
     @Column(columnDefinition = "TEXT")
     String description;
@@ -46,9 +48,13 @@ public class Product extends BaseEntity {
 
     int reviewCount;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    Category category;
+    @ManyToMany
+    @JoinTable(
+        name = "product_category",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    List<Category> categories;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id")

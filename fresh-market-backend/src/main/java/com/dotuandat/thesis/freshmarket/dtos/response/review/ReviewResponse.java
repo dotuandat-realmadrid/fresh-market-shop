@@ -13,10 +13,12 @@ import java.time.LocalDateTime;
 public class ReviewResponse {
     String id;
     String userId;
+    String username;
     String fullName;
     String orderId;
     String productId;
     int rating;
+    String title;
     String comment;
     LocalDateTime createdDate;
 }

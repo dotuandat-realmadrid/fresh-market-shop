@@ -2,6 +2,7 @@ package com.dotuandat.thesis.freshmarket.services.impl;
 
 import com.dotuandat.thesis.freshmarket.dtos.request.inventoryReceipt.InventoryReceiptDetailRequest;
 import com.dotuandat.thesis.freshmarket.dtos.request.inventoryReceipt.InventoryReceiptRequest;
+import com.dotuandat.thesis.freshmarket.entities.Product;
 import com.dotuandat.thesis.freshmarket.exceptions.AppException;
 import com.dotuandat.thesis.freshmarket.exceptions.ErrorCode;
 import com.dotuandat.thesis.freshmarket.repositories.ProductRepository;
@@ -49,7 +50,9 @@ public class InventoryImportServiceImpl implements InventoryImportService {
     private String geminiApiKey;
 
     @NonFinal
-    @Value("${ai.gemini.apiUrl}")
+    @Value("${ai.gemini_3.1_flash_lite.apiUrl}")
+//    @Value("${ai.gemini_2.5_flash_lite.apiUrl}")
+//    @Value("${ai.gemini_2.5_flash.apiUrl}")
     private String geminiApiUrl;
 
     @Override
@@ -83,7 +86,7 @@ public class InventoryImportServiceImpl implements InventoryImportService {
     @Override
     @Async
     public void importFromAI(int quantity) {
-        if (quantity < 1 || quantity > 100) {
+        if (quantity < 1 || quantity > 50) {
             throw new AppException(ErrorCode.MIN_QUANTITY);
         }
 
@@ -109,11 +112,11 @@ public class InventoryImportServiceImpl implements InventoryImportService {
             inventoryReceiptService.create(request);
             log.info(
                     "Thêm phiếu nhập kho với productCode {} thành công!",
-                    request.getDetails().get(0).getProductCode());
+                    request.getDetails().getFirst().getProductCode());
         } catch (AppException e) {
             log.error(
                     "Lỗi khi thêm phiếu nhập kho với productCode {}: {}",
-                    request.getDetails().get(0).getProductCode(),
+                    request.getDetails().getFirst().getProductCode(),
                     e.getErrorCode().getMessage());
         }
     }
@@ -129,8 +132,8 @@ public class InventoryImportServiceImpl implements InventoryImportService {
             throw new AppException(ErrorCode.MIN_QUANTITY);
         }
         List<String> validProductCodes = productRepository.findAll().stream()
-                .map(product -> product.getCode())
-                .collect(Collectors.toList());
+                .map(Product::getCode)
+                .toList();
         for (InventoryReceiptDetailRequest detail : request.getDetails()) {
             if (detail.getProductCode() == null || detail.getProductCode().trim().isEmpty()) {
                 throw new AppException(ErrorCode.PRODUCT_ID_NOT_BLANK);
@@ -490,18 +493,12 @@ public class InventoryImportServiceImpl implements InventoryImportService {
             byte[] decoded = Base64.getDecoder().decode(data);
             String decodedContent = new String(decoded);
 
-            switch (format.toUpperCase()) {
-                case "BASE64_JSON":
-                    return parseJsonToReceipts(decodedContent);
-                case "BASE64_CSV":
-                    return parseCsvToReceipts(decodedContent);
-                case "BASE64_MULTI_LINE":
-                    return parseMultiLineToReceipts(decodedContent);
-                default:
-                    throw new AppException(ErrorCode.INVALID_FILE_QR_FORMAT);
-            }
-        } catch (IllegalArgumentException e) {
-            throw new AppException(ErrorCode.INVALID_FILE_QR_FORMAT);
+            return switch (format.toUpperCase()) {
+                case "BASE64_JSON" -> parseJsonToReceipts(decodedContent);
+                case "BASE64_CSV" -> parseCsvToReceipts(decodedContent);
+                case "BASE64_MULTI_LINE" -> parseMultiLineToReceipts(decodedContent);
+                default -> throw new AppException(ErrorCode.INVALID_FILE_QR_FORMAT);
+            };
         } catch (Exception e) {
             throw new AppException(ErrorCode.INVALID_FILE_QR_FORMAT);
         }
@@ -544,21 +541,27 @@ public class InventoryImportServiceImpl implements InventoryImportService {
      * Repository tự quản lý transaction riêng cho từng câu query
      */
     private List<InventoryReceiptRequest> generateInventoryDataByAI(int quantity) {
-        // Query tự mở/đóng transaction → connection trả về pool ngay
         List<String> validProductCodes = productRepository.findAllProductCodes();
 
         if (validProductCodes.isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_NOT_EXISTED);
         }
 
-        // Từ đây không còn giữ connection, gọi AI thoải mái
+        // Lấy thêm price của từng sản phẩm
+        Map<String, Long> productPriceMap = productRepository.findAll().stream()
+                .collect(Collectors.toMap(
+                        Product::getCode,
+                        p -> p.getDiscountPrice() != null ? p.getDiscountPrice() : p.getPrice()
+                ));
+
         List<InventoryReceiptRequest> requests = new ArrayList<>();
-        String prompt = createDetailedPrompt(validProductCodes, quantity);
+        String prompt = createDetailedPrompt(validProductCodes, productPriceMap, quantity);
 
         try {
             String aiResponse = callGeminiAPI(prompt).block();
             log.info("Phản hồi thô từ Gemini API: {}", aiResponse);
 
+            assert aiResponse != null;
             String cleanedResponse = cleanResponse(aiResponse);
             log.info("Phản hồi đã làm sạch từ Gemini API: {}", cleanedResponse);
 
@@ -640,19 +643,22 @@ public class InventoryImportServiceImpl implements InventoryImportService {
     /*
      * Tạo prompt chi tiết
      */
-    private String createDetailedPrompt(List<String> validProductCodes, int quantity) {
-        String codes = String.join(", ", validProductCodes);
+    private String createDetailedPrompt(List<String> validProductCodes, Map<String, Long> productPriceMap, int quantity) {
+        // Tạo danh sách "code: price" thay vì chỉ code
+        String codeWithPrices = validProductCodes.stream()
+                .map(code -> code + ": " + productPriceMap.getOrDefault(code, 0L) + " VND")
+                .collect(Collectors.joining(", "));
 
         return "Bạn là hệ thống khởi tạo dữ liệu phiếu nhập kho chuyên nghiệp. Hãy tạo đúng " + quantity + " phiếu nhập dưới dạng mảng JSON.\n\n" +
-                "=== DANH SÁCH MÃ SẢN PHẨM HỢP LỆ (BẮT BUỘC) ===\n" +
-                "[" + codes + "]\n\n" +
+                "=== DANH SÁCH MÃ SẢN PHẨM VÀ GIÁ (BẮT BUỘC) ===\n" +
+                "[" + codeWithPrices + "]\n\n" +
                 "=== QUY TẮC DỮ LIỆU ===\n" +
-                "1. 'productCode': CHỈ ĐƯỢC CHỌN từ danh sách hợp lệ bên trên. Tuyệt đối không tự sinh mã mới.\n" +
+                "1. 'productCode': CHỈ ĐƯỢC CHỌN từ danh sách hợp lệ bên trên.\n" +
                 "2. 'quantity': Số nguyên từ 1 đến 100.\n" +
-                "3. 'price': Số nguyên từ 10.000 đến 1.000.000 (VND).\n" +
-                "4. 'manufacturedDate': Định dạng 'dd/MM/yyyy' (Ngày trong quá khứ hoặc hiện tại).\n" +
-                "5. 'expiryDate': Định dạng 'dd/MM/yyyy' (Ngày trong tương lai, sau ngày sản xuất ít nhất 30 ngày).\n" +
-                "6. 'note': Ghi chú tiếng Việt thực tế (ví dụ: 'Nhập hàng rau củ tươi sáng thứ 2', 'Bổ sung kho hàng khô').\n" +
+                "3. 'price': PHẢI LẤY ĐÚNG GIÁ từ danh sách trên tương ứng với productCode đã chọn.\n" +
+                "4. 'manufacturedDate': Định dạng 'dd/MM/yyyy'.\n" +
+                "5. 'expiryDate': Định dạng 'dd/MM/yyyy' (sau ngày sản xuất ít nhất 30 ngày).\n" +
+                "6. 'note': Ghi chú tiếng Việt thực tế.\n" +
                 "7. 'totalAmount': PHẢI BẰNG (price * quantity).\n\n" +
                 "=== ĐỊNH DẠNG ĐẦU RA ===\n" +
                 "- Trả về duy nhất mảng JSON.\n" +

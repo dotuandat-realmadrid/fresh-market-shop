@@ -48,12 +48,8 @@ public class PaymentController {
             @RequestParam(required = false) String orderData,
             HttpServletRequest request) {
         try {
-            log.info(
-                    "VNPay payment request - Amount: {}, BankCode: {}, Language: {}, OrderData: {}",
-                    amount,
-                    bankCode,
-                    language,
-                    orderData);
+            log.info("VNPay payment request - Amount: {}, BankCode: {}, Language: {}, OrderData: {}",
+                    amount, bankCode, language, orderData);
 
             String paymentUrl = paymentService.pay(amount, bankCode, language, orderData, request);
 
@@ -98,7 +94,9 @@ public class PaymentController {
 
     @PostMapping("/vnpay/query")
     public ApiResponse<String> query(
-            @RequestParam String order_id, @RequestParam String trans_date, HttpServletRequest request) {
+            @RequestParam String order_id,
+            @RequestParam String trans_date,
+            HttpServletRequest request) {
         try {
             String response = paymentService.query(order_id, trans_date, request);
             return ApiResponse.<String>builder()
@@ -115,13 +113,14 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay-return")
-    public ResponseEntity<Void> handleVnpayReturn(HttpServletRequest request, HttpServletResponse response)
+    public ResponseEntity<Void> handleVnPayReturn(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+
         Map<String, String> fields = new HashMap<>();
         for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements(); ) {
             String fieldName = params.nextElement();
             String fieldValue = request.getParameter(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if (fieldValue != null && fieldValue.length() > 0) {
                 fields.put(fieldName, fieldValue);
             }
         }
@@ -131,38 +130,32 @@ public class PaymentController {
 
         String vnp_ResponseCode = fields.get("vnp_ResponseCode");
         String vnp_TxnRef = fields.get("vnp_TxnRef");
-        String vnp_OrderInfo = fields.get("vnp_OrderInfo");
 
-        log.info(
-                "VNPay return - ResponseCode: {}, TxnRef: {}, SecureHash: {}, SignValue: {}, OrderInfo: {}",
-                vnp_ResponseCode,
-                vnp_TxnRef,
-                vnp_SecureHash,
-                signValue,
-                vnp_OrderInfo);
+        log.info("VNPay return - ResponseCode: {}, TxnRef: {}, SecureHash: {}, SignValue: {}",
+                vnp_ResponseCode, vnp_TxnRef, vnp_SecureHash, signValue);
 
         String redirectUrl;
+
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(vnp_ResponseCode)) {
                 try {
-                    // Lấy orderData từ tempOrderStorage
                     OrderRequest orderRequest = paymentService.retrieveAndRemoveOrderData(vnp_TxnRef);
+
                     if (orderRequest == null) {
                         log.error("Cannot find order data for TxnRef: {}", vnp_TxnRef);
-                        redirectUrl = "http://localhost:8080/doan/order.html?error=invalid_order_info";
+                        redirectUrl = "http://localhost:3001/confirm?error=invalid_order_info";
                     } else {
-                        // Sử dụng createWithId với vnp_TxnRef làm ID
-                        log.info("Creating order with VNPay TxnRef as ID: {}", vnp_TxnRef);
+                        // Gắn paymentRef = vnp_TxnRef để lưu vào DB
+                        orderRequest.setPaymentRef(vnp_TxnRef);
 
-                        OrderResponse orderResponse =
-                                orderService.createWithId(vnp_TxnRef, orderRequest, OrderStatus.PENDING);
+                        log.info("Creating order with paymentRef (VNPay TxnRef): {}", vnp_TxnRef);
+
+                        OrderResponse orderResponse = orderService.create(orderRequest, OrderStatus.PENDING);
+
                         if (orderResponse != null && orderResponse.getId() != null) {
-                            log.info(
-                                    "Order created successfully with ID: {} (same as VNPay TxnRef: {})",
-                                    orderResponse.getId(),
-                                    vnp_TxnRef);
+                            log.info("Order created successfully - OrderId: {}, PaymentRef: {}",
+                                    orderResponse.getId(), vnp_TxnRef);
 
-                            // Xóa giỏ hàng
                             String userId = orderRequest.getUserId();
                             if (userId != null && !userId.isEmpty()) {
                                 try {
@@ -173,29 +166,24 @@ public class PaymentController {
                                 }
                             }
 
-                            redirectUrl = "http://localhost:8080/doan/order-confirmation.html?orderId="
-                                    + orderResponse.getId();
+                            redirectUrl = "http://localhost:3001/confirm?orderId=" + orderResponse.getId();
                         } else {
-                            log.error("Failed to create order from VNPay payment with ID: {}", vnp_TxnRef);
-                            redirectUrl = "http://localhost:8080/doan/order.html?error=create_order_failed";
+                            log.error("Failed to create order, paymentRef: {}", vnp_TxnRef);
+                            redirectUrl = "http://localhost:3001/confirm?error=create_order_failed";
                         }
                     }
                 } catch (Exception e) {
-                    log.error(
-                            "Error processing successful payment - TxnRef: {}, Error: {}",
-                            vnp_TxnRef,
-                            e.getMessage(),
-                            e);
-                    redirectUrl = "http://localhost:8080/doan/order.html?error=processing_failed";
+                    log.error("Error processing successful payment - TxnRef: {}, Error: {}",
+                            vnp_TxnRef, e.getMessage(), e);
+                    redirectUrl = "http://localhost:3001/confirm?error=processing_failed";
                 }
             } else {
                 log.warn("Payment failed - ResponseCode: {}, TxnRef: {}", vnp_ResponseCode, vnp_TxnRef);
-                redirectUrl =
-                        "http://localhost:8080/doan/order.html?error=payment_failed&responseCode=" + vnp_ResponseCode;
+                redirectUrl = "http://localhost:3001/confirm?error=payment_failed&responseCode=" + vnp_ResponseCode;
             }
         } else {
             log.warn("Invalid signature - Expected: {}, Actual: {}", vnp_SecureHash, signValue);
-            redirectUrl = "http://localhost:8080/doan/order.html?error=invalid_signature";
+            redirectUrl = "http://localhost:3001/confirm?error=invalid_signature";
         }
 
         log.info("Redirecting to: {}", redirectUrl);

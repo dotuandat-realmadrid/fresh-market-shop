@@ -59,8 +59,33 @@ public class ProductImportServiceImpl implements ProductImportService {
     private String geminiApiKey;
 
     @NonFinal
-    @Value("${ai.gemini.apiUrl}")
+    @Value("${ai.gemini_3.1_flash_lite.apiUrl}")
+//    @Value("${ai.gemini_2.5_flash_lite.apiUrl}")
+//    @Value("${ai.gemini_2.5_flash.apiUrl}")
     private String geminiApiUrl;
+
+    /**
+     * Parse categoryCodes từ map JSON, chỉ dùng key "categoryCodes", hỗ trợ:
+     * - "categoryCodes": ["rau-cu", "thuc-pham"]  -> List trực tiếp
+     * - "categoryCodes": "rau-cu, thuc-pham"       -> split String bằng dấu ,
+     */
+    private List<String> parseCategoryCodesFromMap(Map<String, Object> map) {
+        Object raw = map.get("categoryCodes");
+
+        if (raw instanceof List) {
+            return ((List<?>) raw).stream()
+                    .map(Object::toString)
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } else if (raw instanceof String) {
+            return Arrays.stream(((String) raw).split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+        return new ArrayList<>();
+    }
 
     /**
      * Import Excel có hình ảnh
@@ -269,7 +294,7 @@ public class ProductImportServiceImpl implements ProductImportService {
     }
 
     /*
-     * Đọc QR bằng Json
+     * Đọc QR bằng Json — chỉ dùng key "categoryCodes"
      */
     @SuppressWarnings("unchecked")
     private <T> List<T> parseJsonToProducts(String content, String action) {
@@ -281,11 +306,24 @@ public class ProductImportServiceImpl implements ProductImportService {
                 throw new AppException(ErrorCode.INVALID_FILE_QR_FORMAT);
             }
 
+            List<Map<String, Object>> rawList =
+                    objectMapper.readValue(data, new TypeReference<List<Map<String, Object>>>() {});
+
             if ("create".equalsIgnoreCase(action)) {
-                return (List<T>) objectMapper.readValue(data, new TypeReference<List<ProductCreateRequest>>() {});
+                List<ProductCreateRequest> createRequests = rawList.stream()
+                        .map(map -> ProductCreateRequest.builder()
+                                .categoryCodes(parseCategoryCodesFromMap(map))
+                                .supplierCode((String) map.getOrDefault("supplierCode", ""))
+                                .code((String) map.getOrDefault("code", ""))
+                                .name((String) map.getOrDefault("name", ""))
+                                .branch((String) map.getOrDefault("branch", ""))
+                                .description((String) map.getOrDefault("description", ""))
+                                .price(map.containsKey("price")
+                                        ? Long.parseLong(map.get("price").toString()) : 0L)
+                                .build())
+                        .collect(Collectors.toList());
+                return (List<T>) createRequests;
             } else {
-                List<Map<String, Object>> rawList =
-                        objectMapper.readValue(data, new TypeReference<List<Map<String, Object>>>() {});
                 List<Pair<String, ProductUpdateRequest>> updateRequests = rawList.stream()
                         .map(map -> {
                             String code = (String) map.get("code");
@@ -293,14 +331,13 @@ public class ProductImportServiceImpl implements ProductImportService {
                                 throw new RuntimeException("Mã sản phẩm không được để trống");
                             }
                             ProductUpdateRequest request = ProductUpdateRequest.builder()
-                                    .categoryCode((String) map.getOrDefault("categoryCode", ""))
+                                    .categoryCodes(parseCategoryCodesFromMap(map))
                                     .supplierCode((String) map.getOrDefault("supplierCode", ""))
                                     .name((String) map.getOrDefault("name", ""))
+                                    .branch((String) map.getOrDefault("branch", ""))
                                     .description((String) map.getOrDefault("description", ""))
-                                    .price(
-                                            map.containsKey("price")
-                                                    ? Long.parseLong(map.get("price").toString())
-                                                    : 0L)
+                                    .price(map.containsKey("price")
+                                            ? Long.parseLong(map.get("price").toString()) : 0L)
                                     .discountId((String) map.getOrDefault("discountId", null))
                                     .build();
                             return Pair.of(code, request);
@@ -315,6 +352,9 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     /*
      * Đọc QR bằng CSV
+     * Cột 0: categoryCodes, nhiều category phân cách bằng |
+     * Create: categoryCodes, supplierCode, code, name, branch, description, price
+     * Update: categoryCodes, supplierCode, code, name, branch, description, price, discountId
      */
     @SuppressWarnings("unchecked")
     private <T> List<T> parseCsvToProducts(String content, String action) {
@@ -350,15 +390,20 @@ public class ProductImportServiceImpl implements ProductImportService {
                 String[] fields = lines.get(i);
 
                 if ("create".equalsIgnoreCase(action)) {
-                    if (fields.length >= 6) {
+                    if (fields.length >= 7) {
                         try {
+                            List<String> categoryCodes = Arrays.stream(fields[0].trim().split("\\|"))
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .collect(Collectors.toCollection(ArrayList::new));
                             ProductCreateRequest request = ProductCreateRequest.builder()
-                                    .categoryCode(fields[0].trim())
+                                    .categoryCodes(categoryCodes)
                                     .supplierCode(fields[1].trim())
                                     .code(fields[2].trim())
                                     .name(fields[3].trim())
-                                    .description(fields[4].trim())
-                                    .price(Long.parseLong(fields[5].trim()))
+                                    .branch(fields[4].trim())
+                                    .description(fields[5].trim())
+                                    .price(Long.parseLong(fields[6].trim()))
                                     .build();
                             requests.add((T) request);
                             log.debug("Đã tạo request cho sản phẩm: {}", request.getCode());
@@ -367,22 +412,27 @@ public class ProductImportServiceImpl implements ProductImportService {
                                     "Lỗi phân tích giá trị price thành số ở dòng " + i + ": " + e.getMessage());
                         }
                     } else {
-                        throw new RuntimeException("Dòng " + i + " không đủ 6 cột: " + String.join(",", fields));
+                        throw new RuntimeException("Dòng " + i + " không đủ 7 cột: " + String.join(",", fields));
                     }
                 } else {
-                    if (fields.length >= 7) {
+                    if (fields.length >= 8) {
                         try {
                             String code = fields[2].trim();
                             if (code.isEmpty()) {
                                 throw new RuntimeException("Mã sản phẩm không được để trống ở dòng " + i);
                             }
+                            List<String> categoryCodes = Arrays.stream(fields[0].trim().split("\\|"))
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .collect(Collectors.toCollection(ArrayList::new));
                             ProductUpdateRequest request = ProductUpdateRequest.builder()
-                                    .categoryCode(fields[0].trim())
+                                    .categoryCodes(categoryCodes)
                                     .supplierCode(fields[1].trim())
                                     .name(fields[3].trim())
-                                    .description(fields[4].trim())
-                                    .price(Long.parseLong(fields[5].trim()))
-                                    .discountId(fields[6].trim().isEmpty() ? null : fields[6].trim())
+                                    .branch(fields[4].trim())
+                                    .description(fields[5].trim())
+                                    .price(Long.parseLong(fields[6].trim()))
+                                    .discountId(fields[7].trim().isEmpty() ? null : fields[7].trim())
                                     .build();
                             requests.add((T) Pair.of(code, request));
                             log.debug("Đã tạo request cập nhật cho sản phẩm: {}", code);
@@ -391,7 +441,7 @@ public class ProductImportServiceImpl implements ProductImportService {
                                     "Lỗi phân tích giá trị price thành số ở dòng " + i + ": " + e.getMessage());
                         }
                     } else {
-                        throw new RuntimeException("Dòng " + i + " không đủ 7 cột: " + String.join(",", fields));
+                        throw new RuntimeException("Dòng " + i + " không đủ 8 cột: " + String.join(",", fields));
                     }
                 }
             }
@@ -411,6 +461,7 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     /*
      * Đọc QR bằng Multi-line
+     * Key "categoryCodes" phân cách bằng |
      */
     @SuppressWarnings("unchecked")
     private <T> List<T> parseMultiLineToProducts(String content, String action) {
@@ -431,21 +482,25 @@ public class ProductImportServiceImpl implements ProductImportService {
                     .filter(arr -> arr.length == 2)
                     .collect(Collectors.toMap(arr -> arr[0].trim(), arr -> arr[1].trim()));
 
-            if (map.isEmpty()) {
-                continue;
-            }
+            if (map.isEmpty()) continue;
+
+            // Chỉ dùng key "categoryCodes", phân cách bằng |
+            String rawCategoryCodes = map.getOrDefault("categoryCodes", "");
+            List<String> categoryCodes = Arrays.stream(rawCategoryCodes.split("\\|"))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             if ("create".equalsIgnoreCase(action)) {
                 ProductCreateRequest request = ProductCreateRequest.builder()
                         .code(map.getOrDefault("code", ""))
-                        .categoryCode(map.getOrDefault("categoryCode", ""))
+                        .categoryCodes(categoryCodes)
                         .supplierCode(map.getOrDefault("supplierCode", ""))
                         .name(map.getOrDefault("name", ""))
+                        .branch(map.getOrDefault("branch", ""))
                         .description(map.getOrDefault("description", ""))
-                        .price(
-                                map.containsKey("price")
-                                        ? Long.parseLong(map.get("price").trim())
-                                        : 0L)
+                        .price(map.containsKey("price")
+                                ? Long.parseLong(map.get("price").trim()) : 0L)
                         .build();
                 requests.add((T) request);
             } else {
@@ -454,14 +509,13 @@ public class ProductImportServiceImpl implements ProductImportService {
                     throw new RuntimeException("Mã sản phẩm không được để trống");
                 }
                 ProductUpdateRequest request = ProductUpdateRequest.builder()
-                        .categoryCode(map.getOrDefault("categoryCode", ""))
+                        .categoryCodes(categoryCodes)
                         .supplierCode(map.getOrDefault("supplierCode", ""))
                         .name(map.getOrDefault("name", ""))
+                        .branch(map.getOrDefault("branch", ""))
                         .description(map.getOrDefault("description", ""))
-                        .price(
-                                map.containsKey("price")
-                                        ? Long.parseLong(map.get("price").trim())
-                                        : 0L)
+                        .price(map.containsKey("price")
+                                ? Long.parseLong(map.get("price").trim()) : 0L)
                         .discountId(map.getOrDefault("discountId", null))
                         .build();
                 requests.add((T) Pair.of(code, request));
@@ -570,11 +624,8 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     /*
      * Sinh dữ liệu bằng AI (chỉ dùng Gemini)
-     * Bỏ @Transactional để tránh giữ DB connection trong khi gọi AI
-     * Repository tự quản lý transaction riêng cho từng câu query
      */
     private List<ProductCreateRequest> generateProductDataByAI(int quantity) {
-        // Mỗi câu query dưới tự mở/đóng transaction → connection trả về pool ngay
         List<String> validCategoryCodes = categoryRepository.findAllCategoryCodes();
         List<String> validSupplierCodes = supplierRepository.findAllSupplierCodes();
 
@@ -582,7 +633,6 @@ public class ProductImportServiceImpl implements ProductImportService {
             throw new RuntimeException("Không có danh mục hoặc nhà cung cấp hợp lệ trong cơ sở dữ liệu");
         }
 
-        // Từ đây không còn giữ connection, gọi AI thoải mái
         List<ProductCreateRequest> requests = new ArrayList<>();
         String prompt = createDetailedPrompt(validCategoryCodes, validSupplierCodes, quantity);
 
@@ -593,8 +643,21 @@ public class ProductImportServiceImpl implements ProductImportService {
             String cleanedResponse = cleanResponse(aiResponse);
             log.info("Phản hồi đã làm sạch từ Gemini API: {}", cleanedResponse);
 
-            List<ProductCreateRequest> apiRequestsList =
-                    objectMapper.readValue(cleanedResponse, new TypeReference<List<ProductCreateRequest>>() {});
+            List<Map<String, Object>> rawList =
+                    objectMapper.readValue(cleanedResponse, new TypeReference<List<Map<String, Object>>>() {});
+
+            List<ProductCreateRequest> apiRequestsList = rawList.stream()
+                    .map(map -> ProductCreateRequest.builder()
+                            .categoryCodes(parseCategoryCodesFromMap(map))
+                            .supplierCode((String) map.getOrDefault("supplierCode", ""))
+                            .code((String) map.getOrDefault("code", ""))
+                            .name((String) map.getOrDefault("name", ""))
+                            .branch((String) map.getOrDefault("branch", ""))
+                            .description((String) map.getOrDefault("description", ""))
+                            .price(map.containsKey("price")
+                                    ? Long.parseLong(map.get("price").toString()) : 0L)
+                            .build())
+                    .collect(Collectors.toList());
 
             validateAIGeneratedData(apiRequestsList, validCategoryCodes, validSupplierCodes);
             requests.addAll(apiRequestsList);
@@ -619,18 +682,30 @@ public class ProductImportServiceImpl implements ProductImportService {
         String categories = String.join(", ", validCategoryCodes);
         String suppliers = String.join(", ", validSupplierCodes);
 
-        return "Bạn là một hệ thống khởi tạo dữ liệu mẫu chuyên nghiệp. Hãy tạo đúng " + quantity + " đối tượng sản phẩm dưới dạng mảng JSON.\n\n" +
-                "=== QUY TẮC BẮT BUỘC ===\n" +
-                "1. 'categoryCode': CHỈ ĐƯỢC CHỌN 1 giá trị trong danh sách sau: [" + categories + "]. Tuyệt đối không tự tạo mã mới.\n" +
-                "2. 'supplierCode': CHỈ ĐƯỢC CHỌN 1 giá trị trong danh sách sau: [" + suppliers + "]. Tuyệt đối không tự tạo mã mới.\n" +
-                "3. 'code': Mã sản phẩm viết thường, không dấu, dùng dấu gạch ngang thay khoảng trắng, không ký tự đặc biệt (ví dụ: 'ca-rot-da-lat', 'nuoc-mam-phu-quoc'). Mỗi sản phẩm phải có mã duy nhất trong danh sách.\n" +
-                "4. 'name': Tên sản phẩm tiếng Việt thực tế, phù hợp với sản phẩm thực tế và categoryCode đã chọn.\n" +
-                "5. 'price': Lấy đúng giá thị trường (VNĐ).\n" +
-                "6. 'description': Mô tả ngắn gọn (khoảng 20-30 từ) về công dụng hoặc nguồn gốc sản phẩm.\n\n" +
-                "=== ĐỊNH DẠNG ĐẦU RA ===\n" +
-                "- Chỉ trả về duy nhất mảng JSON (Bắt đầu bằng [ và kết thúc bằng ]).\n" +
-                "- Không có ký tự markdown ```json, không có lời dẫn giải thích.\n" +
-                "- Đảm bảo JSON hợp lệ, không bị ngắt quãng giữa chừng.";
+        return "Bạn là hệ thống sinh dữ liệu sản phẩm thực phẩm/hàng tiêu dùng. Tạo đúng " + quantity + " sản phẩm dạng JSON array.\n\n" +
+                "DANH SÁCH CATEGORY CODES HỢP LỆ (chỉ được dùng đúng các giá trị này):\n" +
+                "[" + categories + "]\n\n" +
+                "DANH SÁCH SUPPLIER CODES HỢP LỆ (chỉ được dùng đúng các giá trị này):\n" +
+                "[" + suppliers + "]\n\n" +
+                "QUY TẮC TUYỆT ĐỐI:\n" +
+                "- categoryCodes: PHẢI lấy từ danh sách CATEGORY CODES ở trên, KHÔNG được tự tạo\n" +
+                "- supplierCode: PHẢI lấy từ danh sách SUPPLIER CODES ở trên, KHÔNG được tự tạo\n" +
+                "- code: chữ thường, không dấu, dùng dấu gạch ngang, ví dụ: \"tao-do-uc\"\n" +
+                "- name: tên sản phẩm tiếng Việt, có thể kèm xuất xứ, ví dụ: \"Táo Đỏ Úc\"\n" +
+                "- branch: thương hiệu/xuất xứ của sản phẩm, PHẢI là một trong các giá trị sau: \"Việt Nam\", \"Hàn Quốc\", \"Anh\", \"Hà Lan\", \"Úc\", \"Mỹ\", \"Nhật Bản\", \"Thái Lan\", \"New Zealand\", \"Pháp\", \"Ý\" — chọn phù hợp với loại sản phẩm\n" +
+                "- price: giá thị trường VNĐ, số nguyên, không có dấu phẩy\n" +
+                "- description: mô tả ngắn 20-30 từ tiếng Việt\n\n" +
+                "CHỈ trả về JSON array hợp lệ, không markdown, không giải thích.\n" +
+                "Ví dụ 1 phần tử:\n" +
+                "[{" +
+                "\"categoryCodes\":[\"" + validCategoryCodes.get(0) + "\"]," +
+                "\"supplierCode\":\"" + validSupplierCodes.get(0) + "\"," +
+                "\"code\":\"tao-do-uc\"," +
+                "\"name\":\"Táo Đỏ Úc\"," +
+                "\"branch\":\"Úc\"," +
+                "\"price\":85000," +
+                "\"description\":\"Táo đỏ nhập khẩu từ Úc, vị ngọt giòn tự nhiên, giàu vitamin và chất xơ tốt cho sức khỏe.\"" +
+                "}]";
     }
 
     /*
@@ -639,7 +714,6 @@ public class ProductImportServiceImpl implements ProductImportService {
     private Mono<String> callGeminiAPI(String prompt) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))));
-
         requestBody.put("generationConfig", Map.of(
                 "maxOutputTokens", 40000,
                 "temperature", 0.1,
@@ -682,10 +756,14 @@ public class ProductImportServiceImpl implements ProductImportService {
     /*
      * Xác thực dữ liệu sinh từ AI
      */
-    private void validateAIGeneratedData(List<ProductCreateRequest> requests, List<String> validCategoryCodes, List<String> validSupplierCodes) {
+    private void validateAIGeneratedData(
+            List<ProductCreateRequest> requests,
+            List<String> validCategoryCodes,
+            List<String> validSupplierCodes) {
         for (ProductCreateRequest request : requests) {
-            if (!validCategoryCodes.contains(request.getCategoryCode())) {
-                log.error("Mã danh mục không hợp lệ từ AI: {}", request.getCategoryCode());
+            if (request.getCategoryCodes() == null || request.getCategoryCodes().isEmpty()
+                    || !validCategoryCodes.containsAll(request.getCategoryCodes())) {
+                log.error("Mã danh mục không hợp lệ từ AI: {}", request.getCategoryCodes());
                 throw new AppException(ErrorCode.CATEGORY_NOT_EXISTED);
             }
             if (!validSupplierCodes.contains(request.getSupplierCode())) {

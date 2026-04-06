@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getCategoryTree } from '../../api/category';
 import { IMAGE_URL } from '../../api/auth';
+import icon1 from '../../assets/images/icon-1.png';
 import './Menu.css';
 
 const Menu = ({ onHoverChange, headerHeight = 0, isMobileOpen, onClose }) => {
@@ -31,7 +32,7 @@ const Menu = ({ onHoverChange, headerHeight = 0, isMobileOpen, onClose }) => {
               title: subCat.name,
               img: subCat.imagePath ? `${IMAGE_URL}/${subCat.imagePath}` : 'src/assets/images/no_image_large.jpg',
               path: `/collections/${subCat.code}`,
-              items: subCat.children.map(item => item.name)
+              items: subCat.children.map(item => ({ name: item.name, code: item.code }))
             }))
           }));
           setMenuItems(formattedData);
@@ -88,7 +89,7 @@ const Menu = ({ onHoverChange, headerHeight = 0, isMobileOpen, onClose }) => {
       <div className="menu-container d-flex flex-column bg-white h-100 border-end">
         <div className="menu-logo-section py-5 px-2 border-bottom d-flex align-items-center justify-content-center bg-light">
           <div className="d-flex align-items-center gap-2">
-            <img src='src/assets/images/icon-1.png' alt="Fresh Market Icon" style={{ height: '38px', objectFit: 'contain' }} />
+            <img src={icon1} alt="Fresh Market Icon" style={{ height: '38px', objectFit: 'contain' }} />
             <div className="d-flex flex-column" style={{ lineHeight: '1.1' }}>
               <span style={{ color: '#004aad', fontSize: '22px', fontWeight: '900', letterSpacing: '0.5px' }}>BICH THUY</span>
               <span style={{ color: '#ff6600', fontSize: '12px', fontWeight: '700', letterSpacing: '1.5px', paddingLeft: '2px' }}>MARKET</span>
@@ -191,13 +192,13 @@ const Menu = ({ onHoverChange, headerHeight = 0, isMobileOpen, onClose }) => {
                   {displayItems.length > 0 && (
                     <ul className="sub-item-product-list">
                       {displayItems.map((item, idx) => (
-                        <li key={idx} title={item}>
+                        <li key={idx} title={item.name}>
                           <Link 
-                            to={`${subPath}/${getSlug(item)}`} 
+                            to={`/collections/${item.code}`} 
                             className="product-link"
                             onClick={() => { if (isMobileOpen) { onClose(); setHoveredIndex(null); } }}
                           >
-                            {item}
+                            {item.name}
                           </Link>
                         </li>
                       ))}

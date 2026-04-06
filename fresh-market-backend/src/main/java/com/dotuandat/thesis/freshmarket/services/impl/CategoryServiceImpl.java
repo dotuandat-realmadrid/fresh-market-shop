@@ -127,7 +127,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
     public CategoryResponse findByCode(String code) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));

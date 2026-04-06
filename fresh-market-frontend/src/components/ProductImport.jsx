@@ -261,14 +261,14 @@ const ProductImport = ({
                 <li>Nhập số lượng sản phẩm muốn tạo tự động.</li>
                 <li>Dữ liệu sẽ được sinh ngẫu nhiên theo định dạng hợp lệ.</li>
                 <li>Chỉ hỗ trợ thêm mới sản phẩm.</li>
-                <li>Giới hạn tạo 100 sản phẩm.</li>
+                <li>Giới hạn tạo 50 sản phẩm.</li>
             </ul>
         </div>
         
         <div className="form-group" style={{marginBottom: 20}}>
-            <label style={{fontSize: 18, color: '#334155', fontWeight: 400}}>Số lượng sản phẩm:</label>
+            <label style={{fontSize: 18, color: '#334155', fontWeight: 400}}>Số lượng sản phẩm cần tạo:</label>
             <InputNumber 
-                min={1} max={100} 
+                min={1} max={50} 
                 style={{width: '100%', height: 45, borderRadius: 8, display: 'flex', alignItems: 'center'}} 
                 value={aiQuantity}
                 onChange={setAiQuantity}

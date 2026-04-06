@@ -45,21 +45,20 @@ public interface ReportRepository extends JpaRepository<Order, String> {
 			""")
     List<RevenueByOrderType> getRevenueByOrderType();
 
-    @Query(
-            """
-				SELECT new com.dotuandat.thesis.freshmarket.dtos.response.report.CategoryReport(
-					c.name,
-					COALESCE(SUM(od.quantity), 0),
-					COALESCE(SUM(od.priceAtPurchase * od.quantity), 0)
-				)
-				FROM Category c
-				LEFT JOIN Product p ON p.category = c
-				LEFT JOIN OrderDetail od ON od.product = p AND od.order.status = 'COMPLETED'
-				WHERE c.isActive = 1
-				GROUP BY c
-				ORDER BY c.code
-			""")
-    List<CategoryReport> getCategoryReport();
+	@Query("""
+		SELECT new com.dotuandat.thesis.freshmarket.dtos.response.report.CategoryReport(
+			c.name,
+			COALESCE(SUM(od.quantity), 0),
+			COALESCE(SUM(od.priceAtPurchase * od.quantity), 0)
+		)
+		FROM Category c
+		LEFT JOIN Product p ON c MEMBER OF p.categories
+		LEFT JOIN OrderDetail od ON od.product = p AND od.order.status = 'COMPLETED'
+		WHERE c.isActive = 1
+		GROUP BY c
+		ORDER BY c.code
+	""")
+	List<CategoryReport> getCategoryReport();
 
     @Query(
             """

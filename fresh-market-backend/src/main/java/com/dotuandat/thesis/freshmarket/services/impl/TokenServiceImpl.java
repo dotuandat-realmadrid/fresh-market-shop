@@ -78,21 +78,18 @@ public class TokenServiceImpl implements TokenService {
         SignedJWT signedJWT = SignedJWT.parse(token);
 
         String jti = signedJWT.getJWTClaimsSet().getJWTID();
-        Date expirationDate = (isRefresh)
-                ? Date.from(signedJWT
-                        .getJWTClaimsSet()
-                        .getIssueTime()
-                        .toInstant()
-                        .plus(REFRESHABLE_DURATION, ChronoUnit.HOURS))
-                : signedJWT
-                        .getJWTClaimsSet()
-                        .getExpirationTime(); // isRefresh: true - refresh token, false - access token
+        Date expirationDate = (isRefresh) ?
+                Date.from(signedJWT.getJWTClaimsSet().getIssueTime()
+                        .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.HOURS))
+                : signedJWT.getJWTClaimsSet().getExpirationTime(); // isRefresh: true - refresh token, false - access token
 
         boolean verified = signedJWT.verify(verifier);
 
-        if (!(verified && expirationDate.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!(verified && expirationDate.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if (invalidatedTokenRepository.existsById(jti)) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (invalidatedTokenRepository.existsById(jti))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
     }

@@ -5,6 +5,12 @@ import Product from "../pages/Home/Product";
 import ProductDetail from "../pages/Home/ProductDetail";
 import NotFound from "../pages/Home/404NotFound";
 import AuthPage from "../pages/Home/AuthPage";
+import Cart from "../pages/Home/Cart";
+import Checkout from "../pages/Home/Checkout";
+import Confirm from "../pages/Home/Confirm";
+import AddressList from "../pages/Home/AddressList";
+import MyProfile from "../pages/Home/MyProfile";
+import MyOrders from "../pages/Home/MyOrders";
 import ScrollToTop from "../components/ScrollToTop";
 import AdminLayout from "../components/layout/AdminLayout";
 import HomeAdmin from "../pages/Admin/HomeAdmin";
@@ -33,9 +39,15 @@ const AppRoutes = () => {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="/collections/:category" element={<Product />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route path="/products/:code" element={<ProductDetail />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<AuthPage />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/confirm" element={<Confirm />} />
+            <Route path="/my-address" element={<AddressList />} />
+            <Route path="/my-profile" element={<MyProfile />} />
+            <Route path="/my-orders" element={<MyOrders />} />
           </Route>
           <Route path="/admin" element={ 
             <PrivateRoute

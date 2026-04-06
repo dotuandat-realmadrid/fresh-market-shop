@@ -17,6 +17,8 @@ public interface OrderService {
 
     OrderResponse getOneByOrderId(String orderId);
 
+    OrderResponse getById(String orderId);
+
     OrderResponse getByIdAndEmail(String id, String email);
 
     PageResponse<OrderResponse> getByUser(OrderStatus status, String userId, Pageable pageable);

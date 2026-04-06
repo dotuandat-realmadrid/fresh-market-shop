@@ -3,6 +3,8 @@ package com.dotuandat.thesis.freshmarket.dtos.request.product;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -10,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductSearchRequest {
     String id;
-    String categoryCode;
+    List<String> categoryCodes;
     String supplierCode;
     String code;
     String name;

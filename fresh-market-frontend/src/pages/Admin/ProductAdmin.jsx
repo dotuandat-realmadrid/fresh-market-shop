@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   App, Table, Input, Select, Radio, Checkbox, 
   Space, Typography, Tag, Tooltip, Dropdown, Modal, 
-  Row, Col, Form, InputNumber, Badge, Avatar
+  Row, Col, Form, InputNumber, Badge, Avatar, Upload, AutoComplete, Rate
 } from 'antd';
 import { 
   FaFilter, FaChevronDown, FaIdCard, FaBarcode, FaBox, 
@@ -12,7 +12,10 @@ import {
   FaCloudUploadAlt, FaLink, FaTrash
 } from 'react-icons/fa';
 import { 
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  PictureOutlined
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import './AccountAdmin.css';
@@ -53,8 +56,9 @@ const ProductAdmin = () => {
     name: '',
     minPrice: '',
     maxPrice: '',
-    categoryCode: '',
+    categoryCodes: [],
     supplierCode: '',
+    branch: '',
     sortBy: 'createdDate',
     direction: 'DESC'
   });
@@ -119,8 +123,9 @@ const ProductAdmin = () => {
       name: '',
       minPrice: '',
       maxPrice: '',
-      categoryCode: '',
+      categoryCodes: [],
       supplierCode: '',
+      branch: '',
       sortBy: 'createdDate',
       direction: 'DESC'
     });
@@ -149,14 +154,8 @@ const ProductAdmin = () => {
   };
 
   // Image handlers
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const validImages = files.filter(file => file.type.startsWith('image/'));
-    setPendingImages(prev => [...prev, ...validImages]);
-  };
-
-  const removePendingImage = (index) => {
-    setPendingImages(prev => prev.filter((_, i) => i !== index));
+  const handleImageChange = ({ fileList }) => {
+    setPendingImages(fileList);
   };
 
   const handleCreateProduct = async (values) => {
@@ -164,7 +163,10 @@ const ProductAdmin = () => {
     try {
       const result = await createProduct(values);
       if (result && pendingImages.length > 0) {
-        await uploadProductImages(result.id, pendingImages);
+        const filesToUpload = pendingImages.map(file => file.originFileObj).filter(Boolean);
+        if (filesToUpload.length > 0) {
+           await uploadProductImages(result.id, filesToUpload);
+        }
       }
       message.success("Thêm sản phẩm thành công");
       setIsAddModalVisible(false);
@@ -237,13 +239,24 @@ const ProductAdmin = () => {
       ),
     },
     {
-      title: 'Danh mục & Hãng',
+      title: 'Danh mục, Hãng & Thương hiệu',
       key: 'categorySupplier',
-      width: 150,
+      width: 180,
       render: (_, record) => (
         <div className="tag-stack">
-          <Tag color="blue" className="pill-tag">{record.categoryCode || 'N/A'}</Tag>
-          <Tag color="green" className="pill-tag">{record.supplierCode || 'N/A'}</Tag>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {record.categoryCodes && record.categoryCodes.length > 0 ? (
+              record.categoryCodes.map(catCode => (
+                <Tag key={catCode} color="blue" className="pill-tag" style={{ margin: 0 }}>{catCode}</Tag>
+              ))
+            ) : (
+              <Tag color="default" className="pill-tag">N/A</Tag>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            <Tag color="green" className="pill-tag">{record.supplierCode || 'N/A'}</Tag>
+            {record.branch && <Tag color="orange" className="pill-tag">{record.branch}</Tag>}
+          </div>
         </div>
       ),
     },
@@ -286,7 +299,7 @@ const ProductAdmin = () => {
       align: 'center',
       render: (_, record) => (
         <div className="rating-stack">
-          <div className="stars-row">★★★★★</div>
+          <Rate disabled allowHalf value={record.avgRating} style={{ fontSize: 12 }} />
           <div className="review-text">({record.reviewCount || 0} đánh giá)</div>
         </div>
       ),
@@ -401,17 +414,6 @@ const ProductAdmin = () => {
               </div>
 
               <div className="form-group">
-                <label>Danh mục</label>
-                <select 
-                    value={filters.categoryCode}
-                    onChange={e => setFilters({...filters, categoryCode: e.target.value})}
-                >
-                  <option value="">Tất cả danh mục</option>
-                  {categories.map(cat => <option key={cat.code} value={cat.code}>{cat.name}</option>)}
-                </select>
-              </div>
-
-              <div className="form-group">
                 <label>Nhà cung cấp</label>
                 <select 
                     value={filters.supplierCode}
@@ -439,12 +441,26 @@ const ProductAdmin = () => {
                         value={filters.direction}
                         onChange={e => setFilters({...filters, direction: e.target.value})}
                     >
-                        <Space direction="vertical" size={0}>
+                        <Space orientation="vertical" size={0}>
                             <Radio value="DESC" style={{ fontSize: '13px' }}>Giảm dần</Radio>
                             <Radio value="ASC" style={{ fontSize: '13px' }}>Tăng dần</Radio>
                         </Space>
                     </Radio.Group>
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label>Danh mục</label>
+                <Select 
+                    mode="multiple"
+                    allowClear
+                    placeholder="Tất cả danh mục"
+                    value={filters.categoryCodes}
+                    onChange={values => setFilters({...filters, categoryCodes: values})}
+                    style={{ width: '100%' }}
+                >
+                  {categories.map(cat => <Option key={cat.code} value={cat.code}>{cat.name}</Option>)}
+                </Select>
               </div>
             </div>
             <div className="filter-actions" style={{ marginTop: '10px' }}>
@@ -550,14 +566,14 @@ const ProductAdmin = () => {
             initialValues={{ price: 1000 }}
         >
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Danh mục" name="categoryCode" rules={[{ required: true, message: 'Vui lòng chọn danh mục' }]}>
-                <Select placeholder="Chọn danh mục">
+            <Col span={16}>
+              <Form.Item label="Danh mục" name="categoryCodes" rules={[{ required: true, message: 'Vui lòng chọn danh mục' }]}>
+                <Select mode="multiple" placeholder="Chọn danh mục" allowClear>
                    {categories.map(cat => <Option key={cat.code} value={cat.code}>{cat.name}</Option>)}
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item label="Nhà cung cấp" name="supplierCode" rules={[{ required: true, message: 'Vui lòng chọn nhà cung cấp' }]}>
                 <Select placeholder="Chọn nhà cung cấp">
                    {suppliers.map(sup => <Option key={sup.code} value={sup.code}>{sup.name}</Option>)}
@@ -566,18 +582,28 @@ const ProductAdmin = () => {
             </Col>
           </Row>
 
+          <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: 'Vui lòng nhập tên sản phẩm' }]}>
+            <Input prefix={<FaBox color="#94a3b8"/>} placeholder="Tên sản phẩm" />
+          </Form.Item>
+
           <Row gutter={16}>
-            <Col span={6}>
+            <Col span={12}>
               <Form.Item label="Mã sản phẩm" name="code" rules={[{ required: true, message: 'Vui lòng nhập mã sản phẩm' }]}>
                 <Input prefix={<FaBarcode color="#94a3b8"/>} placeholder="Mã sản phẩm" />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: 'Vui lòng nhập tên sản phẩm' }]}>
-                <Input prefix={<FaBox color="#94a3b8"/>} placeholder="Tên sản phẩm" />
+            <Col span={7}>
+              <Form.Item label="Thương hiệu" name="branch" rules={[{ required: true, message: 'Vui lòng nhập thương hiệu' }]}>
+                <AutoComplete
+                    placeholder="Thương hiệu"
+                    options={[...new Set(products.map(p => p.branch).filter(Boolean))].map(b => ({ value: b }))}
+                    filterOption={(inputValue, option) =>
+                      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                />
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={5}>
               <Form.Item label="Giá (VNĐ)" name="price" rules={[{ required: true, message: 'Vui lòng nhập giá' }]}>
                 <InputNumber
                   style={{ width: '100%' }}
@@ -595,33 +621,27 @@ const ProductAdmin = () => {
           </Form.Item>
 
           <div className="mb-3">
-            <label className="fw-bold d-block mb-2">Hình ảnh sản phẩm</label>
-            <div className="image-upload-area">
-                <input 
-                    type="file" id="multi-upload" hidden 
-                    multiple accept="image/*"
-                    onChange={handleImageChange}
-                />
-                <label htmlFor="multi-upload" className="upload-placeholder">
-                    <FaImage size={24} />
-                    <span style={{fontSize: 12, marginTop: 4}}>Tải ảnh lên</span>
-                </label>
-                
-                {pendingImages.map((file, idx) => (
-                    <div className="preview-item" key={idx}>
-                        <img src={URL.createObjectURL(file)} alt="preview" />
-                        <MyButton className="remove-img-btn" onClick={() => removePendingImage(idx)}>
-                            <FaTimes />
-                        </MyButton>
-                    </div>
-                ))}
-            </div>
+            <label className="fw-bold d-block mb-3">Hình ảnh sản phẩm</label>
+            <Upload
+              listType="picture-card"
+              fileList={pendingImages}
+              onChange={handleImageChange}
+              beforeUpload={() => false}
+              showUploadList={{ showPreviewIcon: false }}
+              multiple
+              accept="image/*"
+            >
+              <div>
+                <PictureOutlined />
+                <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+              </div>
+            </Upload>
             <Text type="secondary" style={{fontSize: 12}}>Có thể tải lên nhiều hình ảnh cùng lúc</Text>
           </div>
 
           <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: 20}}>
-            <MyButton size="large" onClick={() => setIsAddModalVisible(false)} style={{marginRight: 10}}>Hủy</MyButton>
-            <MyButton type="primary" size="large" htmlType="submit" loading={loading}>Thêm mới</MyButton>
+            <MyButton onClick={() => setIsAddModalVisible(false)} style={{marginRight: 10}}>Hủy</MyButton>
+            <MyButton type="primary" htmlType="submit" loading={loading}>Thêm mới</MyButton>
           </div>
         </Form>
       </Modal>

@@ -28,36 +28,34 @@ public class ExportPdfProdHelper {
         title.setSpacingAfter(20);
         document.add(title);
 
-        // Sử dụng bảng 13 cột
-        PdfPTable table = new PdfPTable(13);
+        PdfPTable table = new PdfPTable(14); // tăng lên 14 cột
         table.setWidthPercentage(100f);
         table.setSpacingBefore(10f);
 
-        // Điều chỉnh độ rộng cột dựa trên độ dài tiêu đề
         table.setWidths(new float[] {
-            2f, // "Mã danh mục" (~10 ký tự)
-            3f, // "Mã nhà cung cấp" (~12 ký tự)
-            3f, // "Mã sản phẩm" (~12 ký tự)
-            3f, // "Tên sản phẩm" (~12 ký tự)
-            10f, // "Mô tả" (tương đương 50 ký tự hoặc hơn)
-            2f, // "Giá" (~3 ký tự)
-            2f, // "Giá giảm" (~6 ký tự)
-            2f, // "Số lượng tồn" (~6 ký tự)
-            2f, // "Số lượng bán" (~6 ký tự)
-            2f, // "Điểm" (~4 ký tự)
-            2f, // "Đánh giá trung bình" (~9 ký tự)
-            2f, // "Số lượng đánh giá" (~9 ký tự)
-            2f // "Tên giảm giá" (~6 ký tự)
+                2f,  // Mã danh mục
+                3f,  // Mã nhà cung cấp
+                3f,  // Mã sản phẩm
+                3f,  // Tên sản phẩm
+                3f,  // Thương hiệu (branch)
+                8f,  // Mô tả
+                2f,  // Giá
+                2f,  // Giá giảm
+                2f,  // Số lượng tồn
+                2f,  // Số lượng bán
+                2f,  // Điểm
+                2f,  // Đánh giá trung bình
+                2f,  // Số lượng đánh giá
+                2f   // Tên giảm giá
         });
 
         Font headFont = getArialBoldFont(12f);
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        // Header
         table.addCell(new Phrase("Mã danh mục", headFont));
         table.addCell(new Phrase("Mã nhà cung cấp", headFont));
         table.addCell(new Phrase("Mã sản phẩm", headFont));
         table.addCell(new Phrase("Tên sản phẩm", headFont));
+        table.addCell(new Phrase("Thương hiệu", headFont)); // thêm branch
         table.addCell(new Phrase("Mô tả", headFont));
         table.addCell(new Phrase("Giá", headFont));
         table.addCell(new Phrase("Giá giảm", headFont));
@@ -68,12 +66,13 @@ public class ExportPdfProdHelper {
         table.addCell(new Phrase("Số lượng đánh giá", headFont));
         table.addCell(new Phrase("Tên giảm giá", headFont));
 
-        // Dữ liệu
         for (ProductResponse p : productList) {
-            table.addCell(p.getCategoryCode() != null ? p.getCategoryCode() : "");
+            table.addCell(p.getCategoryCodes() != null && !p.getCategoryCodes().isEmpty()
+                    ? String.join(", ", p.getCategoryCodes()) : "");
             table.addCell(p.getSupplierCode() != null ? p.getSupplierCode() : "");
             table.addCell(p.getCode() != null ? p.getCode() : "");
             table.addCell(p.getName() != null ? p.getName() : "");
+            table.addCell(p.getBranch() != null ? p.getBranch() : ""); // thêm branch
             table.addCell(p.getDescription() != null ? p.getDescription() : "");
             table.addCell(String.valueOf(p.getPrice()));
             table.addCell(p.getDiscountPrice() != null ? String.valueOf(p.getDiscountPrice()) : "");

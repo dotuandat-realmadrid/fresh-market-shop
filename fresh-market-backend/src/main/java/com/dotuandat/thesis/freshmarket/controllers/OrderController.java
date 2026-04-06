@@ -7,6 +7,7 @@ import com.dotuandat.thesis.freshmarket.dtos.response.ApiResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.PageResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.order.OrderResponse;
 import com.dotuandat.thesis.freshmarket.enums.OrderStatus;
+import com.dotuandat.thesis.freshmarket.services.OrderPdfService;
 import com.dotuandat.thesis.freshmarket.services.OrderService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -15,9 +16,13 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/orders")
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class OrderController {
     OrderService orderService;
+    OrderPdfService orderPdfService;
 
     @GetMapping
     public ApiResponse<PageResponse<OrderResponse>> search(
@@ -56,10 +62,17 @@ public class OrderController {
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/me/{id}")
     public ApiResponse<OrderResponse> getOneByOrderId(@PathVariable String id) {
         return ApiResponse.<OrderResponse>builder()
                 .result(orderService.getOneByOrderId(id))
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<OrderResponse> getById(@PathVariable String id) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.getById(id))
                 .build();
     }
 
@@ -118,5 +131,17 @@ public class OrderController {
         return ApiResponse.<Integer>builder()
                 .result(orderService.countTotalPendingOrders())
                 .build();
+    }
+
+    @GetMapping("/{id}/invoice/pdf")
+    public ResponseEntity<byte[]> exportInvoicePdf(@PathVariable String id) {
+        byte[] pdfBytes = orderPdfService.exportInvoicePdf(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "hoa-don-" + id + ".pdf");
+        headers.setContentLength(pdfBytes.length);
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }

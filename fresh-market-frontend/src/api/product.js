@@ -2,33 +2,48 @@ import { API } from "./auth";
 import { getToken } from "../services/localStorageService";
 
 export const searchProducts = async (filters, page = 1, size = 10) => {
-  try {
-    const queryParams = new URLSearchParams({
-      page: page,
-      size: size,
-      ...filters
-    }).toString();
+    try {
+        const queryParams = new URLSearchParams({
+            page: page,
+            size: size,
+        });
 
-    const response = await fetch(`${API}/products?${queryParams}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+        Object.keys(filters).forEach(key => {
+            const value = filters[key];
+            if (value !== undefined && value !== null && value !== '') {
+                if (Array.isArray(value)) {
+                    value.forEach(item => queryParams.append(key, item));
+                } else {
+                    queryParams.append(key, value);
+                }
+            }
+        });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Tải danh sách sản phẩm thất bại!");
+        const queryString = queryParams.toString();
+
+        const token = getToken();
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API}/products?${queryString}`, {
+            method: "GET",
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Tải danh sách sản phẩm thất bại!");
+        }
+
+        const result = await response.json();
+        if (result.code !== 1000) {
+            throw new Error(result.message);
+        }
+        return result.result;
+    } catch (error) {
+        throw error;
     }
-
-    const result = await response.json();
-    if (result.code !== 1000) {
-        throw new Error(result.message);
-    }
-    return result.result;
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const createProduct = async (productData) => {
@@ -142,7 +157,7 @@ export const importProductsExcel = async (file, action = 'create') => {
     try {
         const formData = new FormData();
         formData.append('file', file);
-        
+
         const method = action === 'create' ? 'POST' : 'PUT';
         const response = await fetch(`${API}/products/import-excel`, {
             method: method,
@@ -250,11 +265,14 @@ export const importProductsAI = async (quantity) => {
 };
 export const getProductByCode = async (code) => {
     try {
+        const token = getToken();
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const response = await fetch(`${API}/products/${code}`, {
             method: "GET",
-            headers: {
-                Authorization: `Bearer ${getToken()}`,
-            },
         });
 
         if (!response.ok) {
@@ -299,14 +317,14 @@ export const deleteProduct = async (productId) => {
 export const updateProductImages = async (productId, keepImages, files) => {
     try {
         const formData = new FormData();
-        
+
         // Append keepImages individually or as multiple fields
         if (keepImages && keepImages.length > 0) {
             keepImages.forEach(img => {
                 formData.append('keepImages', img);
             });
         }
-        
+
         // Append new files as 'newImages' to match backend @RequestParam
         if (files && files.length > 0) {
             files.forEach(file => {

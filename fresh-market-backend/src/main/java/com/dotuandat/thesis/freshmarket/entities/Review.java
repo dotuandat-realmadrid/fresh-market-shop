@@ -23,11 +23,13 @@ public class Review extends BaseEntity {
     Product product;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id")
     Order order;
 
     @Column(nullable = false)
     int rating;
+
+    String title;
 
     @Column(length = 500)
     String comment;

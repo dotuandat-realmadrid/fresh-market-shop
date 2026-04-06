@@ -9,7 +9,7 @@ import { getMyInfo } from "./user";
 
 export const API = `http://localhost:8088/fresh-market`;
 export const IMAGE_URL = `http://localhost:3001/src/assets/uploads`;
-export const DEFAULT_IMAGE = "http://localhost:3001/src/assets/uploads/images/no_image_large.jpg";
+export const DEFAULT_IMAGE = "http://localhost:3001/src/assets/images/no_image_large.jpg";
 
 export const login = async (data, navigate, dispatch) => {
   await fetch(`${API}/auth/login`, {
@@ -99,7 +99,7 @@ export const refresh = async (token) => {
   return await fetch(`${API}/auth/refresh`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      // Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),

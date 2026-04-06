@@ -34,3 +34,6 @@ build/
 
 ### Environment files ###
 .env
+
+### Databases ###
+fresh-market.sql

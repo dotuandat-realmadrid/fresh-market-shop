@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PageResponse<ProductResponse> search(ProductSearchRequest request, Pageable pageable) {
         Specification<Product> spec = Specification.where(ProductSpecification.withId(request.getId()))
-                .and(ProductSpecification.withCategoryCode(request.getCategoryCode()))
+                .and(ProductSpecification.withCategoryCodes(request.getCategoryCodes()))
                 .and(ProductSpecification.withSupplierCode(request.getSupplierCode()))
                 .and(ProductSpecification.withCode(request.getCode()))
                 .and(ProductSpecification.withName(request.getName()))

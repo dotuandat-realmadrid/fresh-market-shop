@@ -45,7 +45,7 @@ public class Category extends BaseEntity {
     List<Category> children;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "category")
+    @ManyToMany(mappedBy = "categories")
     List<Product> products;
 
     @ManyToMany

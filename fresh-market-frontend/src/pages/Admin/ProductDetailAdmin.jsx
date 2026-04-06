@@ -36,6 +36,7 @@ import {
   Tooltip,
   Typography,
   Upload,
+  AutoComplete
 } from "antd";
 import MyButton from "../../components/MyButton";
 import TextArea from "antd/es/input/TextArea";
@@ -210,9 +211,10 @@ export default function ProductDetailAdmin() {
           const price = values.price ? parseInt(values.price.toString().replace(/,/g, ''), 10) : 0;
 
           const data = {
-            categoryCode: values.categoryCode,
+            categoryCodes: values.categoryCodes,
             supplierCode: values.supplierCode,
             name: values.name,
+            branch: values.branch,
             description: values.description,
             price: price,
             discountId: discountId || null,
@@ -490,21 +492,36 @@ export default function ProductDetailAdmin() {
                 </Space>
               </Divider>
 
-              <Form.Item
-                label="Tên sản phẩm"
-                name="name"
-                rules={[
-                  { required: true, message: "Vui lòng nhập tên sản phẩm!" },
-                ]}
-              >
-                <Input placeholder="Nhập tên sản phẩm" />
-              </Form.Item>
+              <Row gutter={[24, 0]}>
+                <Col span={24} lg={16}>
+                  <Form.Item
+                    label="Tên sản phẩm"
+                    name="name"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập tên sản phẩm!" },
+                    ]}
+                  >
+                    <Input placeholder="Nhập tên sản phẩm" />
+                  </Form.Item>
+                </Col>
+                <Col span={24} lg={8}>
+                  <Form.Item
+                    label="Thương hiệu"
+                    name="branch"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập thương hiệu!" },
+                    ]}
+                  >
+                    <AutoComplete placeholder="Nhập thương hiệu" />
+                  </Form.Item>
+                </Col>
+              </Row>
 
               <Row gutter={[24, 0]}>
-                <Col span={24} lg={12}>
+                <Col span={24} lg={16}>
                   <Form.Item
                     label="Danh mục"
-                    name="categoryCode"
+                    name="categoryCodes"
                     rules={[
                       { required: true, message: "Vui lòng chọn danh mục!" },
                     ]}
@@ -512,6 +529,8 @@ export default function ProductDetailAdmin() {
                     <Select
                       placeholder="Chọn danh mục"
                       showSearch
+                      mode="multiple"
+                      allowClear
                       optionFilterProp="children"
                     >
                       {Array.isArray(categories) && categories.map((category) => (
@@ -526,7 +545,7 @@ export default function ProductDetailAdmin() {
                   </Form.Item>
                 </Col>
 
-                <Col span={24} lg={12}>
+                <Col span={24} lg={8}>
                   <Form.Item
                     label="Nhà cung cấp"
                     name="supplierCode"

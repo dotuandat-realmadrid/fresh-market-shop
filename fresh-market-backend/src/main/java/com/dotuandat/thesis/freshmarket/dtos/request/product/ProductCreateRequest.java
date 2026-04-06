@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import jakarta.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -12,8 +14,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductCreateRequest {
-    @NotBlank(message = "CATEGORY_NOT_BLANK")
-    String categoryCode;
+    @NotNull(message = "CATEGORY_NOT_NULL")
+    @Size(min = 1, message = "CATEGORY_NOT_BLANK")
+    List<String> categoryCodes;
 
     @NotBlank(message = "SUPPLIER_NOT_BLANK")
     String supplierCode;
@@ -23,6 +26,8 @@ public class ProductCreateRequest {
 
     @NotBlank(message = "NAME_NOT_BLANK")
     String name;
+
+    String branch;
 
     String description;
 

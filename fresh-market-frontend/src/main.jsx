@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './store/store.js'
 import { ConfigProvider, message, App as AntApp } from 'antd'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')).render(
           }}
         >
           <AntApp>
-            <App />
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
           </AntApp>
         </ConfigProvider>
       </PersistGate>

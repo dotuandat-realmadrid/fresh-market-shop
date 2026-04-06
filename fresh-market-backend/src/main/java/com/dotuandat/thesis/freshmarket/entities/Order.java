@@ -40,6 +40,9 @@ public class Order extends BaseEntity {
 
     String note;
 
+    @Column(name = "payment_ref")
+    String paymentRef;
+
     @ManyToOne
     @JoinColumn(name = "address_id")
     Address address;

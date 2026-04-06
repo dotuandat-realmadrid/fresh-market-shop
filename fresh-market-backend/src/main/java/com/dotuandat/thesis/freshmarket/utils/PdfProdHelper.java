@@ -66,10 +66,11 @@ public class PdfProdHelper {
                         columnMap.put(header, i);
                     }
 
-                    int categoryCodeIdx = columnMap.getOrDefault("categorycode", -1);
+                    int categoryCodeIdx = columnMap.getOrDefault("categorycodes", -1);
                     int supplierCodeIdx = columnMap.getOrDefault("suppliercode", -1);
                     int codeIdx = columnMap.getOrDefault("code", -1);
                     int nameIdx = columnMap.getOrDefault("name", -1);
+                    int branchIdx = columnMap.getOrDefault("branch", -1);
                     int descriptionIdx = columnMap.getOrDefault("description", -1);
                     int priceIdx = columnMap.getOrDefault("price", -1);
                     int imagePathIdx = columnMap.getOrDefault("imagepath", -1);
@@ -78,6 +79,7 @@ public class PdfProdHelper {
                             || supplierCodeIdx == -1
                             || codeIdx == -1
                             || nameIdx == -1
+                            || branchIdx == -1
                             || descriptionIdx == -1
                             || priceIdx == -1) {
                         log.error("Thiếu cột bắt buộc trong bảng trên trang {}", pageNum);
@@ -93,20 +95,27 @@ public class PdfProdHelper {
                         }
 
                         try {
-                            String categoryCode = getRawValue(cells, categoryCodeIdx);
+                            String categoryCodes = getRawValue(cells, categoryCodeIdx);
+                            List<String> listCategoryCodes = categoryCodes.isEmpty()
+                                    ? List.of()
+                                    : Arrays.stream(categoryCodes.split(","))
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .toList();
                             String supplierCode = getRawValue(cells, supplierCodeIdx);
                             String code = getRawValue(cells, codeIdx);
                             String name = getRawValue(cells, nameIdx);
+                            String branch = getRawValue(cells, branchIdx);
                             String description = getRawValue(cells, descriptionIdx);
                             String priceStr = getRawValue(cells, priceIdx).replaceAll("[^0-9]", "");
                             Long price = priceStr.isEmpty() ? 0L : Long.parseLong(priceStr);
                             List<String> imagePaths = extractImagesFromPdf(pdPage, cells, imagePathIdx);
 
-                            if (categoryCode.isEmpty() || supplierCode.isEmpty() || code.isEmpty() || name.isEmpty()) {
+                            if (categoryCodes.isEmpty() || supplierCode.isEmpty() || code.isEmpty() || name.isEmpty()) {
                                 log.warn(
                                         "Dữ liệu không hợp lệ tại dòng {}: categoryCode={}, supplierCode={}, code={}, name={}",
                                         i,
-                                        categoryCode,
+                                        categoryCodes,
                                         supplierCode,
                                         code,
                                         name);
@@ -114,10 +123,11 @@ public class PdfProdHelper {
                             }
 
                             ProductCreateRequest request = ProductCreateRequest.builder()
-                                    .categoryCode(categoryCode)
+                                    .categoryCodes(listCategoryCodes)
                                     .supplierCode(supplierCode)
                                     .code(code)
                                     .name(name)
+                                    .branch(branch)
                                     .description(description)
                                     .price(price)
                                     .build();
@@ -170,10 +180,11 @@ public class PdfProdHelper {
                         columnMap.put(header, i);
                     }
 
-                    int categoryCodeIdx = columnMap.getOrDefault("categorycode", -1);
+                    int categoryCodeIdx = columnMap.getOrDefault("categorycodes", -1);
                     int supplierCodeIdx = columnMap.getOrDefault("suppliercode", -1);
                     int codeIdx = columnMap.getOrDefault("code", -1);
                     int nameIdx = columnMap.getOrDefault("name", -1);
+                    int branchIdx = columnMap.getOrDefault("branch", -1);
                     int descriptionIdx = columnMap.getOrDefault("description", -1);
                     int priceIdx = columnMap.getOrDefault("price", -1);
                     int discountIdx = columnMap.getOrDefault("discountid", -1);
@@ -182,6 +193,7 @@ public class PdfProdHelper {
                             || supplierCodeIdx == -1
                             || codeIdx == -1
                             || nameIdx == -1
+                            || branchIdx == -1
                             || descriptionIdx == -1
                             || priceIdx == -1) {
                         log.error("Thiếu cột bắt buộc trong bảng trên trang {}", pageNum);
@@ -197,10 +209,17 @@ public class PdfProdHelper {
                         }
 
                         try {
-                            String categoryCode = getRawValue(cells, categoryCodeIdx);
+                            String categoryCodes = getRawValue(cells, categoryCodeIdx);
+                            List<String> listCategoryCodes = categoryCodes.isEmpty()
+                                    ? List.of()
+                                    : Arrays.stream(categoryCodes.split(","))
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .toList();
                             String supplierCode = getRawValue(cells, supplierCodeIdx);
                             String code = getRawValue(cells, codeIdx);
                             String name = getRawValue(cells, nameIdx);
+                            String branch = getRawValue(cells, branchIdx);
                             String description = getRawValue(cells, descriptionIdx);
                             String priceStr = getRawValue(cells, priceIdx).replaceAll("[^0-9]", "");
                             Long price = priceStr.isEmpty() ? 0L : Long.parseLong(priceStr);
@@ -214,9 +233,10 @@ public class PdfProdHelper {
                             }
 
                             ProductUpdateRequest request = ProductUpdateRequest.builder()
-                                    .categoryCode(categoryCode)
+                                    .categoryCodes(listCategoryCodes)
                                     .supplierCode(supplierCode)
                                     .name(name)
+                                    .branch(branch)
                                     .description(description)
                                     .price(price)
                                     .discountId(discountId)

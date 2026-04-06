@@ -84,7 +84,7 @@
 
 .hero-slider:hover .custom-nav,
 .promo-slider-container:hover .custom-nav,
-.hot-deal-slider-container:hover .custom-nav {
+.product-slider-container:hover .custom-nav {
     opacity: 1;
     visibility: visible;
 }
@@ -265,7 +265,7 @@
 }
 
 /* Hot Deal Section Styles */
-.hot-deal-section {
+.product-section {
     padding: 20px 10px;
     /* margin-bottom: 40px; */
 }
@@ -295,22 +295,23 @@
     text-decoration: underline;
 }
 
-.hot-deal-slider-container {
+.product-slider-container {
     position: relative;
     padding: 0 10px;
 }
 
 
 
-.hot-deal-slider-container:hover .custom-nav {
+.product-slider-container:hover .custom-nav {
     opacity: 1;
+    visibility: visible;
 }
 
-.hot-deal-slider-container .custom-nav.hot-deal-prev {
+.product-slider-container .custom-nav.product-prev {
     left: 0;
 }
 
-.hot-deal-slider-container .custom-nav.hot-deal-next {
+.product-slider-container .custom-nav.product-next {
     right: 0;
 }
 
@@ -319,7 +320,7 @@
         font-size: 18px;
     }
 
-    .hot-deal-slider-container {
+    .product-slider-container {
         padding: 0 30px;
     }
 }

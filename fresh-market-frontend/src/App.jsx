@@ -1,4 +1,3 @@
-import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
 import { useEffect } from "react";
@@ -32,7 +31,6 @@ function App() {
     }
   }, [token, dispatch]);
   return (
-    <BrowserRouter>
       <RoleProvider>
         <SupplierProvider>
           <CategoryProvider>
@@ -40,7 +38,6 @@ function App() {
           </CategoryProvider>
         </SupplierProvider>
       </RoleProvider>
-    </BrowserRouter>
   );
 }
 

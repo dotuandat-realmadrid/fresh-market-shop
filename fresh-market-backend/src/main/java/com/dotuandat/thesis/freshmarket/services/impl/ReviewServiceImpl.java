@@ -39,11 +39,15 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewResponse create(ReviewRequest request) {
-        Order order = validateOrderAndUser(request);
-        validateProductInOrder(request);
-        validateReviewNotExists(request);
+        // Resolve user từ username
+        User user = userRepository.findByUsernameAndIsActive(request.getUsername(), StatusConstant.ACTIVE)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Review review = createReviewFromRequest(request, order);
+        Order order = validateOrderAndUser(request, user.getId());
+        validateProductInOrder(request);
+        validateReviewNotExists(request, user.getId());
+
+        Review review = createReviewFromRequest(request, order, user);
         reviewRepository.save(review);
 
         updateProductRatingAndPoint(review.getProduct().getId(), review.getRating(), true);
@@ -77,12 +81,14 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.save(review);
     }
 
-    private Order validateOrderAndUser(ReviewRequest request) {
+    private Order validateOrderAndUser(ReviewRequest request, String userId) {
+        if (request.getOrderId() == null) return null;
+
         Order order = orderRepository
                 .findById(request.getOrderId())
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
 
-        if (!order.getUser().getId().equals(request.getUserId())) {
+        if (!order.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
@@ -94,6 +100,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private void validateProductInOrder(ReviewRequest request) {
+        if (request.getOrderId() == null) return;
+
         boolean productInOrder =
                 orderDetailRepository.existsByOrderIdAndProductId(request.getOrderId(), request.getProductId());
         if (!productInOrder) {
@@ -101,17 +109,20 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private void validateReviewNotExists(ReviewRequest request) {
-        if (reviewRepository.existsByUserIdAndOrderIdAndProductId(
-                request.getUserId(), request.getOrderId(), request.getProductId())) {
+//    private void validateReviewNotExists(ReviewRequest request, String userId) {
+//        if (reviewRepository.existsByUserIdAndOrderIdAndProductId(
+//                userId, request.getOrderId(), request.getProductId())) {
+//            throw new AppException(ErrorCode.ALREADY_REVIEWED);
+//        }
+//    }
+
+    private void validateReviewNotExists(ReviewRequest request, String userId) {
+        if (reviewRepository.existsByUserIdAndProductId(userId, request.getProductId())) {
             throw new AppException(ErrorCode.ALREADY_REVIEWED);
         }
     }
 
-    private Review createReviewFromRequest(ReviewRequest request, Order order) {
-        User user = userRepository
-                .findByIdAndIsActive(request.getUserId(), StatusConstant.ACTIVE)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    private Review createReviewFromRequest(ReviewRequest request, Order order, User user) {
         Product product = productRepository
                 .findById(request.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
@@ -121,9 +132,25 @@ public class ReviewServiceImpl implements ReviewService {
                 .product(product)
                 .order(order)
                 .rating(request.getRating())
+                .title(request.getTitle())       // thêm title
                 .comment(request.getComment())
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
+                .build();
+    }
+
+    private ReviewResponse mapToResponse(Review review) {
+        return ReviewResponse.builder()
+                .id(review.getId())
+                .userId(review.getUser().getId())
+                .username(review.getUser().getUsername())
+                .fullName(review.getUser().getFullName())
+                .orderId(review.getOrder() != null ? review.getOrder().getId() : null)  // fix null
+                .productId(review.getProduct().getId())
+                .rating(review.getRating())
+                .title(review.getTitle())
+                .comment(review.getComment())
+                .createdDate(review.getCreatedDate())
                 .build();
     }
 
@@ -164,18 +191,5 @@ public class ReviewServiceImpl implements ReviewService {
         product.setPoint(point);
 
         productRepository.save(product);
-    }
-
-    private ReviewResponse mapToResponse(Review review) {
-        return ReviewResponse.builder()
-                .id(review.getId())
-                .userId(review.getUser().getId())
-                .fullName(review.getUser().getFullName())
-                .orderId(review.getOrder().getId())
-                .productId(review.getProduct().getId())
-                .rating(review.getRating())
-                .comment(review.getComment())
-                .createdDate(review.getCreatedDate())
-                .build();
     }
 }

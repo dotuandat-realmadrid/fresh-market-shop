@@ -13,13 +13,15 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponse {
     String id;
-    String categoryCode;
+    List<String> categoryCodes;
     String supplierCode;
     String code;
     String name;
+    String branch;
     String description;
     int price;
     Integer discountPrice;
+    Double percent;
     int inventoryQuantity;
     int soldQuantity;
     int point;

@@ -3,8 +3,11 @@ package com.dotuandat.thesis.freshmarket.dtos.request.product;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -12,14 +15,17 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductUpdateRequest {
-    @NotBlank(message = "CATEGORY_NOT_BLANK")
-    String categoryCode;
+    @NotNull(message = "CATEGORY_NOT_NULL")
+    @Size(min = 1, message = "CATEGORY_NOT_BLANK")
+    List<String> categoryCodes;
 
     @NotBlank(message = "SUPPLIER_NOT_BLANK")
     String supplierCode;
 
     @NotBlank(message = "NAME_NOT_BLANK")
     String name;
+
+    String branch;
 
     String description;
 

@@ -343,7 +343,10 @@ INSERT INTO `category` (`id`, `createdby`, `createddate`, `is_active`, `modified
 ('779bf3c9-fc34-4141-8332-9914f5ad43a5', 'admin@gmail.com', NOW(), 1, 'admin@gmail.com', NOW(), 'cham-soc-co-the', 'Chăm Sóc Cơ Thể', NULL, 3, 'Chăm Sóc Cơ Thể'),
 ('77dfce3d-9ca5-48f4-ae40-94e871e65358', 'admin@gmail.com', NOW(), 1, 'admin@gmail.com', NOW(), 'cham-soc-mat', 'Chăm Sóc Mặt', NULL, 3, 'Chăm Sóc Mặt'),
 ('78190b49-3413-433e-bab1-60e658edce3c', 'admin@gmail.com', NOW(), 1, 'admin@gmail.com', NOW(), 'cham-soc-rang-mieng', 'Chăm Sóc Răng Miệng', NULL, 3, 'Chăm Sóc Răng Miệng'),
-('79233f62-acaf-4a05-88e3-8b7384417c33', 'admin@gmail.com', NOW(), 1, 'admin@gmail.com', NOW(), 'do-dung-ca-nhan', 'Đồ Dùng Cá Nhân', NULL, 3, 'Đồ Dùng Cá Nhân');
+('79233f62-acaf-4a05-88e3-8b7384417c33', 'admin@gmail.com', NOW(), 1, 'admin@gmail.com', NOW(), 'do-dung-ca-nhan', 'Đồ Dùng Cá Nhân', NULL, 3, 'Đồ Dùng Cá Nhân'),
+
+-- Level 2: Danh mục con Đi Chợ Online
+('79233f62-acaf-4a05-88e3-8b7384417111', 'admin@gmail.com', NOW(), 1, 'admin@gmail.com', NOW(), 'di-cho-online', 'Đi Chợ', NULL, 2, 'Đi Chợ Online');
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
 

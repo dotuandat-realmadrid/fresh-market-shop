@@ -2,8 +2,13 @@ package com.dotuandat.thesis.freshmarket.specifications;
 
 import com.dotuandat.thesis.freshmarket.entities.Product;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 public class ProductSpecification {
     public static Specification<Product> withId(String id) {
@@ -14,11 +19,20 @@ public class ProductSpecification {
         };
     }
 
-    public static Specification<Product> withCategoryCode(String categoryCode) {
+    public static Specification<Product> withCategoryCodes(List<String> categoryCodes) {
         return (root, query, criteriaBuilder) -> {
-            if (!StringUtils.hasText(categoryCode)) return null;
+            if (categoryCodes == null || categoryCodes.isEmpty()) return null;
 
-            return criteriaBuilder.equal(root.get("category").get("code"), categoryCode);
+            // Dùng subquery thay vì JOIN để tránh duplicate
+            assert query != null;
+            Subquery<String> subquery = query.subquery(String.class);
+            Root<Product> subRoot = subquery.correlate(root); // correlated subquery
+            var categoriesJoin = subRoot.join("categories", JoinType.INNER);
+
+            subquery.select(categoriesJoin.get("code"))
+                    .where(categoriesJoin.get("code").in(categoryCodes));
+
+            return criteriaBuilder.exists(subquery);
         };
     }
 

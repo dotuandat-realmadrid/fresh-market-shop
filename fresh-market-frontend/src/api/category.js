@@ -131,9 +131,6 @@ export const getCategoryByCode = async (code) => {
   try {
     const response = await fetch(`${API}/categories/${code}`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
     });
 
     if (!response.ok) {
