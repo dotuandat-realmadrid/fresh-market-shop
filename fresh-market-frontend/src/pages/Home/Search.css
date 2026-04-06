@@ -1,0 +1,129 @@
+.search-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 0px 10px 0px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #111;
+}
+
+/* Breadcrumb */
+.search-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 13px;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid #dcdcdc;
+  margin-bottom: 24px;
+}
+
+.search-bc-link {
+    text-decoration: none;
+    color: #666;
+}
+
+.search-bc-link:hover {
+    color: #000;
+}
+
+.search-bc-sep {
+    margin: 0 2px;
+    color: #747474;
+}
+
+.search-bc-current {
+    color: #333;
+}
+
+/* Header Section */
+.search-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.search-main-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 12px;
+}
+
+.search-count-info {
+    font-size: 15px;
+    color: #666;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.search-title-line {
+    width: 60px;
+    height: 3px;
+    background-color: #333;
+    margin: 0 auto;
+}
+
+.search-query-result {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+/* Grid */
+.search-product-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 1400px) {
+    .search-product-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .search-product-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .search-product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .search-product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .search-product-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Pagination */
+.search-pagination-wrapper {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Skeleton/Loading items */
+.search-skeleton-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.no-results-container {
+    padding: 60px 0;
+    text-align: center;
+}

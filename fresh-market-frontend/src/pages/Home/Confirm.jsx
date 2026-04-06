@@ -20,7 +20,7 @@ const Confirm = () => {
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
   const user = useSelector((state) => state.user);
-  const [messageApi, contextHolder] = message.useMessage();
+
 
   useEffect(() => {
     const errorParam = searchParams.get('error');
@@ -30,14 +30,14 @@ const Confirm = () => {
       if (errorParam === 'invalid_signature') errorMsg = "Chữ ký không hợp lệ!";
       else if (errorParam === 'payment_failed') errorMsg = `Thanh toán thất bại! Mã lỗi: ${code}`;
       
-      messageApi.error(errorMsg);
+      message.error(errorMsg);
       navigate('/checkout'); // Redirect back to checkout or show error page
       return;
     }
 
     const fetchOrder = async () => {
       if (!orderId) {
-        messageApi.error("Không tìm thấy mã đơn hàng!");
+        message.error("Không tìm thấy mã đơn hàng!");
         navigate('/');
         return;
       }
@@ -63,7 +63,7 @@ const Confirm = () => {
         }
       } catch (error) {
         console.error("Lỗi khi tải đơn hàng:", error);
-        messageApi.error("Không thể tải thông tin đơn hàng.");
+        message.error("Không thể tải thông tin đơn hàng.");
       } finally {
         setLoading(false);
       }
@@ -97,7 +97,7 @@ const Confirm = () => {
 
   const handleExportInvoice = async () => {
     try {
-      messageApi.loading({ content: 'Đang chuẩn bị hóa đơn...', key: 'exporting' });
+      message.loading({ content: 'Đang chuẩn bị hóa đơn...', key: 'exporting' });
       const blob = await exportInvoicePdf(order.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -107,16 +107,16 @@ const Confirm = () => {
       link.click();
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
-      messageApi.success({ content: 'Tạo hóa đơn thành công!', key: 'exporting' });
+      message.success({ content: 'Tạo hóa đơn thành công!', key: 'exporting' });
     } catch (error) {
       console.error("Lỗi tạo hóa đơn:", error);
-      messageApi.error({ content: 'Không thể tạo hóa đơn. Vui lòng thử lại!', key: 'exporting' });
+      message.error({ content: 'Không thể tạo hóa đơn. Vui lòng thử lại!', key: 'exporting' });
     }
   };
 
   return (
     <div className="confirm-container">
-      {contextHolder}
+
       {/* 1. Header Banner - Matching Image 1 */}
       <div className="confirm-header-banner">
         <div className="success-icon-circle">

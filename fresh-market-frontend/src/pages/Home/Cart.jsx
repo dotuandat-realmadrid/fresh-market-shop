@@ -41,7 +41,7 @@ const Cart = () => {
   const user = useSelector((state) => state.user);
   const token = getToken();
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+
 
   const [suggestedPrev, setSuggestedPrev] = useState(null);
   const [suggestedNext, setSuggestedNext] = useState(null);
@@ -97,7 +97,7 @@ const Cart = () => {
           if (item.quantity > latestInventory) {
             // Tự động xóa khỏi server
             await removeItem(user.id, item.productId || item.id);
-            messageApi.info(`Sản phẩm ${item.productName || item.name} đã bị xóa do hết hàng`);
+            message.info(`Sản phẩm ${item.productName || item.name} đã bị xóa do hết hàng`);
             continue;
           }
           
@@ -155,7 +155,7 @@ const Cart = () => {
         const latestInventory = resp?.data?.[0]?.inventoryQuantity ?? 999;
         
         if (currentQty >= latestInventory) {
-          messageApi.warning(`Không đủ hàng trong kho!`);
+          message.warning(`Không đủ hàng trong kho!`);
           return;
         }
       } catch (err) {
@@ -191,7 +191,7 @@ const Cart = () => {
         await addCartItem(body);
         await loadUserCart();
       } catch (error) {
-        messageApi.error('Cập nhật số lượng thất bại');
+        message.error('Cập nhật số lượng thất bại');
       }
     }
     window.dispatchEvent(new Event('cartUpdated'));
@@ -208,11 +208,11 @@ const Cart = () => {
         await removeCartItem(user.id, item.productId);
         await loadUserCart();
       } catch (error) {
-        messageApi.error('Xóa sản phẩm thất bại');
+        message.error('Xóa sản phẩm thất bại');
       }
     }
     window.dispatchEvent(new Event('cartUpdated'));
-    messageApi.success('Đã xóa sản phẩm khỏi giỏ hàng');
+    message.success('Đã xóa sản phẩm khỏi giỏ hàng');
   };
 
   // Fetch suggested products
@@ -243,7 +243,7 @@ const Cart = () => {
 
   return (
     <div className="cart-page">
-      {contextHolder}
+
       {/* Breadcrumb */}
       <nav className="cart-breadcrumb">
         <Link to="/">Trang chủ</Link>

@@ -295,8 +295,8 @@ export default function OrderCreationAdmin() {
             suffixIcon={<PlusOutlined />}
           >
             {products.map((product) => (
-              <Option key={product.code} value={JSON.stringify(product)}>
-                {product.code}
+              <Option key={product.name} value={JSON.stringify(product)}>
+                {product.name}
               </Option>
             ))}
           </Select>

@@ -454,8 +454,8 @@ export default function InventoryReceiptDetailAdmin() {
               suffixIcon={<PlusOutlined />}
             >
               {products.map((product) => (
-                <Option key={product.code} value={product.code} label={`${product.code} - ${product.name}`}>
-                  {product.code} - {product.name}
+                <Option key={product.name} value={product.name} label={`${product.name}`}>
+                  {product.name}
                 </Option>
               ))}
             </Select>

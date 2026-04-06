@@ -148,7 +148,7 @@ const ProductDetail = () => {
   const [qty, setQty] = useState(1);
   const userId = useSelector((state) => state.user.id);
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+
   const [descExpanded, setDescExpanded] = useState(false);
   const [hasOverflow, setHasOverflow] = useState(false);
   const descRef = useRef(null);
@@ -211,7 +211,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = debounce(async (isBuy) => {
     if (product.inventoryQuantity <= 0) {
-      messageApi.warning('Sản phẩm đã hết hàng!');
+      message.warning('Sản phẩm đã hết hàng!');
       return;
     }
 
@@ -220,13 +220,13 @@ const ProductDetail = () => {
       const existingItem = guestCart.items.find((item) => item.productId === product.id);
       if (existingItem) {
         if (existingItem.quantity + qty > product.inventoryQuantity) {
-          messageApi.warning(`Số lượng tối đa bạn có thể thêm là ${product.inventoryQuantity - existingItem.quantity}`);
+          message.warning(`Số lượng tối đa bạn có thể thêm là ${product.inventoryQuantity - existingItem.quantity}`);
           return;
         }
         existingItem.quantity += qty;
       } else {
         if (qty > product.inventoryQuantity) {
-           messageApi.warning(`Sản phẩm này chỉ còn ${product.inventoryQuantity} trong kho`);
+           message.warning(`Sản phẩm này chỉ còn ${product.inventoryQuantity} trong kho`);
            return;
         }
         guestCart.items.push({
@@ -243,7 +243,7 @@ const ProductDetail = () => {
       localStorage.setItem('guestCart', JSON.stringify(guestCart));
       window.dispatchEvent(new Event('cartUpdated'));
       if (isBuy) navigate('/cart');
-      else messageApi.success('Đã thêm vào giỏ hàng');
+      else message.success('Đã thêm vào giỏ hàng');
       return;
     }
 
@@ -257,9 +257,9 @@ const ProductDetail = () => {
       await addCartItem(data);
       window.dispatchEvent(new Event('cartUpdated'));
       if (isBuy) navigate('/cart');
-      else messageApi.success('Đã thêm vào giỏ hàng');
+      else message.success('Đã thêm vào giỏ hàng');
     } catch {
-      messageApi.error('Có lỗi xảy ra, vui lòng thử lại!');
+      message.error('Có lỗi xảy ra, vui lòng thử lại!');
     }
   }, 500);
 
@@ -410,7 +410,7 @@ const ProductDetail = () => {
 
   return (
     <div className="pd-page">
-      {contextHolder}
+
       {/* ── Breadcrumb ─────────────────────────────────────────────────────── */}
       <nav className="pd-breadcrumb">
         <Link to="/">Trang chủ</Link>

@@ -9,8 +9,6 @@ import { RoleProvider } from './context/RoleContext';
 import { SupplierProvider } from './context/SupplierContext';
 import { CategoryProvider } from './context/CategoryContext';
 
-import { App as AntApp } from 'antd';
-
 function App() {
   
   const token = getToken();
@@ -33,15 +31,13 @@ function App() {
     }
   }, [token, dispatch]);
   return (
-    <AntApp>
-      <RoleProvider>
-        <SupplierProvider>
-          <CategoryProvider>
-            <AppRoutes />
-          </CategoryProvider>
-        </SupplierProvider>
-      </RoleProvider>
-    </AntApp>
+    <RoleProvider>
+      <SupplierProvider>
+        <CategoryProvider>
+          <AppRoutes />
+        </CategoryProvider>
+      </SupplierProvider>
+    </RoleProvider>
   );
 }
 

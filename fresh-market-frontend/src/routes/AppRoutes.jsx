@@ -11,6 +11,7 @@ import Confirm from "../pages/Home/Confirm";
 import AddressList from "../pages/Home/AddressList";
 import MyProfile from "../pages/Home/MyProfile";
 import MyOrders from "../pages/Home/MyOrders";
+import Search from "../pages/Home/Search";
 import ScrollToTop from "../components/ScrollToTop";
 import AdminLayout from "../components/layout/AdminLayout";
 import HomeAdmin from "../pages/Admin/HomeAdmin";
@@ -53,6 +54,7 @@ const AppRoutes = () => {
             <Route path="/my-address" element={<AddressList />} />
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/search" element={<Search />} />
           </Route>
           <Route path="/admin" element={ 
             <PrivateRoute

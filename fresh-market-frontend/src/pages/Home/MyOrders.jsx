@@ -31,7 +31,7 @@ const MyOrders = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
-    const [messageApi, contextHolder] = message.useMessage();
+
     
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -68,7 +68,7 @@ const MyOrders = () => {
             setTotalOrders(result.totalElements || 0);
         } catch (error) {
             console.error("Fetch orders error:", error);
-            messageApi.error("Không thể tải danh sách đơn hàng");
+            message.error("Không thể tải danh sách đơn hàng");
         } finally {
             setLoading(false);
         }
@@ -95,11 +95,11 @@ const MyOrders = () => {
     const handleCancelOrder = async (orderId) => {
         try {
             await cancelOrder(orderId);
-            messageApi.success("Đã hủy đơn hàng thành công");
+            message.success("Đã hủy đơn hàng thành công");
             fetchOrders(activeStatus, currentPage);
             setDetailModalVisible(false);
         } catch (error) {
-            messageApi.error(error.message || "Không thể hủy đơn hàng");
+            message.error(error.message || "Không thể hủy đơn hàng");
         }
     };
 
@@ -110,7 +110,7 @@ const MyOrders = () => {
             setSelectedOrder(result);
             setDetailModalVisible(true);
         } catch (error) {
-            messageApi.error("Không thể lấy chi tiết đơn hàng");
+            message.error("Không thể lấy chi tiết đơn hàng");
         } finally {
             setLoading(false);
         }
@@ -141,7 +141,7 @@ const MyOrders = () => {
         const finalReason = reason === 'Khác' ? otherReason : reason;
         
         if (!finalReason) {
-            messageApi.warning("Vui lòng chọn hoặc nhập lý do hoàn tiền");
+            message.warning("Vui lòng chọn hoặc nhập lý do hoàn tiền");
             return;
         }
 
@@ -156,7 +156,7 @@ const MyOrders = () => {
             };
             const result = await createRefund(payload);
             if (result.code === 1000) {
-                messageApi.success("Gửi yêu cầu hoàn tiền thành công!");
+                message.success("Gửi yêu cầu hoàn tiền thành công!");
                 setRefundModalVisible(false);
                 if (selectedOrder.status === 'PENDING') {
                     await cancelOrder(selectedOrder.id).catch(() => {});
@@ -164,13 +164,13 @@ const MyOrders = () => {
                 fetchOrders(activeStatus, currentPage);
             }
         } catch (error) {
-            messageApi.error(error.message || "Lỗi khi gửi yêu cầu hoàn tiền");
+            message.error(error.message || "Lỗi khi gửi yêu cầu hoàn tiền");
         }
     };
 
     const submitReviewForm = async () => {
         if (reviewData.rating === 0) {
-            messageApi.warning("Vui lòng chọn số sao đánh giá");
+            message.warning("Vui lòng chọn số sao đánh giá");
             return;
         }
 
@@ -184,12 +184,12 @@ const MyOrders = () => {
                 comment: reviewData.comment
             };
             await createReview(payload);
-            messageApi.success("Đánh giá sản phẩm thành công!");
+            message.success("Đánh giá sản phẩm thành công!");
             setReviewModalVisible(false);
             handleOpenDetail(selectedOrder.id);
             fetchOrders(activeStatus, currentPage);
         } catch (error) {
-            messageApi.error(error.message || "Lỗi khi gửi đánh giá");
+            message.error(error.message || "Lỗi khi gửi đánh giá");
         }
     };
 
@@ -290,7 +290,7 @@ const MyOrders = () => {
 
     return (
         <div className="address-list-container">
-            {contextHolder}
+
             <div className="address-list-title">
                 <h1>Thông tin đơn hàng</h1>
                 <div className="title-underline"></div>

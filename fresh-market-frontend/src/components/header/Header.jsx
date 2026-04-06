@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Dropdown } from 'antd';
+import { Dropdown, Select, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken } from '../../services/localStorageService';
 import { introspect, logout, login, IMAGE_URL, DEFAULT_IMAGE } from '../../api/auth';
@@ -28,6 +28,73 @@ const Header = ({ onMenuToggle }) => {
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+  // ===== Search Dropdown =====
+  const [searchProductsList, setSearchProductsList] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+
+  const debounce = (func, wait) => {
+    let timeout;
+    const debounced = (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+    debounced.cancel = () => clearTimeout(timeout);
+    return debounced;
+  };
+
+  const fetchProductsForSearch = async (search = "") => {
+    if (!search.trim()) {
+      setSearchProductsList([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const data = await searchProducts({ name: search }, 1, 10);
+      setSearchProductsList(data.data || []);
+    } catch (error) {
+      console.error("Lỗi khi lấy sản phẩm tìm kiếm:", error);
+    }
+    setIsSearching(false);
+  };
+
+  const debouncedSearch = useMemo(
+    () => debounce((value) => fetchProductsForSearch(value), 300),
+    []
+  );
+
+  const onSearchQueryChange = (value) => {
+    setSearchValue(value);
+    debouncedSearch(value);
+  };
+
+  const onSelectProduct = (productCode) => {
+    setIsCartOpen(false); // Đóng cart nếu đang mở
+    navigate(`/products/${productCode}`);
+    setSearchValue('');
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (searchValue && searchValue.trim()) {
+      const trimmedQuery = searchValue.trim();
+      // Kiểm tra nếu có sản phẩm nào khớp chính xác tên (không phân biệt hoa thường)
+      const exactMatch = searchProductsList.find(
+        (p) => p.name.toLowerCase() === trimmedQuery.toLowerCase()
+      );
+
+      if (exactMatch) {
+        navigate(`/products/${exactMatch.code}`);
+      } else {
+        navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+      }
+      
+      setSearchValue('');
+      setSearchProductsList([]); // Đóng danh sách gợi ý sau khi tìm kiếm
+      setIsCartOpen(false);      // Đảm bảo các overlay đều đóng
+    }
+  };
 
   // ===== Cart helpers =====
 
@@ -319,6 +386,8 @@ const Header = ({ onMenuToggle }) => {
     });
   };
 
+
+
   const formatPrice = (price) => price.toLocaleString('vi-VN') + '₫';
 
   return (
@@ -349,19 +418,51 @@ const Header = ({ onMenuToggle }) => {
 
             {/* Search Bar Section */}
             <div className="col-12 col-md-8 col-lg-5 header-search px-3 px-lg-5 mb-3 mb-lg-0">
-              <form className="search-form d-flex w-100" action="/search">
-                <button type="submit" className="search-btn bg-transparent border-0 px-3 text-secondary">
+              <div className="search-form d-flex w-100">
+                <button type="button" className="search-btn bg-transparent border-0 px-3 text-secondary" onClick={handleSearchSubmit}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
                 </button>
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm sản phẩm..."
-                  className="search-input form-control border-0 shadow-none bg-transparent"
-                />
-              </form>
+                <div style={{ flex: 1, position: 'relative' }}>
+                  <Select
+                    showSearch
+                    value={searchValue || undefined}
+                    placeholder="Tìm kiếm sản phẩm..."
+                    className="search-input-select w-100 h-100"
+                    bordered={false}
+                    filterOption={false}
+                    defaultActiveFirstOption={false} // Không tự động highlight bản ghi đầu tiên
+                    onSearch={onSearchQueryChange}
+                    onSelect={(val, option) => onSelectProduct(option.code)}
+                    onInputKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        // Nếu Enter được nhấn, handleSearchSubmit sẽ xử lý logic tìm kiếm
+                        handleSearchSubmit();
+                      }
+                    }}
+                    notFoundContent={isSearching ? <div style={{ textAlign: 'center', padding: '10px' }}><Spin size="small" /></div> : null}
+                    dropdownStyle={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  >
+                    {searchProductsList.map((product) => (
+                        <Select.Option key={product.code} value={product.name} code={product.code}>
+                          <div className="d-flex align-items-center gap-2">
+                            <img 
+                              src={product.images && product.images.length > 0 ? `${IMAGE_URL}/${product.images[0]}` : DEFAULT_IMAGE} 
+                              alt={product.name} 
+                              style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px' }}
+                            />
+                            <div className="d-flex flex-column" style={{ lineHeight: '1.2' }}>
+                              <span style={{ fontSize: '13px', fontWeight: 500 }}>{product.name}</span>
+                              <span style={{ fontSize: '12px', color: '#888' }}>{product.price.toLocaleString('vi-VN')}₫</span>
+                            </div>
+                          </div>
+                        </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
             </div>
 
             {/* User and Cart Actions Section */}
@@ -584,9 +685,7 @@ const Header = ({ onMenuToggle }) => {
                 <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
               <p>Giỏ hàng của bạn đang trống</p>
-              <Link to="/" className="cart-sidebar__link" onClick={() => setIsCartOpen(false)}>
-                Tiếp tục mua sắm
-              </Link>
+
             </div>
           ) : (
             cartItems.map((item) => (
@@ -625,28 +724,36 @@ const Header = ({ onMenuToggle }) => {
         </div>
 
         {/* Footer */}
-        <div className="cart-sidebar__footer">
-          <div className="cart-sidebar__total">
-            <span>TỔNG TIỀN:</span>
-            <span className="cart-sidebar__total-price">{formatPrice(totalPrice)}</span>
+        {cartItems.length > 0 ? (
+          <div className="cart-sidebar__footer">
+            <div className="cart-sidebar__total">
+              <span>TỔNG TIỀN:</span>
+              <span className="cart-sidebar__total-price">{formatPrice(totalPrice)}</span>
+            </div>
+            <button className="cart-sidebar__btn cart-sidebar__btn--note"
+              onClick={() => { setIsCartOpen(false); navigate('/cart'); }}
+            >
+              GHI CHÚ ĐƠN HÀNG - XUẤT HÓA ĐƠN VAT
+            </button>
+            <button
+              className="cart-sidebar__btn cart-sidebar__btn--checkout"
+              onClick={() => { setIsCartOpen(false); navigate('/checkout'); }}
+            >
+              THANH TOÁN
+            </button>
+            <div className="cart-sidebar__links">
+              <Link to="/cart" className="cart-sidebar__link" onClick={() => setIsCartOpen(false)}>
+                Xem giỏ hàng
+              </Link>
+            </div>
           </div>
-          <button className="cart-sidebar__btn cart-sidebar__btn--note"
-            onClick={() => { setIsCartOpen(false); navigate('/cart'); }}
-          >
-            GHI CHÚ ĐƠN HÀNG - XUẤT HÓA ĐƠN VAT
-          </button>
-          <button
-            className="cart-sidebar__btn cart-sidebar__btn--checkout"
-            onClick={() => { setIsCartOpen(false); navigate('/checkout'); }}
-          >
-            THANH TOÁN
-          </button>
-          <div className="cart-sidebar__links">
-            <Link to="/cart" className="cart-sidebar__link" onClick={() => setIsCartOpen(false)}>
-              Xem giỏ hàng
+        ) : !cartLoading && (
+          <div className="cart-sidebar__footer">
+            <Link to="/" className="cart-sidebar__btn cart-sidebar__btn--black" onClick={() => setIsCartOpen(false)}>
+              Tiếp tục mua sắm
             </Link>
           </div>
-        </div>
+        )}
       </div>
     </>
   );

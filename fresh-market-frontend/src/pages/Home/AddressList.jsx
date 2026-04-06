@@ -20,7 +20,7 @@ const AddressList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.user);
-    const [messageApi, contextHolder] = message.useMessage();
+
     
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ const AddressList = () => {
         dispatch(logout());
         localStorage.removeItem('token');
         navigate('/login');
-        messageApi.success('Đăng xuất thành công');
+        message.success('Đăng xuất thành công');
     };
 
     const handleEdit = (id) => {
@@ -254,7 +254,7 @@ const AddressList = () => {
 
     return (
         <div className="address-list-container">
-            {contextHolder}
+
             <div className="address-list-title">
                 <h1>Thông tin địa chỉ</h1>
                 <div className="title-underline"></div>

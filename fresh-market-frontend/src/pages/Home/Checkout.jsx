@@ -91,7 +91,7 @@ const Checkout = () => {
 
   const isNewAddress = selectedAddress === 'new';
   const [modal, contextHolder] = Modal.useModal();
-  const [messageApi, messageContextHolder] = message.useMessage();
+
 
   const handleFormChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -142,12 +142,12 @@ const Checkout = () => {
 
   const handleCompleteOrder = async () => {
     if (cartItems.length === 0) {
-        messageApi.warning("Giỏ hàng của bạn đang trống");
+        message.warning("Giỏ hàng của bạn đang trống");
         return;
     }
 
     if (!formData.name || !formData.phone || !formData.city || !formData.district || !formData.ward || !formData.addressDetail) {
-      messageApi.error("Vui lòng điền đầy đủ thông tin giao hàng!");
+      message.error("Vui lòng điền đầy đủ thông tin giao hàng!");
       return;
     }
 
@@ -157,7 +157,7 @@ const Checkout = () => {
         okText: 'Xác nhận',
         cancelText: 'Hủy',
         onOk: async () => {
-            const hide = messageApi.loading("Đang xử lý đơn hàng...", 0);
+            const hide = message.loading("Đang xử lý đơn hàng...", 0);
             try {
                 let finalUserId = user.id || null;
                 let finalAddressId = selectedAddress;
@@ -231,7 +231,7 @@ const Checkout = () => {
                     // Thanh toán COD hoặc Tiền mặt
                     const orderResp = await createOrder(orderRequest);
                     if (orderResp?.id) {
-                        messageApi.success("Đặt hàng thành công!");
+                        message.success("Đặt hàng thành công!");
                         // Xóa giỏ hàng sau khi đặt thành công
                         if (token && user.id) {
                             await clearCart(user.id);
@@ -246,7 +246,7 @@ const Checkout = () => {
                 }
             } catch (error) {
                 console.error("Lỗi đặt hàng:", error);
-                messageApi.error(error.message || "Đã có lỗi xảy ra khi đặt hàng");
+                message.error(error.message || "Đã có lỗi xảy ra khi đặt hàng");
             } finally {
                 hide();
             }
@@ -257,7 +257,7 @@ const Checkout = () => {
   return (
     <div className="checkout-container">
       {contextHolder}
-      {messageContextHolder}
+
       <div className="checkout-layout">
         
         {/* LEFT COLUMN: Shipping & Payment */}
