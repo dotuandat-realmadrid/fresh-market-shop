@@ -48,7 +48,7 @@ const Footer = () => {
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
-                <span>support@freshmarket.vn</span>
+                <span>support@bichthuymarket.vn</span>
               </li>
             </ul>
           </div>
@@ -96,7 +96,7 @@ const Footer = () => {
               <div className="col-sm-4">
                 <ul className="list-unstyled mb-0 gap-2 d-flex flex-column">
                   <li><a href="#" className="text-decoration-none text-muted">Giấy Phép Bán Rượu</a></li>
-                  <li><a href="#" className="text-decoration-none text-muted">Liên Hệ</a></li>
+                  <li><a href="/contact" className="text-decoration-none text-muted">Liên Hệ</a></li>
                 </ul>
               </div>
             </div>
@@ -110,7 +110,7 @@ const Footer = () => {
             <a href="#" className="text-decoration-none text-muted">Website Siêu Thị Bich Thuy Market</a>
             <a href="#" className="text-decoration-none text-muted">Cửa Hàng FaceBook</a>
             <a href="#" className="text-decoration-none text-muted">Zalo Bich Thuy Market OA</a>
-            <a href="#" className="text-decoration-none text-muted">Liên Hệ Hợp Tác & Chào Hàng: Merchandise@freshmarket.vn</a>
+            <a href="#" className="text-decoration-none text-muted">Liên Hệ Hợp Tác & Chào Hàng: Merchandise@bichthuymarket.vn</a>
           </div>
         </div>
 

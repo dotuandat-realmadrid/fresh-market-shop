@@ -392,16 +392,45 @@ const ProductDetail = () => {
 
   const renderDescription = (text) => {
     if (!text) return null;
-    return text.split('\n').map((line, index) => {
+    // Tách theo dòng mới (newline thực) hoặc chuỗi '\n' (nghĩa đen) từ backend
+    const lines = text.split(/\\n|\n/);
+    return lines.map((line, index) => {
       const trimmedText = line.trim();
       if (!trimmedText && index > 0) return <br key={index} />;
       
       const isBullet = trimmedText.startsWith('•');
-      // Bôi đậm nếu dòng không bắt đầu bằng dấu • (bao gồm dòng có dấu - và dòng văn bản thường)
-      const isHeader = !isBullet;
+      const isSubBullet = trimmedText.startsWith('◦');
+      // Bôi đậm nếu dòng không bắt đầu bằng dấu • hay ◦
+      const isHeader = !isBullet && !isSubBullet;
+
+      // Kiểm tra nếu là • và theo sau nó là ◦ thì sẽ bôi đậm
+      let isParentBullet = false;
+      if (isBullet) {
+        for (let i = index + 1; i < lines.length; i++) {
+          const nextTrimmed = lines[i].trim();
+          if (nextTrimmed === '') continue;
+          if (nextTrimmed.startsWith('◦')) {
+            isParentBullet = true;
+          }
+          break;
+        }
+      }
+
+      if (isBullet || isSubBullet) {
+        // Tách ký tự đầu tiên (dấu chấm) và phần chữ phía sau
+        const bulletChar = trimmedText.charAt(0);
+        const content = trimmedText.substring(1).trim();
+        
+        return (
+          <div key={index} className={`pd-desc-line pd-desc-list-item ${isSubBullet ? 'pd-desc-sub' : ''} ${isParentBullet ? 'pd-desc-parent' : ''}`}>
+            <span className="pd-bullet-char">{bulletChar}</span>
+            <span className="pd-bullet-content">{content}</span>
+          </div>
+        );
+      }
       
       return (
-        <div key={index} className={`pd-desc-line ${isBullet ? 'pd-desc-bullet' : ''} ${isHeader ? 'pd-desc-header' : ''}`}>
+        <div key={index} className={`pd-desc-line ${isHeader ? 'pd-desc-header' : ''}`}>
           {line}
         </div>
       );

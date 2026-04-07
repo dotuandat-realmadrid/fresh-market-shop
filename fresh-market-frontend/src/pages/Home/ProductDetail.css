@@ -684,9 +684,29 @@
   word-break: break-word;
 }
 
-.pd-desc-bullet {
-  padding-left: 28px;
-  text-indent: -20px;
+.pd-desc-list-item {
+  display: flex;
+  align-items: flex-start;
+  padding-left: 15px; /* Thụt lề cơ bản cho dấu • */
+}
+
+.pd-desc-sub {
+  padding-left: 35px; /* Thụt lề sâu hơn cho dấu ◦ */
+}
+
+.pd-desc-parent {
+  font-weight: 600;
+  color: #000;
+}
+
+.pd-bullet-char {
+  flex-shrink: 0;
+  width: 14px; /* Giữ khoảng cách cố định cho biểu tượng bullet */
+  font-weight: bold;
+}
+
+.pd-bullet-content {
+  flex: 1; /* Hiển thị chữ phía sau bullet */
 }
 
 .pd-desc-header {

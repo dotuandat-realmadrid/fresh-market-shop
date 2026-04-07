@@ -55,12 +55,14 @@ const ProductSection = ({ title, products, prevEl, setPrevEl, nextEl, setNextEl,
 
 // Import images
 import slide_1 from '../../assets/images/slide_1.jpg';
+import slide_2 from '../../assets/images/slide_2.jpg';
+import slide_3 from '../../assets/images/slide_3.jpg';
 import slide_4 from '../../assets/images/slide_4.jpg';
-import banner_home_2 from '../../assets/images/banner_home_2.jpg';
-import banner_home_3 from '../../assets/images/banner_home_3.jpg';
-import banner_home_4 from '../../assets/images/banner_home_4.jpg';
-import banner_home_5 from '../../assets/images/banner_home_5.jpg';
-import banner_home_6 from '../../assets/images/banner_home_6.jpg';
+import banner_home_2 from '../../assets/images/banner_home_2.png';
+import banner_home_3 from '../../assets/images/banner_home_3.png';
+import banner_home_4 from '../../assets/images/banner_home_4.png';
+import banner_home_5 from '../../assets/images/banner_home_5.png';
+import banner_home_6 from '../../assets/images/banner_home_6.png';
 
 // Import category icons
 import menuIcon1 from '../../assets/images/img_item_category_home_1_medium.png';
@@ -100,6 +102,7 @@ const Home = () => {
     const [gift83Products, setGift83Products] = useState([]);
     const [fruitGiftProducts, setFruitGiftProducts] = useState([]);
     const [importedFruitProducts, setImportedFruitProducts] = useState([]);
+    const [vietnameseFruitProducts, setVietnameseFruitProducts] = useState([]);
     const [marketProducts, setMarketProducts] = useState([]);
     const [dryFoodProducts, setDryFoodProducts] = useState([]);
     const [organicFoodProducts, setOrganicFoodProducts] = useState([]);
@@ -130,6 +133,7 @@ const Home = () => {
                     { setter: setGift83Products, code: 'qua-tang-8-3' },
                     { setter: setFruitGiftProducts, code: 'qua-tang-trai-cay' },
                     { setter: setImportedFruitProducts, code: 'trai-cay-nhap' },
+                    { setter: setVietnameseFruitProducts, code: 'trai-cay-viet' },
                     { setter: setMarketProducts, code: 'di-cho-online' },
                     { setter: setDryFoodProducts, code: 'thuc-pham-kho' },
                     { setter: setOrganicFoodProducts, code: 'thuc-pham-huu-co' },
@@ -161,6 +165,8 @@ const Home = () => {
     const [fruitGiftNext, setFruitGiftNext] = React.useState(null);
     const [importedPrev, setImportedPrev] = React.useState(null);
     const [importedNext, setImportedNext] = React.useState(null);
+    const [vietPrev, setVietPrev] = React.useState(null);
+    const [vietNext, setVietNext] = React.useState(null);
     const [marketPrev, setMarketPrev] = React.useState(null);
     const [marketNext, setMarketNext] = React.useState(null);
     const [dryFoodPrev, setDryFoodPrev] = React.useState(null);
@@ -222,6 +228,8 @@ const Home = () => {
                     loop={true}
                 >
                     <SwiperSlide><Link to="/collections/gio-hoa-qua-nhap-khau" className="hero-slide"><img src={slide_1} alt="Slide 1" /></Link></SwiperSlide>
+                    <SwiperSlide><Link to="/collections/cham-soc-suc-khoe" className="hero-slide"><img src={slide_2} alt="Slide 2" /></Link></SwiperSlide>
+                    <SwiperSlide><Link to="/collections/khuyen-mai" className="hero-slide"><img src={slide_3} alt="Slide 3" /></Link></SwiperSlide>
                     <SwiperSlide><Link to="/collections/qua-tang-cay-xanh" className="hero-slide"><img src={slide_4} alt="Slide 4" /></Link></SwiperSlide>
                 </Swiper>
                 <div ref={(node) => setHeroPrev(node)} className="custom-nav hero-prev"><FaChevronLeft /></div>
@@ -232,7 +240,7 @@ const Home = () => {
             <section className="promo-slider-container">
                 <Swiper
                     modules={[Navigation]}
-                    spaceBetween={20} slidesPerView={1}
+                    spaceBetween={25} slidesPerView={1}
                     navigation={{ prevEl: promoPrev, nextEl: promoNext }}
                     onBeforeInit={(swiper) => {
                         swiper.params.navigation.prevEl = promoPrev;
@@ -241,8 +249,8 @@ const Home = () => {
                     breakpoints={{ 480: { slidesPerView: 1 }, 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 }, 1200: { slidesPerView: 4 } }}
                     loop={true}
                 >
-                    <SwiperSlide className="promo-slide"><Link to="/collections/nho-xanh-khong-hat" className="promo-card"><img src={banner_home_2} alt="2" /></Link></SwiperSlide>
-                    <SwiperSlide className="promo-slide"><Link to="/searchs?name=keo-huu-co" className="promo-card"><img src={banner_home_3} alt="3" /></Link></SwiperSlide>
+                    <SwiperSlide className="promo-slide"><Link to="/collections/viet-quat-dau-tay-cac-loai" className="promo-card"><img src={banner_home_2} alt="2" /></Link></SwiperSlide>
+                    <SwiperSlide className="promo-slide"><Link to="/search?q=keo-huu-co" className="promo-card"><img src={banner_home_3} alt="3" /></Link></SwiperSlide>
                     <SwiperSlide className="promo-slide"><Link to="/collections/thuc-pham-huu-co" className="promo-card"><img src={banner_home_4} alt="4" /></Link></SwiperSlide>
                     <SwiperSlide className="promo-slide"><Link to="/collections/di-cho-online" className="promo-card"><img src={banner_home_5} alt="5" /></Link></SwiperSlide>
                     <SwiperSlide className="promo-slide"><Link to="/collections/cham-soc-suc-khoe" className="promo-card"><img src={banner_home_6} alt="6" /></Link></SwiperSlide>
@@ -265,9 +273,10 @@ const Home = () => {
 
             {/* Product Sections */}
             <ProductSection title="HOT DEAL" products={hotDealProducts} prevEl={hotDealPrev} setPrevEl={setHotDealPrev} nextEl={hotDealNext} setNextEl={setHotDealNext} link="/collections/khuyen-mai" />
-            <ProductSection title="Quà Tặng 8/3" products={gift83Products} prevEl={gift83Prev} setPrevEl={setGift83Prev} nextEl={gift83Next} setNextEl={setGift83Next} link="/collections/qua-tang-8-3" />
+            {/* <ProductSection title="Quà Tặng 8/3" products={gift83Products} prevEl={gift83Prev} setPrevEl={setGift83Prev} nextEl={gift83Next} setNextEl={setGift83Next} link="/collections/qua-tang-8-3" /> */}
             <ProductSection title="Quà Tặng Trái Cây" products={fruitGiftProducts} prevEl={fruitGiftPrev} setPrevEl={setFruitGiftPrev} nextEl={fruitGiftNext} setNextEl={setFruitGiftNext} link="/collections/qua-tang-trai-cay" />
             <ProductSection title="Trái Cây Nhập" products={importedFruitProducts} prevEl={importedPrev} setPrevEl={setImportedPrev} nextEl={importedNext} setNextEl={setImportedNext} link="/collections/trai-cay-nhap" />
+            <ProductSection title="Trái Cây Việt" products={vietnameseFruitProducts} prevEl={vietPrev} setPrevEl={setVietPrev} nextEl={vietNext} setNextEl={setVietNext} link="/collections/trai-cay-viet" />
             <ProductSection title="Đi Chợ" products={marketProducts} prevEl={marketPrev} setPrevEl={setMarketPrev} nextEl={marketNext} setNextEl={setMarketNext} link="/collections/di-cho-online" />
             <ProductSection title="Thực Phẩm Khô Các Loại" products={dryFoodProducts} prevEl={dryFoodPrev} setPrevEl={setDryFoodPrev} nextEl={dryFoodNext} setNextEl={setDryFoodNext} link="/collections/thuc-pham-kho" />
             <ProductSection title="Thực Phẩm Hữu Cơ" products={organicFoodProducts} prevEl={organicPrev} setPrevEl={setOrganicPrev} nextEl={organicNext} setNextEl={setOrganicNext} link="/collections/thuc-pham-huu-co" />

@@ -34,7 +34,7 @@
 
 
 .promo-slide {
-    padding: 10px;
+    padding: 10px 10px 10px 0;
 }
 
 .promo-card {
@@ -51,7 +51,7 @@
 }
 
 .promo-card img {
-    width: 100%;
+    width: 105%;
     height: auto;
     display: block;
     border-radius: 15px;
@@ -99,20 +99,26 @@
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-.custom-nav.hero-prev,
-.custom-nav.promo-prev {
-    left: 15px;
+.custom-nav.hero-prev {
+    left: 10px;
 }
 
-.custom-nav.hero-next,
+.custom-nav.promo-prev {
+    margin-left: 8px;
+}
+
+.custom-nav.hero-next {
+    right: 10px;
+}
+
 .custom-nav.promo-next {
-    right: 15px;
+    margin-right: 8px;
 }
 
 /* Specific to Promo Slider */
 .promo-slider-container {
     position: relative;
-    padding: 0 40px;
+    padding: 0 24px;
     margin-top: 20px;
 }
 

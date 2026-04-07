@@ -12,6 +12,7 @@ import AddressList from "../pages/Home/AddressList";
 import MyProfile from "../pages/Home/MyProfile";
 import MyOrders from "../pages/Home/MyOrders";
 import Search from "../pages/Home/Search";
+import Contact from "../pages/Home/Contact";
 import ScrollToTop from "../components/ScrollToTop";
 import AdminLayout from "../components/layout/AdminLayout";
 import HomeAdmin from "../pages/Admin/HomeAdmin";
@@ -38,6 +39,7 @@ import OrderByUser from "../pages/Admin/OrderByUser";
 import RefundAdmin from "../pages/Admin/RefundAdmin";
 import ContactAdmin from "../pages/Admin/ContactAdmin";
 import ReceiptByProductAdmin from "../pages/Admin/ReceiptByProductAdmin";
+import ReportAdmin from "../pages/Admin/ReportAdmin";
 import PrivateRoute from "./PrivateRoutes";
 
 const AppRoutes = () => {
@@ -58,6 +60,7 @@ const AppRoutes = () => {
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/contact" element={<Contact />} />
           </Route>
           <Route path="/admin" element={ 
             <PrivateRoute
@@ -92,6 +95,7 @@ const AppRoutes = () => {
             <Route path="orders/user/:userId/status/:status" element={<OrderByUser />} />
             <Route path="refunds" element={<RefundAdmin />} />
             <Route path="contacts" element={<ContactAdmin />} />
+            <Route path="reports" element={<ReportAdmin />} />
           </Route>
           {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
