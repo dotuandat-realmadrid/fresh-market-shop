@@ -36,6 +36,7 @@ import OrderCreationAdmin from "../pages/Admin/OrderCreationAdmin";
 import OrderDetailAdmin from "../pages/Admin/OrderDetailAdmin";
 import OrderByUser from "../pages/Admin/OrderByUser";
 import RefundAdmin from "../pages/Admin/RefundAdmin";
+import ContactAdmin from "../pages/Admin/ContactAdmin";
 import PrivateRoute from "./PrivateRoutes";
 
 const AppRoutes = () => {
@@ -88,6 +89,7 @@ const AppRoutes = () => {
             <Route path="orders/user/:userId" element={<OrderByUser />} />
             <Route path="orders/user/:userId/status/:status" element={<OrderByUser />} />
             <Route path="refunds" element={<RefundAdmin />} />
+            <Route path="contacts" element={<ContactAdmin />} />
           </Route>
           {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
