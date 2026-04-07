@@ -262,7 +262,7 @@ export const importInventoryAI = async (quantity) => {
     }
 };
 
-export const getInventoryReceiptDetailsByProduct = async (productId, page = 1, size = 5) => {
+export const getInventoryReceiptDetailByProductId = async (productId, page = 1, size = 5) => {
     try {
         const response = await fetch(`${API}/inventory-receipt-details?productId=${productId}&page=${page}&size=${size}`, {
             method: "GET",

@@ -131,6 +131,11 @@ const AdminLayout = () => {
     if (path.startsWith("/admin/orders")) {
       return ["/admin/orders"];
     }
+    
+    // active danh sách sản phẩm nếu đang xem lịch sử nhập kho của sản phẩm
+    if (path.startsWith("/admin/inventory-receipt-details")) {
+      return ["/admin/products"];
+    }
 
     // Các mục có submenu (Inventory, Products, Accounts, etc.)
     // Ưu tiên khớp chính xác key con (create, trash) trước, 
@@ -164,7 +169,7 @@ const AdminLayout = () => {
         path.includes("/admin/add-inventory-receipt")) {
       return ["inventory-manager"];
     }
-    if (path.includes("/admin/products")) {
+    if (path.includes("/admin/products") || path.includes("/admin/inventory-receipt-details")) {
       return ["products-manager"];
     }
     if (path.includes("/admin/discounts")) {

@@ -37,6 +37,7 @@ import OrderDetailAdmin from "../pages/Admin/OrderDetailAdmin";
 import OrderByUser from "../pages/Admin/OrderByUser";
 import RefundAdmin from "../pages/Admin/RefundAdmin";
 import ContactAdmin from "../pages/Admin/ContactAdmin";
+import ReceiptByProductAdmin from "../pages/Admin/ReceiptByProductAdmin";
 import PrivateRoute from "./PrivateRoutes";
 
 const AppRoutes = () => {
@@ -78,6 +79,7 @@ const AppRoutes = () => {
             <Route path="products" element={<ProductAdmin />} />
             <Route path="products/trash" element={<ProductTrashBinAdmin />} />
             <Route path="products/:code" element={<ProductDetailAdmin />} />
+            <Route path="inventory-receipt-details" element={<ReceiptByProductAdmin />} />
             <Route path="inventory-receipts" element={<InventoryReceiptAdmin />} />
             <Route path="inventory-receipts/create" element={<InventoryReceiptDetailAdmin />} />
             <Route path="inventory-receipts/:id" element={<InventoryReceiptDetailAdmin />} />
