@@ -431,19 +431,18 @@ const Header = ({ onMenuToggle }) => {
                     value={searchValue || undefined}
                     placeholder="Tìm kiếm sản phẩm..."
                     className="search-input-select w-100 h-100"
-                    bordered={false}
+                    variant="borderless"
                     filterOption={false}
                     defaultActiveFirstOption={false} // Không tự động highlight bản ghi đầu tiên
                     onSearch={onSearchQueryChange}
                     onSelect={(val, option) => onSelectProduct(option.code)}
                     onInputKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        // Nếu Enter được nhấn, handleSearchSubmit sẽ xử lý logic tìm kiếm
+                      if (e.key === 'Enter' && !isSearching) {
                         handleSearchSubmit();
                       }
                     }}
                     notFoundContent={isSearching ? <div style={{ textAlign: 'center', padding: '10px' }}><Spin size="small" /></div> : null}
-                    dropdownStyle={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                    classNames={{ popup: { root: 'search-dropdown-popup' } }}
                   >
                     {searchProductsList.map((product) => (
                         <Select.Option key={product.code} value={product.name} code={product.code}>

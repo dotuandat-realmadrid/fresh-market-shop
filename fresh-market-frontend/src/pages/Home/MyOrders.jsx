@@ -276,11 +276,10 @@ const MyOrders = () => {
                                 <Popconfirm title="Hủy đơn?" onConfirm={() => handleCancelOrder(order.id)}>
                                     <Button danger size="small" className="btn-action-custom">Hủy đơn hàng</Button>
                                 </Popconfirm>
-                                <Button className="btn-refund-custom" size="small" onClick={() => handleOpenRefund(order)}>Yêu cầu hoàn tiền</Button>
+                                {order.paymentMethod && order.paymentMethod !== 'COD' && (
+                                    <Button className="btn-refund-custom" size="small" onClick={() => handleOpenRefund(order)}>Yêu cầu hoàn tiền</Button>
+                                )}
                             </>
-                        )}
-                        {order.status === 'COMPLETED' && (
-                            <Button className="btn-refund-custom" size="small" onClick={() => handleOpenRefund(order)}>Yêu cầu hoàn tiền</Button>
                         )}
                     </div>
                 </Col>

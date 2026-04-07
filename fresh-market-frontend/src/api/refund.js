@@ -43,7 +43,7 @@ export const createRefund = async (refundRequest) => {
         throw new Error(errorData.message || "Gửi yêu cầu hoàn tiền thất bại!");
     }
 
-    return (await response.json()).result;
+    return (await response.json());
 };
 
 /**

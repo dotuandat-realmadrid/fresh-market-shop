@@ -44,6 +44,17 @@
     padding-inline-start: 0 !important;
 }
 
+.search-dropdown-popup {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
+.search-dropdown-popup .ant-select-item {
+    padding: 8px 12px !important;
+}
+
 .user-login {
     font-size: 14px;
     color: #666;
