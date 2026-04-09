@@ -8,7 +8,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
@@ -37,14 +36,14 @@ public class PdfProdHelper {
     @Value("${app.file.storage-dir}")
     private String STORAGE_DIR;
 
+    @SuppressWarnings("rawtypes")
     public List<Pair<ProductCreateRequest, List<String>>> readProductsForCreateFromPdf(InputStream input)
             throws IOException {
         List<Pair<ProductCreateRequest, List<String>>> requests = new ArrayList<>();
 
-        try (PDDocument document = PDDocument.load(input)) {
-            ObjectExtractor extractor = new ObjectExtractor(document);
+        try (PDDocument document = PDDocument.load(input);
+             ObjectExtractor extractor = new ObjectExtractor(document)) {
             SpreadsheetExtractionAlgorithm algorithm = new SpreadsheetExtractionAlgorithm();
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
 
             for (int pageNum = 1; pageNum <= document.getNumberOfPages(); pageNum++) {
                 Page page = extractor.extract(pageNum);
@@ -152,18 +151,17 @@ public class PdfProdHelper {
         return requests;
     }
 
+    @SuppressWarnings("rawtypes")
     public List<Pair<String, ProductUpdateRequest>> readProductsForUpdateFromPdf(InputStream input) throws IOException {
         List<Pair<String, ProductUpdateRequest>> requests = new ArrayList<>();
 
-        try (PDDocument document = PDDocument.load(input)) {
-            ObjectExtractor extractor = new ObjectExtractor(document);
+        try (PDDocument document = PDDocument.load(input);
+             ObjectExtractor extractor = new ObjectExtractor(document)) {
             SpreadsheetExtractionAlgorithm algorithm = new SpreadsheetExtractionAlgorithm();
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
 
             for (int pageNum = 1; pageNum <= document.getNumberOfPages(); pageNum++) {
                 Page page = extractor.extract(pageNum);
                 List<Table> tables = algorithm.extract(page);
-                PDPage pdPage = document.getPage(pageNum - 1);
 
                 for (Table table : tables) {
                     List<List<RectangularTextContainer>> rows = table.getRows();
@@ -262,15 +260,16 @@ public class PdfProdHelper {
         return requests;
     }
 
+    @SuppressWarnings("rawtypes")
     private String getRawValue(List<RectangularTextContainer> cells, int index) {
         return index >= 0 && index < cells.size() ? cells.get(index).getText().trim() : "";
     }
 
+    @SuppressWarnings("rawtypes")
     private List<String> extractImagesFromPdf(PDPage page, List<RectangularTextContainer> cells, int imagePathIdx)
             throws IOException {
         List<String> imagePaths = new ArrayList<>();
         if (imagePathIdx >= 0 && imagePathIdx < cells.size()) {
-            RectangularTextContainer cell = cells.get(imagePathIdx);
             PDResources resources = page.getResources();
             for (var entry : resources.getXObjectNames()) {
                 if (resources.isImageXObject(entry)) {

@@ -76,7 +76,6 @@ public class QRProdHelper {
 
     // ==================== SMART PARSE ====================
 
-    @SuppressWarnings("unchecked")
     private <T> List<T> smartParseContent(String content, String action) {
         for (var parser : List.<java.util.function.Supplier<List<T>>>of(
                 () -> parseJsonToProducts(content, action),

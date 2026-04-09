@@ -293,10 +293,6 @@ public class OrderPdfServiceImpl implements OrderPdfService {
         return VND_FORMAT.format(amount) + "đ";
     }
 
-    private String formatVnd(double amount) {
-        return formatVnd((long) amount);
-    }
-
     private String safeStr(String s) {
         return s != null ? s : "";
     }
