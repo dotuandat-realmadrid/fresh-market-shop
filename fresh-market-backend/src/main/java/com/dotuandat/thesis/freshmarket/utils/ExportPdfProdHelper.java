@@ -87,20 +87,20 @@ public class ExportPdfProdHelper {
         document.close();
     }
 
-    private static Font getArialFont(float size) {
-        try {
-            InputStream fontStream =
-                    ExportPdfProdHelper.class.getResourceAsStream("/static/assets/fonts/times.ttf");
-            if (fontStream == null) {
-                throw new RuntimeException("Times font file not found at /static/assets/fonts/times.ttf");
-            }
-            BaseFont baseFont = BaseFont.createFont(
-                    "times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, false, fontStream.readAllBytes(), null);
-            return new Font(baseFont, size);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not load Times font", e);
-        }
-    }
+    // private static Font getArialFont(float size) {
+    //     try {
+    //         InputStream fontStream =
+    //                 ExportPdfProdHelper.class.getResourceAsStream("/static/assets/fonts/times.ttf");
+    //         if (fontStream == null) {
+    //             throw new RuntimeException("Times font file not found at /static/assets/fonts/times.ttf");
+    //         }
+    //         BaseFont baseFont = BaseFont.createFont(
+    //                 "times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, false, fontStream.readAllBytes(), null);
+    //         return new Font(baseFont, size);
+    //     } catch (Exception e) {
+    //         throw new RuntimeException("Could not load Times font", e);
+    //     }
+    // }
 
     private static Font getArialBoldFont(float size) {
         try {

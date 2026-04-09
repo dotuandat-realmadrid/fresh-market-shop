@@ -33,8 +33,8 @@ public class AIInventoryHelper {
 
     @NonFinal
     @Value("${ai.gemini_3.1_flash_lite.apiUrl}")
-//    @Value("${ai.gemini_2.5_flash_lite.apiUrl}")
-//    @Value("${ai.gemini_2.5_flash.apiUrl}")
+    // @Value("${ai.gemini_2.5_flash_lite.apiUrl}")
+    // @Value("${ai.gemini_2.5_flash.apiUrl}")
     private String geminiApiUrl;
 
     // =========================================================
@@ -83,12 +83,14 @@ public class AIInventoryHelper {
     /**
      * Tạo prompt chi tiết gửi cho Gemini.
      */
-    private String createDetailedPrompt(List<String> validProductCodes, Map<String, Long> productPriceMap, int quantity) {
+    private String createDetailedPrompt(List<String> validProductCodes, Map<String, Long> productPriceMap,
+            int quantity) {
         String codeWithPrices = validProductCodes.stream()
                 .map(code -> code + ": " + productPriceMap.getOrDefault(code, 0L) + " VND")
                 .collect(Collectors.joining(", "));
 
-        return "Bạn là hệ thống khởi tạo dữ liệu phiếu nhập kho chuyên nghiệp. Hãy tạo đúng " + quantity + " phiếu nhập dưới dạng mảng JSON.\n\n" +
+        return "Bạn là hệ thống khởi tạo dữ liệu phiếu nhập kho chuyên nghiệp. Hãy tạo đúng " + quantity
+                + " phiếu nhập dưới dạng mảng JSON.\n\n" +
                 "=== DANH SÁCH MÃ SẢN PHẨM VÀ GIÁ (BẮT BUỘC) ===\n" +
                 "[" + codeWithPrices + "]\n\n" +
                 "=== QUY TẮC DỮ LIỆU ===\n" +
@@ -114,8 +116,7 @@ public class AIInventoryHelper {
         requestBody.put("generationConfig", Map.of(
                 "maxOutputTokens", 40000,
                 "temperature", 0.1, // Rất thấp để đảm bảo tính chính xác
-                "response_mime_type", "application/json"
-        ));
+                "response_mime_type", "application/json"));
 
         return webClient.post()
                 .uri(geminiApiUrl + "?key=" + geminiApiKey)
@@ -158,7 +159,8 @@ public class AIInventoryHelper {
                             .productCode(detailNode.path("productCode").asText())
                             .quantity(detailNode.path("quantity").asInt())
                             .price(detailNode.path("price").asLong())
-                            .manufacturedDate(qrInventoryHelper.parseDate(detailNode.path("manufacturedDate").asText(null)))
+                            .manufacturedDate(
+                                    qrInventoryHelper.parseDate(detailNode.path("manufacturedDate").asText(null)))
                             .expiryDate(qrInventoryHelper.parseDate(detailNode.path("expiryDate").asText(null)))
                             .build());
                 }

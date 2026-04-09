@@ -35,11 +35,6 @@ public class HomeController {
     ActivityLogService activityLogService;
     InventoryReceiptService receiptService;
 
-    @GetMapping()
-    public String getHomePage() {
-        return "index.html";
-    }
-
     @GetMapping("/sales")
     public ApiResponse<List<SaleStatistic>> getSalesStatistics() {
         return ApiResponse.<List<SaleStatistic>>builder()
