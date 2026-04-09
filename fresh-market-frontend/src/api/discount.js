@@ -107,7 +107,7 @@ export const createDiscount = async (data) => {
       throw new Error(result.message);
     }
 
-    message.success("Thành công");
+    message.success("Tạo mã giảm giá thành công");
     return result.result;
   } catch (error) {
     message.error(error.message);
@@ -136,7 +136,7 @@ export const updateDiscount = async (id, data) => {
       throw new Error(result.message);
     }
 
-    message.success("Thành công");
+    message.success("Cập nhật mã giảm giá thành công");
     return result.result;
   } catch (error) {
     message.error(error.message);
@@ -165,7 +165,7 @@ export const addDiscountProduct = async (id, data) => {
       throw new Error(result.message);
     }
 
-    message.success("Thành công");
+    message.success("Thêm mã giảm giá vào sản phẩm thành công");
     return result.result;
   } catch (error) {
     message.error(error.message);

@@ -44,6 +44,7 @@ import {
 import { refundVNPay, queryVNPay } from "../../api/payment";
 import { IMAGE_URL, DEFAULT_IMAGE } from "../../api/auth";
 import CustomPagination from "../../components/CustomPagination/CustomPagination";
+import dayjs from "dayjs";
 import "../Admin/AccountAdmin.css";
 
 const { Text, Title } = Typography;
@@ -650,8 +651,9 @@ export default function RefundAdmin() {
         onCancel={() => !processing && setDetailVisible(false)}
         footer={null}
         width={780}
+        centered
         destroyOnHidden
-        styles={{ body: { padding: "16px 24px" } }}
+        styles={{ body: { padding: "0 24px 28px" } }}
       >
         {detailLoading ? (
           <div style={{ textAlign: "center", padding: "60px 0" }}>
@@ -661,7 +663,7 @@ export default function RefundAdmin() {
           <>
 
             {/* Customer */}
-            <Divider titlePlacement="left" styles={{ content: { margin: 0 } }}>
+            <Divider titlePlacement="left" style={{ marginTop: 0 }} styles={{ content: { margin: 0 } }}>
               <Text strong><UserOutlined style={{ marginRight: 6 }} />Thông tin khách hàng</Text>
             </Divider>
             <Descriptions column={2} size="small" bordered style={{ marginBottom: 14 }}>
@@ -683,7 +685,9 @@ export default function RefundAdmin() {
                 </Text>
               </Descriptions.Item>
               <Descriptions.Item label="Mã đơn hàng">#{selectedRefund.orderId || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Ngày giao dịch">{selectedRefund.transactionDate || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Ngày giao dịch">
+                {selectedRefund.transactionDate ? dayjs(selectedRefund.transactionDate).format("DD/MM/YYYY HH:mm:ss") : "N/A"}
+              </Descriptions.Item>
               <Descriptions.Item label="Lý do" span={2}>{selectedRefund.reason || "N/A"}</Descriptions.Item>
             </Descriptions>
 

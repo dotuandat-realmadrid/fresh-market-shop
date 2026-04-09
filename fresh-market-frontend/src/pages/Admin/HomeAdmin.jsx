@@ -49,6 +49,7 @@ const HomeAdmin = () => {
   const [loadingLowStock, setLoadingLowStock] = useState(false);
   const [expiringReceipts, setExpiringReceipts] = useState([]);
   const [loadingExpiring, setLoadingExpiring] = useState(false);
+  const [, setTick] = useState(0);
 
   // --- Initial Load ---
   useEffect(() => {
@@ -127,6 +128,46 @@ const HomeAdmin = () => {
     };
     fetchActivities();
   }, [activityFilter]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick(n => n + 1), 10000); 
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- Real-time Activity Logs via WebSocket ---
+  useEffect(() => {
+    // Sử dụng @stomp/stompjs kết nối qua WebSocket nguyên bản
+    import('@stomp/stompjs').then(({ Client }) => {
+      const client = new Client({
+        brokerURL: 'ws://localhost:8088/fresh-market/ws', // Chỉnh đúng port 8088 và context-path
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+      });
+
+      client.onConnect = (frame) => {
+        console.log('Connected to WebSocket (Native)');
+        client.subscribe('/topic/activities', (stompMessage) => {
+          const newActivity = JSON.parse(stompMessage.body);
+          // Cập nhật state để hiển thị ngay trên UI
+          setActivities((prev) => [newActivity, ...prev].slice(0, 50));
+          
+          // Hiển thị thông báo góc màn hình
+          // message.success(`Có hoạt động mới: ${newActivity.description}`);
+        });
+      };
+
+      client.onStompError = (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message']);
+      };
+
+      client.activate();
+
+      return () => {
+        if (client) client.deactivate();
+      };
+    });
+  }, []);
 
   useEffect(() => {
     const fetchLowStock = async () => {
@@ -506,6 +547,7 @@ const HomeAdmin = () => {
                   if (act.actionType === 'UPDATE') dotColor = '#007bff';
                   if (act.actionType === 'DELETE') dotColor = '#dc3545';
                   if (act.actionType === 'LOGIN') dotColor = '#28a745';
+                  if (act.actionType === 'PAYMENT') dotColor = '#ffc107'; // Màu vàng cho thanh toán
                   
                   return (
                     <div key={act.id || index} className="activity-item d-flex align-items-start mb-3">

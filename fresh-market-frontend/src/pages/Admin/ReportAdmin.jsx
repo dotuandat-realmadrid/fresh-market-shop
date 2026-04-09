@@ -166,7 +166,7 @@ export default function ReportAdmin() {
     return (
       <Card
         title="Tổng quan đơn hàng"
-        bordered={false}
+        variant="borderless"
         className="shadow-sm rounded-4 mb-4"
         style={{ borderRadius: 16 }}
       >
@@ -285,7 +285,6 @@ export default function ReportAdmin() {
         <nav>
           <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
             <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
-            <li className="breadcrumb-item"><Link to="/admin/reports">Thống kê báo cáo</Link></li>
             <li className="breadcrumb-item active">Báo cáo thống kê</li>
           </ol>
         </nav>
@@ -293,7 +292,7 @@ export default function ReportAdmin() {
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "100px 0" }}>
-          <Spin size="large" tip="Đang tải dữ liệu báo cáo..." />
+          <Spin size="large" description="Đang tải dữ liệu báo cáo..." />
         </div>
       ) : (
         <Row gutter={[24, 24]}>
@@ -304,7 +303,7 @@ export default function ReportAdmin() {
           <Col xs={24} lg={12}>
             <Card
               title="Phân bổ đơn hàng (Tại cửa hàng & Online)"
-              bordered={false}
+              variant="borderless"
               className="shadow-sm rounded-4 mb-4"
               style={{ borderRadius: 16, height: '100%' }}
             >
@@ -327,7 +326,7 @@ export default function ReportAdmin() {
           <Col xs={24}>
             <Card
               title="Xu hướng doanh thu hàng tuần"
-              bordered={false}
+              variant="borderless"
               className="shadow-sm rounded-4 mb-4"
               style={{ borderRadius: 16 }}
             >
@@ -348,19 +347,19 @@ export default function ReportAdmin() {
 
           {/* 4. Category & 5. Supplier */}
           <Col xs={24} lg={12}>
-            <Card title="Doanh thu theo danh mục" bordered={false} className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
+            <Card title="Doanh thu theo danh mục" variant="borderless" className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
               {renderPieChart(categoryData, "categoryName")}
             </Card>
           </Col>
           <Col xs={24} lg={12}>
-            <Card title="Doanh thu theo nhà cung cấp" bordered={false} className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
+            <Card title="Doanh thu theo nhà cung cấp" variant="borderless" className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
               {renderPieChart(supplierData, "supplierName")}
             </Card>
           </Col>
 
           {/* 6. Top 5 & 7. Bottom 5 */}
           <Col xs={24} lg={12}>
-            <Card title="Top 5 sản phẩm có doanh thu cao nhất" bordered={false} className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
+            <Card title="Top 5 sản phẩm có doanh thu cao nhất" variant="borderless" className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
               <ResponsiveContainer width="100%" height={350}>
                 <ComposedChart data={topProducts} layout="horizontal" margin={{ bottom: 40 }}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -376,7 +375,7 @@ export default function ReportAdmin() {
             </Card>
           </Col>
           <Col xs={24} lg={12}>
-            <Card title="Top 5 sản phẩm có doanh thu thấp nhất" bordered={false} className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
+            <Card title="Top 5 sản phẩm có doanh thu thấp nhất" variant="borderless" className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
               <ResponsiveContainer width="100%" height={350}>
                 <ComposedChart data={bottomProducts} layout="horizontal" margin={{ bottom: 40 }}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -394,7 +393,7 @@ export default function ReportAdmin() {
 
           {/* 8. User Growth */}
           <Col xs={24}>
-            <Card title="Tăng trưởng người dùng" bordered={false} className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
+            <Card title="Tăng trưởng người dùng" variant="borderless" className="shadow-sm rounded-4 mb-4" style={{ borderRadius: 16 }}>
               <ResponsiveContainer width="100%" height={350}>
                 <ComposedChart data={userGrowth}>
                   <CartesianGrid strokeDasharray="3 3" />

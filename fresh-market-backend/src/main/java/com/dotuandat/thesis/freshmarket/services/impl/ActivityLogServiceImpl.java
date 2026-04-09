@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -25,6 +26,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     ActivityLogRepository activityLogRepository;
     ModelMapper modelMapper;
+    SimpMessagingTemplate messagingTemplate;
 
     @Override
     public ActivityLogResponse create(String username, String actionType, String description) {
@@ -47,7 +49,13 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         try {
             ActivityLog savedLog = activityLogRepository.save(activityLog);
             log.info("Activity log created: id={}, username={}, actionType={}", savedLog.getId(), username, actionType);
-            return modelMapper.map(savedLog, ActivityLogResponse.class);
+            
+            ActivityLogResponse response = modelMapper.map(savedLog, ActivityLogResponse.class);
+            
+            // Broadcast to all subscribers
+            messagingTemplate.convertAndSend("/topic/activities", response);
+            
+            return response;
         } catch (Exception e) {
             log.error("Failed to save activity log: {}", e.getMessage());
             throw new RuntimeException("Could not save activity log", e);

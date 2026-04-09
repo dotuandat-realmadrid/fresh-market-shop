@@ -4,6 +4,7 @@ import com.dotuandat.thesis.freshmarket.dtos.request.order.OrderRequest;
 import com.dotuandat.thesis.freshmarket.dtos.response.ApiResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.order.OrderResponse;
 import com.dotuandat.thesis.freshmarket.enums.OrderStatus;
+import com.dotuandat.thesis.freshmarket.services.ActivityLogService;
 import com.dotuandat.thesis.freshmarket.services.CartService;
 import com.dotuandat.thesis.freshmarket.services.OrderService;
 import com.dotuandat.thesis.freshmarket.services.PaymentService;
@@ -29,17 +30,24 @@ import java.util.Map;
 @Slf4j
 public class PaymentController {
 
-    @Autowired private PaymentService paymentService;
-    @Autowired private OrderService   orderService;
-    @Autowired private CartService    cartService;
-    @Autowired private PaymentUtil    paymentUtil;
+    @Autowired
+    private PaymentService paymentService;
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private CartService cartService;
+    @Autowired
+    private PaymentUtil paymentUtil;
+    @Autowired
+    private ActivityLogService activityLogService;
 
     /**
      * Bước 1: Frontend gọi để tạo order + lấy VNPay payment URL.
      *
      * @param orderData  JSON string của OrderRequest (giữ nguyên như cũ)
      * @param amount     số tiền
-     * @param redirectTo URL trang frontend muốn nhận kết quả (ví dụ: http://localhost:3001/confirm)
+     * @param redirectTo URL trang frontend muốn nhận kết quả (ví dụ:
+     *                   http://localhost:3001/confirm)
      */
     @PostMapping("/vnpay/pay")
     public ApiResponse<String> pay(
@@ -92,26 +100,28 @@ public class PaymentController {
      */
     @GetMapping("/vnpay-return")
     public ResponseEntity<Void> handleVnPayReturn(HttpServletRequest request,
-                                                  HttpServletResponse response) throws IOException {
+            HttpServletResponse response) throws IOException {
         String redirectTo = request.getParameter("redirectTo");
         String baseUrl = (redirectTo != null && !redirectTo.isEmpty())
-                ? redirectTo : "http://localhost:3001/confirm";
+                ? redirectTo
+                : "http://localhost:3001/confirm";
 
         // Collect fields để verify (bỏ vnp_SecureHash và redirectTo)
         Map<String, String> fields = new HashMap<>();
-        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements(); ) {
+        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
             String fieldName = params.nextElement();
-            if ("vnp_SecureHash".equals(fieldName) || "redirectTo".equals(fieldName)) continue;
+            if ("vnp_SecureHash".equals(fieldName) || "redirectTo".equals(fieldName))
+                continue;
             String fieldValue = request.getParameter(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
                 fields.put(fieldName, fieldValue);
             }
         }
 
-        String vnp_SecureHash   = request.getParameter("vnp_SecureHash");
-        String signValue        = paymentUtil.hashAllFields(fields);
+        String vnp_SecureHash = request.getParameter("vnp_SecureHash");
+        String signValue = paymentUtil.hashAllFields(fields);
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
-        String vnp_TxnRef       = request.getParameter("vnp_TxnRef"); // orderId
+        String vnp_TxnRef = request.getParameter("vnp_TxnRef"); // orderId
 
         log.info("VNPay return - OrderId: {}, ResponseCode: {}", vnp_TxnRef, vnp_ResponseCode);
 
@@ -141,14 +151,28 @@ public class PaymentController {
         } else {
             log.info("Payment success - OrderId: {}", vnp_TxnRef);
             try {
-                // getById có sẵn, OrderResponse đã có userId
+                // Lấy thông tin đơn hàng
                 OrderResponse order = orderService.getById(vnp_TxnRef);
+
+                // Cập nhật trạng thái đơn hàng sang CONFIRMED (đã thanh toán)
+                com.dotuandat.thesis.freshmarket.dtos.request.order.OrderStatusRequest statusRequest = new com.dotuandat.thesis.freshmarket.dtos.request.order.OrderStatusRequest(
+                        OrderStatus.CONFIRMED);
+                orderService.updateStatus(vnp_TxnRef, statusRequest);
+
+                // Ghi Log Hoạt động (Để Dashboard nhận Realtime)
+                String userLog = (order.getUsername() != null) ? order.getUsername() : "Guest";
+                activityLogService.create(userLog, "PAYMENT",
+                        "Khách hàng " + order.getFullName() + " vừa thanh toán thành công đơn hàng #" + vnp_TxnRef
+                                + " qua VNPay");
+
+                // Xóa giỏ hàng
                 if (order.getUserId() != null && !order.getUserId().isEmpty()) {
                     cartService.clearCart(order.getUserId());
                     log.info("Cart cleared for user: {}", order.getUserId());
                 }
             } catch (Exception e) {
-                log.warn("Failed to clear cart - OrderId: {}, Error: {}", vnp_TxnRef, e.getMessage());
+                log.warn("Failed to process payment success logic - OrderId: {}, Error: {}", vnp_TxnRef,
+                        e.getMessage());
             }
             finalUrl = baseUrl + "?orderId=" + vnp_TxnRef;
         }

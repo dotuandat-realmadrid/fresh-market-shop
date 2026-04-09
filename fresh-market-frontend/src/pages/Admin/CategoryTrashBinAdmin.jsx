@@ -44,6 +44,14 @@ const CategoryTrashBinAdmin = () => {
     setSelectedIds([]);
   }, []);
 
+  // Tự động làm mới dữ liệu mỗi 30 giây để cập nhật thời gian còn lại
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDeletedCategories();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleRestore = (trashBinId) => {
     modal.confirm({
       title: "Xác nhận khôi phục",

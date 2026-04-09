@@ -36,6 +36,14 @@ const DiscountTrashBinAdmin = () => {
     setSelectedIds([]);
   }, []);
 
+  // Tự động làm mới dữ liệu mỗi 30 giây để cập nhật thời gian còn lại
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDeletedDiscounts();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleRestore = (discountId) => {
     Modal.confirm({
       title: "Xác nhận khôi phục",

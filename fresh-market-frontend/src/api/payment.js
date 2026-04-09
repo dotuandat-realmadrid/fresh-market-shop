@@ -18,6 +18,7 @@ export const initiateVNPay = async (paymentData) => {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": `Bearer ${getToken()}`, // Thêm Token để Backend nhận diện User và ghi log
         },
         body: params.toString(),
     });

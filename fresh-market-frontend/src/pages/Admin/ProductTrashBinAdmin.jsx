@@ -46,6 +46,14 @@ const ProductTrashBinAdmin = () => {
     fetchDeletedProducts();
   }, [currentPage, pageSize]);
 
+  // Tự động làm mới dữ liệu mỗi 30 giây để cập nhật thời gian còn lại
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDeletedProducts();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [currentPage, pageSize]);
+
   useEffect(() => {
     setSelectedIds([]);
   }, [currentPage, pageSize]);

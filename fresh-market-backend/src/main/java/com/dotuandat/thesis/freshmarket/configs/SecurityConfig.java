@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_GET_ENDPOINTS = {
         "/categories/**", "/roles/**", "/permissions/**", "/suppliers/**", "/products/**", "/reviews/product/**",
-        "/orders/check", "/orders/{id}", "/orders/{id}/invoice/pdf", "/home", "/auth/", "/payment/**",
+        "/orders/check", "/orders/{id}", "/orders/{id}/invoice/pdf", "/home", "/auth/", "/payment/**", "/ws/**"
     };
 
     private final String[] PUBLIC_POST_ENDPOINTS = {

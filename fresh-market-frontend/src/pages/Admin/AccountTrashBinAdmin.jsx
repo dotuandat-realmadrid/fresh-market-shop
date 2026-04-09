@@ -86,6 +86,14 @@ const AccountTrashBinAdmin = () => {
     setSelectedIds([]);
   }, [currentPage, pageSize]);
 
+  // Tự động làm mới dữ liệu mỗi 30 giây để cập nhật thời gian còn lại
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDeletedUsers();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [currentPage, pageSize]);
+
   const handleRestore = (userId) => {
     Modal.confirm({
       title: 'Xác nhận khôi phục',
