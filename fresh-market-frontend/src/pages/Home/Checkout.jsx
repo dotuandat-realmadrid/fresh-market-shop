@@ -136,9 +136,21 @@ const Checkout = () => {
     window.scrollTo(0, 0);
   }, [loadCart]);
 
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shippingFee = 0; 
   const total = subtotal + shippingFee;
+
+  // Handle accidental redirect from VNPay back to checkout
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    if (query.has('vnp_ResponseCode')) {
+      const orderIdFromVNP = query.get('vnp_TxnRef');
+      if (orderIdFromVNP) {
+        navigate(`/confirm${location.search}&orderId=${orderIdFromVNP}`, { replace: true });
+      }
+    }
+  }, [location.search, navigate]);
 
   const handleCompleteOrder = async () => {
     if (cartItems.length === 0) {
@@ -223,7 +235,8 @@ const Checkout = () => {
                     });
 
                     if (paymentResp.code === 1000 && paymentResp.result) {
-                        window.location.href = paymentResp.result; // Chuyển hướng sang VNPay
+                        setIsRedirecting(true);
+                        window.location.replace(paymentResp.result); // Chuyển hướng sang VNPay
                     } else {
                         throw new Error(paymentResp.message || "Khởi tạo thanh toán thất bại");
                     }
@@ -253,6 +266,16 @@ const Checkout = () => {
         }
     });
   };
+
+  if (isRedirecting) {
+    return (
+      <div className="checkout-redirect-loading" style={{ height: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <Spin size="large" />
+        <h2 style={{ marginTop: '20px', color: '#004aad' }}>Đang chuyển hướng đến cổng thanh toán VNPay...</h2>
+        <p>Vui lòng không đóng trình duyệt.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="checkout-container">

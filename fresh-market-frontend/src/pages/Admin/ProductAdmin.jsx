@@ -239,9 +239,9 @@ const ProductAdmin = () => {
       ),
     },
     {
-      title: 'Danh mục, Hãng & Thương hiệu',
+      title: 'Phân loại sản phẩm',
       key: 'categorySupplier',
-      width: 180,
+      width: 200,
       render: (_, record) => (
         <div className="tag-stack">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>

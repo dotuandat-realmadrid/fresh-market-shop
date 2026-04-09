@@ -71,7 +71,7 @@ const Confirm = () => {
 
     fetchOrder();
     
-    // Clear cart if successful landing with orderId
+    // Clear cart UI/Local storage if successful landing with orderId
     if (orderId) {
       if (!getToken()) {
         localStorage.removeItem('guestCart');
