@@ -388,11 +388,15 @@ export default function ProductDetailAdmin() {
 
   return (
     <>
-      <div className="page-header">
-        <h1 className="page-title">Thông tin sản phẩm</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <Link to="/admin/products">Quản lý sản phẩm</Link> / <span className="active">{productDetail?.name}</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Thông tin sản phẩm</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/products">Quản lý sản phẩm</Link></li>
+            <li className="breadcrumb-item active">{productDetail?.name}</li>
+          </ol>
+        </nav>
       </div>
 
       <Row gutter={[16]}>

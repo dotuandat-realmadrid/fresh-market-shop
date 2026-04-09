@@ -347,13 +347,15 @@ export default function InventoryReceiptDetailAdmin() {
 
   return (
     <div className="account-admin-container inventory-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">{id ? "Thông tin phiếu nhập" : "Tạo phiếu nhập"}</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> /{" "}
-          <Link to="/admin/inventory-receipts">Quản lý nhập kho</Link> /{" "}
-          <span className="active">{id ? `${id}` : "Tạo phiếu nhập"}</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>{id ? "Thông tin phiếu nhập" : "Tạo phiếu nhập"}</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/inventory-receipts">Quản lý nhập kho</Link></li>
+            <li className="breadcrumb-item active">{id ? `${id}` : "Tạo phiếu nhập"}</li>
+          </ol>
+        </nav>
       </div>
 
       {id ? (

@@ -1,0 +1,111 @@
+.admin-dashboard .info-card {
+  padding-bottom: 10px;
+}
+
+.admin-dashboard .info-card h5 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #012970;
+  font-family: "Poppins", sans-serif;
+}
+
+.admin-dashboard .info-card h5 span {
+  color: #899bbd;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.admin-dashboard .info-card .card-icon {
+  font-size: 32px;
+  line-height: 0;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.admin-dashboard .sales-card .card-icon {
+  color: #4154f1;
+  background: #f6f6fe;
+}
+
+.admin-dashboard .revenue-card .card-icon {
+  color: #2eca6a;
+  background: #e0f8e9;
+}
+
+.admin-dashboard .customers-card .card-icon {
+  color: #ff771d;
+  background: #ffecdf;
+}
+
+.admin-dashboard .activity {
+  font-size: 14px;
+}
+
+.admin-dashboard .activity .activity-item {
+  margin-bottom: 15px;
+}
+
+.admin-dashboard .activity .activity-item .activite-label {
+  color: #888;
+  width: 65px;
+  flex-shrink: 0;
+}
+
+.admin-dashboard .activity .activity-item .activity-badge {
+  margin-top: 3px;
+  z-index: 1;
+  font-size: 11px;
+  line-height: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.admin-dashboard .activity .activity-item .activity-content {
+  padding-left: 10px;
+}
+
+.admin-dashboard .activity .activity-item .activity-badge-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 6px 12px 0;
+    flex-shrink: 0;
+}
+
+.admin-dashboard .activity .activity-item .activity-content a {
+    color: #012970;
+}
+
+/* Custom scrollbar for dashboard elements */
+.admin-dashboard .scroll-scroll {
+    scrollbar-width: thin !important;
+    scrollbar-color: #c1c1c1 transparent !important;
+}
+
+.admin-dashboard .scroll-scroll::-webkit-scrollbar {
+    width: 4px !important;
+    height: 4px !important;
+}
+.admin-dashboard .scroll-scroll::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+.admin-dashboard .scroll-scroll::-webkit-scrollbar-thumb {
+    background: #c1c1c1 !important;
+    border-radius: 10px !important;
+}
+.admin-dashboard .scroll-scroll::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1 !important;
+}
+
+.admin-dashboard .top-selling img {
+    width: 40px;
+    border-radius: 5px;
+}
+
+.admin-dashboard .badge {
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+}

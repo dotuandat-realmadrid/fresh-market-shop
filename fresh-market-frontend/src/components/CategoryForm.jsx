@@ -298,9 +298,8 @@ export default function CategoryForm({
             style={{ 
               minWidth: 130, 
               height: 40, 
-              borderRadius: 8,
+              borderRadius: 6,
               fontWeight: 600,
-              boxShadow: "0 2px 8px rgba(22, 119, 255, 0.25)"
             }}
           >
             {submitButtonText}

@@ -38,7 +38,7 @@ const InventoryImport = ({ onSuccess }) => {
   const [pdfFile, setPdfFile] = useState(null);
   const [qrFile, setQrFile] = useState(null);
   const [qrContent, setQrContent] = useState("");
-  const [aiQuantity, setAiQuantity] = useState(1);
+  const [aiQuantity, setAiQuantity] = useState('');
 
   // QR Camera states
   const [scanning, setScanning] = useState(false);
@@ -218,9 +218,9 @@ const InventoryImport = ({ onSuccess }) => {
         onCancel={() => setIsExcelOpen(false)}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={() => setIsExcelOpen(false)}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={handleImportExcel} disabled={loading}>
-              <FaCloudUploadAlt /> Thêm mới
+            <MyButton onClick={() => setIsExcelOpen(false)}>Hủy</MyButton>
+            <MyButton type="primary" onClick={handleImportExcel} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Thêm mới
             </MyButton>
           </div>
         }
@@ -273,9 +273,9 @@ const InventoryImport = ({ onSuccess }) => {
         onCancel={() => setIsAIOpen(false)}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={() => setIsAIOpen(false)}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={handleImportAI} disabled={loading}>
-              <FaCloudUploadAlt /> Tạo
+            <MyButton onClick={() => setIsAIOpen(false)}>Hủy</MyButton>
+            <MyButton type="primary" onClick={handleImportAI} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Tạo
             </MyButton>
           </div>
         }
@@ -312,9 +312,9 @@ const InventoryImport = ({ onSuccess }) => {
         onCancel={() => setIsQROpen(false)}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={() => setIsQROpen(false)}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={handleImportQR} disabled={loading || (!qrFile && !qrContent)}>
-              <FaCloudUploadAlt /> Thêm mới
+            <MyButton onClick={() => setIsQROpen(false)}>Hủy</MyButton>
+            <MyButton type="primary" onClick={handleImportQR} disabled={loading || (!qrFile && !qrContent)} icon={<FaCloudUploadAlt />}>
+              Thêm mới
             </MyButton>
           </div>
         }
@@ -375,9 +375,9 @@ const InventoryImport = ({ onSuccess }) => {
         onCancel={() => setIsPDFOpen(false)}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={() => setIsPDFOpen(false)}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={handleImportPDF} disabled={loading}>
-              <FaCloudUploadAlt /> Thêm mới
+            <MyButton onClick={() => setIsPDFOpen(false)}>Hủy</MyButton>
+            <MyButton type="primary" onClick={handleImportPDF} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Thêm mới
             </MyButton>
           </div>
         }

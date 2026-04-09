@@ -1,7 +1,9 @@
 import { 
   DeleteOutlined, 
   EditOutlined, 
-  ExclamationCircleOutlined 
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import {
   Modal,
@@ -16,12 +18,9 @@ import MyButton from "../../components/MyButton";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
-  FaPlus, 
   FaFilter, 
   FaChevronDown, 
   FaTrashAlt, 
-  FaSearch, 
-  FaRedo,
   FaIdCard,
   FaTag
 } from 'react-icons/fa';
@@ -164,7 +163,7 @@ export default function CategoryAdmin() {
     fetchCategories();
   }, []);
 
-  const showModal = () => {
+  const showAddModal = () => {
     setIsModalVisible(true);
   };
 
@@ -359,11 +358,15 @@ export default function CategoryAdmin() {
 
   return (
     <div className="account-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Quản lý danh mục</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <Link to="/admin/categories">Quản lý danh mục</Link> / <span className="active">Danh sách</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách danh mục</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/categories">Quản lý danh mục</Link></li>
+            <li className="breadcrumb-item active">Danh sách danh mục</li>
+          </ol>
+        </nav>
       </div>
 
       <div className="admin-card">
@@ -432,11 +435,11 @@ export default function CategoryAdmin() {
               </div>
             </div>
             <div className="filter-actions">
-              <MyButton className="btn-secondary" onClick={handleReset}>
-                <FaTrashAlt /> Xóa bộ lọc
+              <MyButton onClick={handleReset} icon={<DeleteOutlined />}>
+                Xóa bộ lọc
               </MyButton>
-              <MyButton className="btn-primary" onClick={handleSearch}>
-                <FaSearch /> Tìm kiếm
+              <MyButton type="primary" onClick={handleSearch} icon={<SearchOutlined />}>
+                Tìm kiếm
               </MyButton>
             </div>
           </div>
@@ -447,7 +450,6 @@ export default function CategoryAdmin() {
             <div>Tổng số: <span className="count">{pagination.total}</span> danh mục</div>
             {selectedIds.length > 0 && (
               <MyButton
-                className="btn-remove"
                 danger
                 type="primary"
                 onClick={deleteSelectedCategories}
@@ -457,8 +459,8 @@ export default function CategoryAdmin() {
               </MyButton>
             )}
           </div>
-          <MyButton className="btn-add" onClick={showModal}>
-            <FaPlus /> Thêm mới
+          <MyButton type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
+            Thêm mới
           </MyButton>
         </div>
 

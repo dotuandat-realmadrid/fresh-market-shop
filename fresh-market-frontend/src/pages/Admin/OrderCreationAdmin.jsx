@@ -12,7 +12,6 @@ import {
 } from "@ant-design/icons";
 import {
   Breadcrumb,
-  Button,
   Card,
   Col,
   Divider,
@@ -29,6 +28,7 @@ import {
   Table,
   Typography,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import TextArea from "antd/es/input/TextArea";
 import { debounce } from "lodash";
 import { useCallback, useMemo, useState } from "react";
@@ -248,14 +248,14 @@ export default function OrderCreationAdmin() {
     {
       title: "Hành động",
       render: (_, record) => (
-        <Button
+        <MyButton
           type="text"
           danger
           icon={<DeleteOutlined />}
           onClick={() => handleRemove(record.productCode)}
         >
           Xóa
-        </Button>
+        </MyButton>
       ),
     },
   ];
@@ -267,15 +267,15 @@ export default function OrderCreationAdmin() {
 
   return (
     <>
-      <div className="page-header">
-        <h1 className="page-title">Thêm mới đơn hàng</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span style={{ margin: '0 8px' }}> / </span>
-          <Link to="/admin/orders">Quản lý đơn hàng</Link>
-          <span style={{ margin: '0 8px' }}> / </span>
-          <span className="active">Thêm mới đơn hàng</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Thêm mới đơn hàng</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/orders">Quản lý đơn hàng</Link></li>
+            <li className="breadcrumb-item active">Thêm mới đơn hàng</li>
+          </ol>
+        </nav>
       </div>
 
       <Card
@@ -487,11 +487,11 @@ export default function OrderCreationAdmin() {
             }}
           >
             <Link to={"/admin/orders"}>
-              <Button icon={<BackwardOutlined />}>
+              <MyButton icon={<BackwardOutlined />}>
                 <Space>
                   <span>Hủy thao tác</span>
                 </Space>
-              </Button>
+              </MyButton>
             </Link>
 
             <Space align="end" orientation="vertical">
@@ -508,7 +508,7 @@ export default function OrderCreationAdmin() {
                     {totalAmount.toLocaleString("vi-VN") + "đ"}
                   </Text>
                 </Space>
-                <Button
+                <MyButton
                   type="primary"
                   htmlType="submit"
                   size="large"
@@ -516,7 +516,7 @@ export default function OrderCreationAdmin() {
                   style={{ height: 50, fontSize: 16, width: 200 }}
                 >
                   Đặt hàng
-                </Button>
+                </MyButton>
               </div>
             </Space>
           </div>

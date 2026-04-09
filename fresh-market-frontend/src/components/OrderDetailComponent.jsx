@@ -9,7 +9,6 @@ import {
 import {
   Avatar,
   Badge,
-  Button,
   Card,
   Descriptions,
   Divider,
@@ -30,6 +29,7 @@ import {
   Col,
   Breadcrumb,
 } from "antd";
+import MyButton from "./MyButton";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -356,14 +356,14 @@ export default function OrderDetailComponent({
         render: (_, record) => (
           <Space>
             {canReviewProducts && !record.isReviewed && (
-              <Button
+              <MyButton
                 type="primary"
                 size="middle"
                 icon={<StarOutlined />}
                 onClick={() => openReviewModal(record)}
               >
                 Đánh giá ngay
-              </Button>
+              </MyButton>
             )}
 
             {canReviewProducts && record.isReviewed && (
@@ -388,29 +388,24 @@ export default function OrderDetailComponent({
     <>
       {!initialOrderData && (
         <>
-          <div className="page-header">
-            <h1 className="page-title">Chi tiết đơn hàng #{order.id}</h1>
-            <div className="breadcrumbs">
+          <div className="pagetitle mb-4">
+            <h1>Chi tiết đơn hàng #{order.id}</h1>
+            <nav>
               {isAdminPath ? (
-                <>
-                  <Link to="/admin">Dashboard</Link>
-                  <span style={{ margin: '0 8px' }}> / </span>
-                  <Link to="/admin/orders">Quản lý đơn hàng</Link>
-                  <span style={{ margin: '0 8px' }}> / </span>
-                  <span className="active">#{order.id}</span>
-                </>
+                <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+                  <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+                  <li className="breadcrumb-item"><Link to="/admin/orders">Quản lý đơn hàng</Link></li>
+                  <li className="breadcrumb-item active">#{order.id}</li>
+                </ol>
               ) : (
-                <>
-                  <Link to="/">Trang chủ</Link>
-                  <span style={{ margin: '0 8px', color: '#999' }}> / </span>
-                  <Link to="/users">Thông tin tài khoản</Link>
-                  <span style={{ margin: '0 8px', color: '#999' }}> / </span>
-                  <Link to={`/orders/user/${user.id}/status/PENDING`}>Lịch sử đặt hàng</Link>
-                  <span style={{ margin: '0 8px', color: '#999' }}> / </span>
-                  <span className="active">#{order.id}</span>
-                </>
+                <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+                  <li className="breadcrumb-item"><Link to="/">Trang chủ</Link></li>
+                  <li className="breadcrumb-item"><Link to="/users">Thông tin tài khoản</Link></li>
+                  <li className="breadcrumb-item"><Link to={`/orders/user/${user.id}/status/PENDING`}>Lịch sử đặt hàng</Link></li>
+                  <li className="breadcrumb-item active">#{order.id}</li>
+                </ol>
               )}
-            </div>
+            </nav>
           </div>
         </>
       )}
@@ -639,17 +634,17 @@ export default function OrderDetailComponent({
                               )
                             }
                           >
-                            <Button
+                            <MyButton
                               type="primary"
                               disabled={
                                 !nextStatus ||
                                 ["COMPLETED", "CANCELLED", "FAILED"].includes(
                                   order.status
-                                )
+                               )
                               }
                             >
                               Cập nhật trạng thái
-                            </Button>
+                            </MyButton>
                           </Popconfirm>
                         </Space>
                       </Space>
@@ -755,7 +750,7 @@ export default function OrderDetailComponent({
             <Form.Item>
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 <Space>
-                  <Button
+                  <MyButton
                     type="primary"
                     htmlType="submit"
                     loading={ratingSubmitting}
@@ -764,14 +759,14 @@ export default function OrderDetailComponent({
                     style={{ borderRadius: 6 }}
                   >
                     Gửi đánh giá
-                  </Button>
-                  <Button
+                  </MyButton>
+                  <MyButton
                     size="large"
                     onClick={() => setReviewModalVisible(false)}
                     style={{ borderRadius: 6 }}
                   >
                     Hủy
-                  </Button>
+                  </MyButton>
                 </Space>
               </div>
             </Form.Item>

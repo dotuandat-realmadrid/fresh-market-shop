@@ -6,7 +6,6 @@ import {
 } from "@ant-design/icons";
 import {
   Badge,
-  Button,
   Card,
   Divider,
   Empty,
@@ -17,6 +16,7 @@ import {
   Tabs,
   Typography,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -202,13 +202,13 @@ const ContactAdmin = () => {
 
                 {isUnread && (
                   <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
+                    <MyButton
                       type="primary"
                       icon={<CheckOutlined />}
                       onClick={() => onMarkAsRead(contact.id)}
                     >
                       Đánh dấu đã đọc
-                    </Button>
+                    </MyButton>
                   </div>
                 )}
               </Space>
@@ -222,15 +222,15 @@ const ContactAdmin = () => {
   return (
     <div className="account-admin-container">
       {/* Page header */}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý liên hệ</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span> / </span>
-          <Link to="/admin/contacts">Quản lý liên hệ</Link>
-          <span> / </span>
-          <span>Danh sách liên hệ</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách liên hệ</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/contacts">Quản lý liên hệ</Link></li>
+            <li className="breadcrumb-item active">Danh sách liên hệ</li>
+          </ol>
+        </nav>
       </div>
 
       <div

@@ -11,7 +11,6 @@ import {
   Avatar,
   Badge,
   Breadcrumb,
-  Button,
   Card,
   Col,
   DatePicker,
@@ -25,6 +24,7 @@ import {
   Table,
   Typography,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import OrderByStatus from "../../components/OrderByStatus";
 import "../../components/OrderByStatus.css";
 import CustomPagination from "../../components/CustomPagination/CustomPagination";
@@ -396,15 +396,15 @@ export default function OrderSearchAdmin() {
 
   return (
     <>
-      <div className="page-header">
-        <h1 className="page-title">Quản lý đơn hàng</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span style={{ margin: '0 8px' }}> / </span>
-          <Link to="/admin/orders">Quản lý đơn hàng</Link>
-          <span style={{ margin: '0 8px' }}> / </span>
-          <span className="active">Tìm kiếm</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Tìm kiếm đơn hàng</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/orders">Quản lý đơn hàng</Link></li>
+            <li className="breadcrumb-item active">Tìm kiếm đơn hàng</li>
+          </ol>
+        </nav>
       </div>
 
       {/* Search Form Section */}
@@ -488,19 +488,24 @@ export default function OrderSearchAdmin() {
             </Col>
 
             <Col xl={12} lg={12} style={{ textAlign: "right", marginTop: 29 }}>
-              <Space>
-                <Button onClick={handleReset} icon={<ClearOutlined />}>
-                  Xóa bộ lọc
-                </Button>
-                <Button
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
+                <MyButton
+                  icon={<ClearOutlined />}
+                  onClick={handleReset}
+                  style={{ borderRadius: "6px" }}
+                >
+                  Làm mới
+                </MyButton>
+                <MyButton
                   type="primary"
                   htmlType="submit"
                   icon={<SearchOutlined />}
                   loading={loading}
+                  style={{ borderRadius: "6px" }}
                 >
-                  Tìm kiếm
-                </Button>
-              </Space>
+                  Tìm kiếm đơn hàng
+                </MyButton>
+              </div>
             </Col>
           </Row>
         </Form>

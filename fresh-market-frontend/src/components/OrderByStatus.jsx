@@ -9,7 +9,6 @@ import {
 } from "@ant-design/icons";
 import {
   Badge,
-  Button,
   Card,
   Col,
   Divider,
@@ -221,7 +220,7 @@ const OrderByStatus = ({
                 !record.isAllReviewed &&
                 !isAdminPath ? (
                   <Link to={`/orders/${record.id}`}>
-                    <Button
+                    <MyButton
                       type="primary"
                       shape="round"
                       style={{
@@ -234,7 +233,7 @@ const OrderByStatus = ({
                       icon={<StarOutlined />}
                     >
                       Đánh giá
-                    </Button>
+                    </MyButton>
                   </Link>
                 ) : (
                   <Link
@@ -244,13 +243,13 @@ const OrderByStatus = ({
                         : `/orders/${record.id}`
                     }
                   >
-                    <Button
+                    <MyButton
                       type="primary"
                       shape="round"
                       icon={<RightOutlined />}
                     >
                       Chi tiết
-                    </Button>
+                    </MyButton>
                   </Link>
                 )}
 
@@ -261,9 +260,9 @@ const OrderByStatus = ({
                     okText="Đồng ý"
                     cancelText="Hủy"
                   >
-                    <Button shape="round" danger style={{ marginTop: "8px" }}>
+                    <MyButton shape="round" danger style={{ marginTop: "8px" }}>
                       Hủy đơn hàng
-                    </Button>
+                    </MyButton>
                   </Popconfirm>
                 )}
               </Col>
@@ -299,7 +298,7 @@ const OrderByStatus = ({
               key={status.code}
               offset={[-5, 0]}
             >
-              <Button
+              <MyButton
                 type={selectedStatus === status.code ? "primary" : "text"}
                 onClick={() => onStatusChange(status.code)}
                 style={{
@@ -313,10 +312,11 @@ const OrderByStatus = ({
                     selectedStatus === status.code
                       ? getStatusColor(status.code)
                       : "transparent",
+                  color: selectedStatus === status.code ? "#fff" : "rgba(0, 0, 0, 0.85)"
                 }}
               >
                 {status.label}
-              </Button>
+              </MyButton>
             </Badge>
           ))}
         </Space>
@@ -337,13 +337,13 @@ const OrderByStatus = ({
               <MyButton icon={<SearchOutlined />}>Tìm kiếm</MyButton>
             </Link>
             <Link to={"/admin/orders/create"}>
-              <Button
+              <MyButton
                 type="primary"
                 icon={<PlusOutlined />}
                 style={{ marginLeft: 16 }}
               >
                 Thêm mới
-              </Button>
+              </MyButton>
             </Link>
           </div>
         )}

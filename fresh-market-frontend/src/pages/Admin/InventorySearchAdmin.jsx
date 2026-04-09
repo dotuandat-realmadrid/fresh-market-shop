@@ -174,13 +174,15 @@ export default function InventorySearchAdmin() {
 
   return (
     <div className="account-admin-container inventory-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Tìm kiếm phiếu nhập</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> /{" "}
-          <Link to="/admin/inventory-receipts">Quản lý nhập kho</Link> /{" "}
-          <span className="active">Tìm kiếm</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Tìm kiếm phiếu nhập</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/inventory-receipts">Quản lý nhập kho</Link></li>
+            <li className="breadcrumb-item active">Tìm kiếm phiếu nhập</li>
+          </ol>
+        </nav>
       </div>
 
       {/* Search Form Section */}

@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   App,
   DatePicker,
@@ -242,11 +242,15 @@ export default function DiscountAdmin() {
 
   return (
     <div className="account-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Quản lý mã giảm giá</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <Link to="/admin/discounts">Quản lý mã giảm giá</Link> / <span className="active">Danh sách mã giảm giá</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách mã giảm giá</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/discounts">Quản lý mã giảm giá</Link></li>
+            <li className="breadcrumb-item active">Danh sách mã giảm giá</li>
+          </ol>
+        </nav>
       </div>
 
       <div className="admin-card">
@@ -255,7 +259,7 @@ export default function DiscountAdmin() {
           <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div>Tổng số: <span className="count">{discountData.totalElements}</span> mã giảm giá</div>
             {selectedIds.length > 0 && (
-              <MyButton className='btn-remove'
+              <MyButton
                 danger 
                 type="primary" 
                 onClick={deleteSelectedDiscounts}
@@ -265,8 +269,8 @@ export default function DiscountAdmin() {
               </MyButton>
             )}
           </div>
-          <MyButton className="btn-add" onClick={showCreateModal}>
-            <FaPlus /> Thêm mới
+          <MyButton type="primary" icon={<PlusOutlined />} onClick={showCreateModal}>
+            Thêm mới
           </MyButton>
         </div>
 

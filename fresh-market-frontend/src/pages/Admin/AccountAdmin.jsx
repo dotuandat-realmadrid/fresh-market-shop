@@ -20,7 +20,11 @@ import {
   MailOutlined, 
   PhoneOutlined, 
   EyeOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
+  SearchOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  FilterOutlined,
 } from '@ant-design/icons';
 import { App, Avatar, Space, Typography, Tag, Tooltip, Table, Pagination, Modal } from 'antd';
 import MyButton from '../../components/MyButton';
@@ -249,11 +253,15 @@ const AccountAdmin = () => {
 
   return (
     <div className="account-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Quản lý tài khoản</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <Link to="/admin/accounts">Quản lý tài khoản</Link> / <span className="active">Danh sách tài khoản</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách tài khoản</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/accounts">Quản lý tài khoản</Link></li>
+            <li className="breadcrumb-item active">Danh sách tài khoản</li>
+          </ol>
+        </nav>
       </div>
 
       <div className="admin-card">
@@ -380,11 +388,11 @@ const AccountAdmin = () => {
               </div>
             </div>
             <div className="filter-actions">
-              <MyButton className="btn-secondary" onClick={handleReset}>
-                <FaTrashAlt /> Xóa bộ lọc
+              <MyButton onClick={handleReset} icon={<DeleteOutlined />}>
+                Xóa bộ lọc
               </MyButton>
-              <MyButton className="btn-primary" onClick={handleSearch}>
-                <FaSearch /> Tìm kiếm
+              <MyButton type="primary" onClick={handleSearch} icon={<SearchOutlined />}>
+                Tìm kiếm
               </MyButton>
             </div>
           </div>
@@ -395,17 +403,18 @@ const AccountAdmin = () => {
           <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div>Tổng số: <span className="count">{userData.totalElements}</span> người dùng</div>
             {selectedIds.length > 0 && (
-              <MyButton className='btn-remove'
+              <MyButton 
                 danger 
                 type="primary" 
                 onClick={deleteSelectedUsers}
+                icon={<DeleteOutlined />}
               >
-                <FaTrashAlt /> Xóa {selectedIds.length} người dùng
+                Xóa {selectedIds.length} người dùng
               </MyButton>
             )}
           </div>
-          <MyButton className="btn-add" onClick={() => setShowAddModal(true)}>
-            <FaPlus /> Thêm mới
+          <MyButton type="primary" icon={<PlusOutlined />} onClick={() => setShowAddModal(true)}>
+            Thêm mới
           </MyButton>
         </div>
 
@@ -648,8 +657,8 @@ const AccountAdmin = () => {
 
             <div className="modal-footer-actions">
               <MyButton
-                type="submit"
-                className="btn-modal-add"
+                type="primary"
+                htmlType="submit"
                 disabled={loading}
               >
                 {loading ? "Đang xử lý..." : "Thêm mới"}
@@ -664,4 +673,3 @@ const AccountAdmin = () => {
 };
 
 export default AccountAdmin;
-

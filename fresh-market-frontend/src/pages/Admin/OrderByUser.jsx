@@ -105,29 +105,24 @@ export default function OrderByUser() {
 
   return (
     <>
-      <div className="page-header">
-        <h1 className="page-title">Lịch sử đặt hàng</h1>
-        <div className="breadcrumbs">
+      <div className="pagetitle mb-4">
+        <h1>Lịch sử đặt hàng</h1>
+        <nav>
           {isAdminPath ? (
-            <>
-              <Link to="/admin">Dashboard</Link>
-              <span style={{ margin: '0 8px' }}> / </span>
-              <Link to="/admin/accounts">Quản lý tài khoản</Link>
-              <span style={{ margin: '0 8px' }}> / </span>
-              <Link to={`/admin/accounts/${userId}`}>{username}</Link>
-              <span style={{ margin: '0 8px' }}> / </span>
-              <span className="active">Lịch sử đặt hàng</span>
-            </>
+            <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+              <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+              <li className="breadcrumb-item"><Link to="/admin/accounts">Quản lý tài khoản</Link></li>
+              <li className="breadcrumb-item"><Link to={`/admin/accounts/${userId}`}>{username}</Link></li>
+              <li className="breadcrumb-item active">Lịch sử đặt hàng</li>
+            </ol>
           ) : (
-            <>
-              <Link to="/">Trang chủ</Link>
-              <span style={{ margin: '0 8px', color: '#999' }}> / </span>
-              <Link to="/my-profile">Thông tin tài khoản</Link>
-              <span style={{ margin: '0 8px', color: '#999' }}> / </span>
-              <span className="active">Lịch sử đặt hàng</span>
-            </>
+            <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+              <li className="breadcrumb-item"><Link to="/">Trang chủ</Link></li>
+              <li className="breadcrumb-item"><Link to="/my-profile">Thông tin tài khoản</Link></li>
+              <li className="breadcrumb-item active">Lịch sử đặt hàng</li>
+            </ol>
           )}
-        </div>
+        </nav>
       </div>
 
       <OrderByStatus

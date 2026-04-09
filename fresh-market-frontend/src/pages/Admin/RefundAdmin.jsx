@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   Badge,
-  Button,
   Card,
   Descriptions,
   Modal,
@@ -18,6 +17,7 @@ import {
   Col,
   Table,
 } from "antd";
+import MyButton from "../../components/MyButton";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -307,23 +307,25 @@ export default function RefundAdmin() {
                 offset={[-6, 4]}
                 style={{ backgroundColor: "#ff4d4f", fontSize: 10 }}
               >
-                <button
+                <MyButton
+                  key={s.code}
                   onClick={() => setActiveTab(s.code)}
+                  type={isActive ? "primary" : "text"}
                   style={{
                     padding: "7px 22px",
                     borderRadius: 24,
-                    border: "none",
-                    cursor: "pointer",
                     fontWeight: isActive ? 600 : 400,
                     fontSize: 14,
                     color: isActive ? "#fff" : "#555",
                     background: isActive ? s.color : "transparent",
+                    borderColor: isActive ? s.color : "transparent",
                     transition: "all 0.2s",
                     whiteSpace: "nowrap",
+                    height: "auto",
                   }}
                 >
                   {s.label}
-                </button>
+                </MyButton>
               </Badge>
             );
           })}
@@ -452,23 +454,23 @@ export default function RefundAdmin() {
 
           {/* Buttons — right aligned */}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 4 }}>
-            <Button
+            <MyButton
               icon={<StopOutlined />}
               onClick={() => { setShowSearch(false); resetSearch(); }}
             >
               Hủy
-            </Button>
-            <Button icon={<ReloadOutlined />} onClick={resetSearch}>
+            </MyButton>
+            <MyButton icon={<ReloadOutlined />} onClick={resetSearch}>
               Xóa bộ lọc
-            </Button>
-            <Button
+            </MyButton>
+            <MyButton
               type="primary"
               htmlType="submit"
               icon={<SearchOutlined />}
               loading={searchLoading}
             >
               Tìm kiếm
-            </Button>
+            </MyButton>
           </div>
         </Form>
       </div>
@@ -530,15 +532,15 @@ export default function RefundAdmin() {
   return (
     <div className="account-admin-container">
       {/* Page header */}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý hoàn tiền</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span> / </span>
-          <Link to="/admin/refunds">Quản lý hoàn tiền</Link>
-          <span> / </span>
-          <span>Danh sách hoàn tiền</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách hoàn tiền</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/refunds">Quản lý hoàn tiền</Link></li>
+            <li className="breadcrumb-item active">Danh sách hoàn tiền</li>
+          </ol>
+        </nav>
       </div>
 
       {showSearch ? (
@@ -573,14 +575,14 @@ export default function RefundAdmin() {
                 Tổng số:{" "}
                 <span style={{ color: "#1677ff" }}>{current.total}</span> đơn hàng
               </Text>
-              <Button
+              <MyButton
                 type="primary"
                 icon={<SearchOutlined />}
                 style={{ background: "#28a745", borderColor: "#28a745" }}
                 onClick={() => setShowSearch(true)}
               >
                 Tìm kiếm
-              </Button>
+              </MyButton>
             </div>
 
             {/* Cards */}
@@ -732,17 +734,17 @@ export default function RefundAdmin() {
             {selectedRefund.status === "PENDING" && (
               <Row justify="end" gutter={12}>
                 <Col>
-                  <Button
+                  <MyButton
                     danger
                     icon={<CloseCircleOutlined />}
                     onClick={handleReject}
                     loading={processing}
                   >
                     Từ chối
-                  </Button>
+                  </MyButton>
                 </Col>
                 <Col>
-                  <Button
+                  <MyButton
                     type="primary"
                     icon={<CheckCircleOutlined />}
                     onClick={handleApprove}
@@ -750,7 +752,7 @@ export default function RefundAdmin() {
                     style={{ background: "#52c41a", borderColor: "#52c41a" }}
                   >
                     Đồng ý hoàn tiền
-                  </Button>
+                  </MyButton>
                 </Col>
               </Row>
             )}

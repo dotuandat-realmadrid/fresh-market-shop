@@ -65,15 +65,15 @@ export default function OrderAdmin() {
 
   return (
     <>
-      <div className="page-header">
-        <h1 className="page-title">Quản lý đơn hàng</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span> / </span>
-          <Link to="/admin/orders">Quản lý đơn hàng</Link>
-          <span> / </span>
-          <span className="active">Danh sách đơn hàng</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách đơn hàng</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/orders">Quản lý đơn hàng</Link></li>
+            <li className="breadcrumb-item active">Danh sách đơn hàng</li>
+          </ol>
+        </nav>
       </div>
       
       <OrderByStatus

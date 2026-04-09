@@ -192,15 +192,16 @@ export default function ReceiptByProductAdmin() {
   return (
     <div className="account-admin-container">
       {/* Page header */}
-      <div className="page-header">
-        <h1 className="page-title">Lịch sử nhập kho</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span> / </span>
-          <Link to="/admin/inventory-receipts">Quản lý nhập kho</Link>
-          <span> / </span>
-          <Link to={`/admin/products/${productCode}`}>{productName}</Link>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Lịch sử nhập kho</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/inventory-receipts">Quản lý nhập kho</Link></li>
+            <li className="breadcrumb-item"><Link to={`/admin/products/${productCode}`}>{productName}</Link></li>
+            <li className="breadcrumb-item active">Lịch sử nhập kho</li>
+          </ol>
+        </nav>
       </div>
 
       <div

@@ -280,13 +280,15 @@ export default function ReportAdmin() {
   // Main Return
   return (
     <div className="account-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Báo cáo & Thống kê</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link>
-          <span> / </span>
-          <span>Báo cáo & Thống kê</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Báo cáo thống kê</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/reports">Thống kê báo cáo</Link></li>
+            <li className="breadcrumb-item active">Báo cáo thống kê</li>
+          </ol>
+        </nav>
       </div>
 
       {loading ? (

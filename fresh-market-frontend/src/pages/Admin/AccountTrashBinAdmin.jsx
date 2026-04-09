@@ -231,13 +231,15 @@ const AccountTrashBinAdmin = () => {
 
   return (
     <div className="account-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Quản lý tài khoản</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> /{" "}
-          <Link to="/admin/accounts">Quản lý tài khoản</Link> /{" "}
-          <span className="active">Danh sách tài khoản đã xóa</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Thùng rác tài khoản</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/accounts">Quản lý tài khoản</Link></li>
+            <li className="breadcrumb-item active">Thùng rác tài khoản</li>
+          </ol>
+        </nav>
       </div>
 
       <div className="admin-card">

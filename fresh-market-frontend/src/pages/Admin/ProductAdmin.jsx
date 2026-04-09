@@ -15,7 +15,8 @@ import {
   ExclamationCircleOutlined,
   PlusOutlined,
   DeleteOutlined,
-  PictureOutlined
+  PictureOutlined,
+  SearchOutlined
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import './AccountAdmin.css';
@@ -335,11 +336,15 @@ const ProductAdmin = () => {
 
   return (
     <div className="account-admin-container product-admin-container">
-      <div className="page-header">
-        <h1 className="page-title">Quản lý sản phẩm</h1>
-        <div className="breadcrumbs">
-          <Link to="/admin">Dashboard</Link> / <Link to="/admin/products">Quản lý sản phẩm</Link> / <span className="active">Danh sách sản phẩm</span>
-        </div>
+      <div className="pagetitle mb-4">
+        <h1>Danh sách sản phẩm</h1>
+        <nav>
+          <ol className="breadcrumb mb-0" style={{ background: 'transparent', padding: 0 }}>
+            <li className="breadcrumb-item"><Link to="/admin">Dashboard</Link></li>
+            <li className="breadcrumb-item"><Link to="/admin/products">Quản lý sản phẩm</Link></li>
+            <li className="breadcrumb-item active">Danh sách sản phẩm</li>
+          </ol>
+        </nav>
       </div>
 
       <div className="admin-card">
@@ -464,11 +469,11 @@ const ProductAdmin = () => {
               </div>
             </div>
             <div className="filter-actions" style={{ marginTop: '10px' }}>
-              <MyButton className="btn-secondary" onClick={handleResetFilters} style={{ background: 'white' }}>
-                <FaEraser /> Xóa bộ lọc
+              <MyButton onClick={handleResetFilters} icon={<DeleteOutlined />}>
+                Xóa bộ lọc
               </MyButton>
-              <MyButton className="btn-primary" onClick={handleSearch}>
-                <FaSearch /> Tìm kiếm
+              <MyButton type="primary" onClick={handleSearch} icon={<SearchOutlined />}>
+                Tìm kiếm
               </MyButton>
             </div>
           </div>
@@ -478,16 +483,16 @@ const ProductAdmin = () => {
         <div className="table-actions-row">
           <div className="stats" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div>Tổng số: <span className="count">{totalElements}</span> sản phẩm</div>
-            {selectedIds.length > 0 && (
-              <MyButton className="btn-danger" onClick={handleDeleteSelected}>
-                <FaTrashAlt /> Xóa {selectedIds.length} sản phẩm
+             {selectedIds.length > 0 && (
+              <MyButton danger type="primary" onClick={handleDeleteSelected} icon={<DeleteOutlined />}>
+                Xóa {selectedIds.length} sản phẩm
               </MyButton>
             )}
           </div>
           <div className="table-action-buttons">
 
-            <MyButton className="btn-primary" onClick={() => setIsAddModalVisible(true)}>
-              <FaPlus /> Thêm mới
+            <MyButton type="primary" onClick={() => setIsAddModalVisible(true)} icon={<PlusOutlined />}>
+              Thêm mới
             </MyButton>
             
             <Dropdown 
@@ -497,7 +502,7 @@ const ProductAdmin = () => {
                 open={isImportDropdownOpen}
                 onOpenChange={setIsImportDropdownOpen}
             >
-                <MyButton className="btn-success">
+                <MyButton type="primary">
                     <FaFileImport /> Import <FaChevronDown size={10} />
                 </MyButton>
             </Dropdown>
@@ -509,7 +514,7 @@ const ProductAdmin = () => {
                 open={isExportDropdownOpen}
                 onOpenChange={setIsExportDropdownOpen}
             >
-                <MyButton className="btn-success">
+                <MyButton type="primary">
                     <FaFileExport /> Export <FaChevronDown size={10} />
                 </MyButton>
             </Dropdown>

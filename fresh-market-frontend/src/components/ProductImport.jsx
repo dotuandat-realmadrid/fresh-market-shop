@@ -187,12 +187,12 @@ const ProductImport = ({
         onCancel={onExcelCancel}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={onExcelCancel}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={() => handleImportExcel('update')} disabled={loading}>
-              <FaCloudUploadAlt /> Cập nhật
+            <MyButton onClick={onExcelCancel}>Hủy</MyButton>
+            <MyButton type="primary" onClick={() => handleImportExcel('update')} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Cập nhật
             </MyButton>
-            <MyButton className="btn-blue-foot" onClick={() => handleImportExcel('create')} disabled={loading}>
-              <FaCloudUploadAlt /> Thêm mới
+            <MyButton type="primary" onClick={() => handleImportExcel('create')} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Thêm mới
             </MyButton>
           </div>
         }
@@ -211,8 +211,8 @@ const ProductImport = ({
             </ul>
         </div>
         
-        <MyButton className="btn-green-download">
-            <DownloadOutlined /> Tải xuống file mẫu Excel
+        <MyButton icon={<DownloadOutlined />}>
+            Tải xuống file mẫu Excel
         </MyButton>
 
         <div className="drop-area" onClick={() => document.getElementById('excel-upload').click()}>
@@ -244,9 +244,9 @@ const ProductImport = ({
         onCancel={onAICancel}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={onAICancel}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={handleImportAI} disabled={loading}>
-              <FaCloudUploadAlt /> Thêm
+            <MyButton onClick={onAICancel}>Hủy</MyButton>
+            <MyButton type="primary" onClick={handleImportAI} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Thêm
             </MyButton>
           </div>
         }
@@ -282,12 +282,12 @@ const ProductImport = ({
         onCancel={onQRCancel}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={onQRCancel}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={() => handleImportQR('update')} disabled={loading}>
-              <FaCloudUploadAlt /> Cập nhật
+            <MyButton onClick={onQRCancel}>Hủy</MyButton>
+            <MyButton type="primary" onClick={() => handleImportQR('update')} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Cập nhật
             </MyButton>
-            <MyButton className="btn-blue-foot" onClick={() => handleImportQR('create')} disabled={loading}>
-              <FaCloudUploadAlt /> Thêm mới
+            <MyButton type="primary" onClick={() => handleImportQR('create')} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Thêm mới
             </MyButton>
           </div>
         }
@@ -349,12 +349,12 @@ const ProductImport = ({
         onCancel={onPDFCancel}
         footer={
           <div className="modal-footer">
-            <MyButton className="btn-gray-foot" onClick={onPDFCancel}>Hủy</MyButton>
-            <MyButton className="btn-blue-foot" onClick={() => handleImportPDF('update')} disabled={loading}>
-              <FaCloudUploadAlt /> Cập nhật
+            <MyButton onClick={onPDFCancel}>Hủy</MyButton>
+            <MyButton type="primary" onClick={() => handleImportPDF('update')} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Cập nhật
             </MyButton>
-            <MyButton className="btn-blue-foot" onClick={() => handleImportPDF('create')} disabled={loading}>
-              <FaCloudUploadAlt /> Thêm mới
+            <MyButton type="primary" onClick={() => handleImportPDF('create')} disabled={loading} icon={<FaCloudUploadAlt />}>
+              Thêm mới
             </MyButton>
           </div>
         }
