@@ -255,7 +255,7 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public List<ProductResponse> getLowStockProducts(int threshold) {
         // findLowStockProducts trả về List<Product> trực tiếp
-        return productRepository.findLowStockProducts(threshold)
+        return productRepository.findLowStockProducts(threshold, PageRequest.of(0, 10))
                 .stream()
                 .map(productConverter::toResponse)
                 .toList();

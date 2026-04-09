@@ -28,9 +28,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             FROM OrderDetail od
             JOIN od.product p
             JOIN od.order o
-            LEFT JOIN FETCH p.categories
-            LEFT JOIN FETCH p.supplier
-            LEFT JOIN FETCH p.discount
             WHERE o.createdDate >= :startDate AND o.createdDate < :endDate AND o.status = 'COMPLETED'
             GROUP BY p
             ORDER BY SUM(od.quantity) DESC
@@ -43,9 +40,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             FROM OrderDetail od
             JOIN od.product p
             JOIN od.order o
-            LEFT JOIN FETCH p.categories
-            LEFT JOIN FETCH p.supplier
-            LEFT JOIN FETCH p.discount
             WHERE o.createdDate >= :startDate AND o.createdDate < :endDate AND o.status = 'COMPLETED'
             GROUP BY p
             ORDER BY SUM(od.quantity) DESC
@@ -58,9 +52,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             FROM OrderDetail od
             JOIN od.product p
             JOIN od.order o
-            LEFT JOIN FETCH p.categories
-            LEFT JOIN FETCH p.supplier
-            LEFT JOIN FETCH p.discount
             WHERE o.createdDate >= :startDate AND o.createdDate < :endDate AND o.status = 'COMPLETED'
             GROUP BY p
             ORDER BY SUM(od.quantity) DESC
@@ -77,16 +68,13 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             WHERE p.inventoryQuantity <= :threshold
             ORDER BY p.inventoryQuantity ASC
             """)
-	List<Product> findLowStockProducts(@Param("threshold") int threshold);
+	List<Product> findLowStockProducts(@Param("threshold") int threshold, Pageable pageable);
 
 	@Query("""
             SELECT p, SUM(d.quantity)
             FROM InventoryReceiptDetail d
             JOIN d.product p
             JOIN d.receipt r
-            LEFT JOIN FETCH p.categories
-            LEFT JOIN FETCH p.supplier
-            LEFT JOIN FETCH p.discount
             WHERE d.expiryDate >= :startDate AND d.expiryDate <= :endDate
                 AND r.status = com.dotuandat.thesis.freshmarket.enums.InventoryStatus.COMPLETED
             GROUP BY p

@@ -44,14 +44,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
+            AuthenticationException authException) throws IOException {
         ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
 
         response.setStatus(errorCode.getStatusCode().value());
