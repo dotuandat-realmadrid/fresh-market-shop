@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_POST_ENDPOINTS = {
         "/users", "/users/guests", "/auth/**", "/addresses", "/orders", "/contacts", "/reviews", "/payment/**",
-
+        "/chatbot/**",
     };
 
     @Autowired

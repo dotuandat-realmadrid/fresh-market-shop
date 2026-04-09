@@ -8,7 +8,6 @@ import com.dotuandat.thesis.freshmarket.dtos.response.order.OrderResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.product.ProductResponse;
 import com.dotuandat.thesis.freshmarket.entities.Order;
 import com.dotuandat.thesis.freshmarket.entities.Product;
-import com.dotuandat.thesis.freshmarket.entities.ProductImage;
 import com.dotuandat.thesis.freshmarket.repositories.HomeRepository;
 import com.dotuandat.thesis.freshmarket.repositories.ProductRepository;
 import com.dotuandat.thesis.freshmarket.services.HomeService;

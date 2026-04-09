@@ -82,6 +82,11 @@ public class OrderServiceImpl implements OrderService {
 
         updateInventoryQuantity(details, false); // - inventory quantity
 
+        if (status == OrderStatus.COMPLETED) {
+            updateSoldQuantity(details);
+            updateProductPoint(details);
+        }
+
         orderRepository.save(order);
 
         // Handle anonymous (VNPay callback không có token)
@@ -107,6 +112,11 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderDetails(details);
 
         updateInventoryQuantity(details, false); // - inventory quantity
+
+        if (status == OrderStatus.COMPLETED) {
+            updateSoldQuantity(details);
+            updateProductPoint(details);
+        }
 
         orderRepository.save(order);
 

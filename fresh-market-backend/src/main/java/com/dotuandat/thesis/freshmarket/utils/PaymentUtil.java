@@ -58,23 +58,23 @@ public class PaymentUtil {
     }
 
     // Method cũ - sử dụng secretKey từ @Value
-    public String hashAllFields(Map fields) {
+    public String hashAllFields(Map<String, String> fields) {
         return hashAllFields(fields, this.secretKey);
     }
 
     // Method mới - nhận secretKey làm parameter
-    public String hashAllFields(Map fields, String secretKey) {
+    public String hashAllFields(Map<String, String> fields, String secretKey) {
         if (secretKey == null || secretKey.isEmpty()) {
             log.error("Secret key is null or empty");
             return "";
         }
 
-        List fieldNames = new ArrayList(fields.keySet());
+        List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
-        Iterator itr = fieldNames.iterator();
+        Iterator<String> itr = fieldNames.iterator();
         while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
+            String fieldName = itr.next();
             String fieldValue = (String) fields.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 try {
@@ -119,7 +119,7 @@ public class PaymentUtil {
         }
     }
 
-    public static String getIpAddress(HttpServletRequest request) {
+    public String getIpAddress(HttpServletRequest request) {
         String ipAdress;
         try {
             ipAdress = request.getHeader("X-FORWARDED-FOR");
@@ -132,7 +132,7 @@ public class PaymentUtil {
         return ipAdress;
     }
 
-    public static String getRandomNumber(int len) {
+    public String getRandomNumber(int len) {
         Random rnd = new Random();
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(len);

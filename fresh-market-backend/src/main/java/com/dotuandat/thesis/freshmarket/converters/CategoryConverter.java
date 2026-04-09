@@ -1,6 +1,5 @@
 package com.dotuandat.thesis.freshmarket.converters;
 
-import com.dotuandat.thesis.freshmarket.constants.StatusConstant;
 import com.dotuandat.thesis.freshmarket.dtos.request.category.CategoryCreateRequest;
 import com.dotuandat.thesis.freshmarket.dtos.request.category.CategoryUpdateRequest;
 import com.dotuandat.thesis.freshmarket.dtos.response.category.CategoryResponse;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 

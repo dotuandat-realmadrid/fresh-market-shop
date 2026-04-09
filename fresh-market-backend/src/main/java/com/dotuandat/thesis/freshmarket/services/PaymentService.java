@@ -1,6 +1,5 @@
 package com.dotuandat.thesis.freshmarket.services;
 
-import com.dotuandat.thesis.freshmarket.dtos.request.order.OrderRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface PaymentService {

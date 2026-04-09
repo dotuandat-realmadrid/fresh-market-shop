@@ -5,7 +5,6 @@ import com.dotuandat.thesis.freshmarket.dtos.request.category.CategoryUpdateRequ
 import com.dotuandat.thesis.freshmarket.dtos.response.PageResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.category.CategoryResponse;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -10,8 +10,6 @@ import com.dotuandat.thesis.freshmarket.dtos.response.auth.IntrospectResponse;
 import com.dotuandat.thesis.freshmarket.dtos.response.auth.RefreshResponse;
 import com.dotuandat.thesis.freshmarket.services.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
