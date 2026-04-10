@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   server: {
     port: 3001,
+    // host: true,
+    watch: {
+      usePolling: true,
+    },
     open: true,
   },
   plugins: [react()],

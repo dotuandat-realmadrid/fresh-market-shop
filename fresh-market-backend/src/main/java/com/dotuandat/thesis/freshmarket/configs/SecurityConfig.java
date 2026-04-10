@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_GET_ENDPOINTS = {
         "/categories/**", "/roles/**", "/permissions/**", "/suppliers/**", "/products/**", "/reviews/product/**",
-        "/orders/check", "/orders/{id}", "/orders/{id}/invoice/pdf", "/home", "/auth/", "/payment/**", "/ws/**"
+        "/orders/check", "/orders/{id}", "/orders/{id}/invoice/pdf", "/home", "/auth/", "/payment/**", "/ws/**", "/uploads/**"
     };
 
     private final String[] PUBLIC_POST_ENDPOINTS = {
@@ -68,7 +68,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3001");
+        config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

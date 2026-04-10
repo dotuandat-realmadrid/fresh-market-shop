@@ -8,8 +8,9 @@ import { persistor } from "../store/store";
 import { getMyInfo } from "./user";
 
 export const API = `http://localhost:8088/fresh-market`;
-export const IMAGE_URL = `http://localhost:3001/src/assets/uploads`;
-export const DEFAULT_IMAGE = "http://localhost:3001/src/assets/images/no_image_large.jpg";
+export const IMAGE_URL = `${API}/uploads`;
+export const IMAGE_URL_FRONTEND = `/uploads`;
+export const DEFAULT_IMAGE = "/images/no_image_large.jpg";
 
 export const login = async (data, navigate, dispatch) => {
   await fetch(`${API}/auth/login`, {
