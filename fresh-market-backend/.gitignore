@@ -37,3 +37,6 @@ build/
 
 ### Databases ###
 fresh-market.sql
+
+### Uploads Images ###
+uploads/
