@@ -7,7 +7,7 @@ import { introspect, logout, login, IMAGE_URL, DEFAULT_IMAGE } from '../../api/a
 import { addCartItem, getCartByUser, removeItem as removeCartItem } from '../../api/cart';
 import { getWishListByUser, toggleWishlist } from '../../api/wishList';
 import { searchProducts } from '../../api/product';
-import icons from "../../assets/images/icon-1.png";
+const icons = "/images/icon-1.png";
 import './Header.css';
 
 const Header = ({ onMenuToggle }) => {

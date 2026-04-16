@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getToken } from "../../services/localStorageService";
 import { Button, Input, Space } from "antd";
 import { introspect, logout as logoutAction } from "../../api/auth";
-import icons from "../../assets/images/icon-1.png"
+const icons = "/images/icon-1.png";
 import "./AdminHeader.css";
 
 export default function AdminHeader({ collapsed, toggleSidebar }) {

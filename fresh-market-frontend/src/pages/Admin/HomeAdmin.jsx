@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import Chart from 'react-apexcharts';
-import { IMAGE_URL, DEFAULT_IMAGE } from '../../api/auth';
+import { API, IMAGE_URL, DEFAULT_IMAGE } from '../../api/auth';
 import { 
   getSalesStatistics, 
   getTimeSeriesStatistics, 
@@ -139,7 +139,7 @@ const HomeAdmin = () => {
     // Sử dụng @stomp/stompjs kết nối qua WebSocket nguyên bản
     import('@stomp/stompjs').then(({ Client }) => {
       const client = new Client({
-        brokerURL: 'ws://localhost:8088/fresh-market/ws', // Chỉnh đúng port 8088 và context-path
+        brokerURL: `${API.replace(/^http/, 'ws')}/ws`, 
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,

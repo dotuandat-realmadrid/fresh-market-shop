@@ -10,7 +10,7 @@ import CustomPagination from '../../components/CustomPagination/CustomPagination
 import { getCategoryByCode } from '../../api/category';
 import { searchProducts } from '../../api/product';
 import { getWishListByUser } from '../../api/wishList';
-import { IMAGE_URL, DEFAULT_IMAGE } from '../../api/auth';
+import { IMAGE_URL, IMAGE_URL_FRONTEND, DEFAULT_IMAGE } from '../../api/auth';
 import { getToken } from '../../services/localStorageService';
 
 const Product = () => {
@@ -286,7 +286,7 @@ const Product = () => {
                             onClick={() => handleCategoryClick(cat.code)}
                         >
                             <div className="category-card-icon">
-                                <img src={cat.imagePath ? `${IMAGE_URL}/${cat.imagePath}` : DEFAULT_IMAGE} alt={cat.name} />
+                                <img src={cat.imagePath ? `${IMAGE_URL_FRONTEND}/${cat.imagePath}` : DEFAULT_IMAGE} alt={cat.name} />
                             </div>
                             <span className="category-card-title">{cat.name}</span>
                         </div>

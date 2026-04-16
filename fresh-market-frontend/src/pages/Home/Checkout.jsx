@@ -396,7 +396,7 @@ const Checkout = () => {
             >
               {[
                 { id: 'COD', label: 'Thanh toán khi nhận hàng (COD)', icon: <FaTruck style={{marginRight: 8}}/> },
-                { id: 'CREDIT_CARD', label: 'Thanh toán bằng thẻ tín dụng', icon: <FaCreditCard style={{marginRight: 8}}/>, icons: ['src/assets/images/credit_card.png'] },
+                { id: 'CREDIT_CARD', label: 'Thanh toán bằng thẻ tín dụng', icon: <FaCreditCard style={{marginRight: 8}}/>, icons: ['/images/credit_card.png'] },
                 { id: 'ATM', label: 'Thanh toán bằng thẻ ATM', icon: <FaCreditCard style={{marginRight: 8}}/> },
                 { id: 'E_WALLET', label: 'Ví điện tử (VnPay, ZaloPay, ...)', icon: <FaWallet style={{marginRight: 8}}/> },
                 { id: 'MOMO', label: 'Thanh toán bằng Momo', icon: <FaWallet style={{marginRight: 8}}/> },

@@ -8,6 +8,8 @@ import {
     FileTextOutlined,
     CheckCircleOutlined,
     CloseCircleOutlined,
+    CheckCircleFilled,
+    CloseCircleFilled,
     LoadingOutlined,
     CreditCardOutlined,
     EnvironmentOutlined,
@@ -195,11 +197,11 @@ const MyOrders = () => {
 
     const getStatusStep = (status) => {
         switch (status) {
-            case 'PENDING': return 0;
-            case 'CONFIRMED': return 1;
-            case 'SHIPPING': return 2;
-            case 'COMPLETED': return 3;
-            case 'FAILED': return 3;
+            case 'PENDING': return 1;
+            case 'CONFIRMED': return 2;
+            case 'SHIPPING': return 3;
+            case 'COMPLETED': return 4;
+            case 'FAILED': return 1;
             case 'CANCELLED': return 1;
             default: return 0;
         }
@@ -373,28 +375,28 @@ const MyOrders = () => {
                             <Steps 
                                 current={getStatusStep(selectedOrder.status)} 
                                 size="small" 
-                                titlePlacement="vertical"
-                                status={selectedOrder.status === 'FAILED' ? 'error' : 'finish'}
+                                labelPlacement="vertical"
+                                status={['CANCELLED', 'FAILED'].includes(selectedOrder.status) ? 'error' : 'process'}
                                     items={[
                                         { 
-                                            title: 'Đặt hàng', 
-                                            content: (selectedOrder.status === 'CANCELLED' && getStatusStep(selectedOrder.status) === 0) ? 'Đã hủy' : (selectedOrder.status === 'PENDING' || getStatusStep(selectedOrder.status) > 0 ? 'Đã đặt hàng' : 'Chờ đặt'), 
-                                            icon: (selectedOrder.status === 'CANCELLED' && getStatusStep(selectedOrder.status) === 0) ? <CloseCircleOutlined style={{ fontSize: '24px', color: '#ff4d4f' }} /> : <CheckCircleOutlined style={{ fontSize: '24px' }} /> 
+                                            title: <span style={{ color: '#000', fontWeight: 500 }}>Đặt hàng</span>, 
+                                            description: <span style={{ color: '#555' }}>Đặt hàng thành công</span>, 
+                                            icon: (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'FAILED') && getStatusStep(selectedOrder.status) === 0 ? <CloseCircleFilled style={{ fontSize: '24px', color: '#ff4d4f' }} /> : <CheckCircleFilled style={{ fontSize: '24px' }} /> 
                                         },
                                         { 
-                                            title: 'Xác nhận', 
-                                            content: (selectedOrder.status === 'CANCELLED' && getStatusStep(selectedOrder.status) === 1) ? 'Đã hủy' : (getStatusStep(selectedOrder.status) >= 1 ? 'Đã xác nhận' : 'Chưa xác nhận'), 
-                                            icon: (selectedOrder.status === 'CANCELLED' && getStatusStep(selectedOrder.status) === 1) ? <CloseCircleOutlined style={{ fontSize: '24px', color: '#ff4d4f' }} /> : (getStatusStep(selectedOrder.status) >= 1 ? <CheckCircleOutlined style={{ fontSize: '24px' }} /> : <CheckCircleOutlined style={{ fontSize: '24px', opacity: 0.3 }} />)
+                                            title: <span style={{ color: '#000', fontWeight: 500 }}>Xác nhận</span>, 
+                                            description: <span style={{ color: '#555' }}>{selectedOrder.status === 'PENDING' ? 'Chờ xác nhận' : (['CANCELLED', 'FAILED'].includes(selectedOrder.status) ? 'Đã hủy' : 'Đã xác nhận')}</span>, 
+                                            icon: (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'FAILED') ? <CloseCircleFilled style={{ fontSize: '24px', color: '#ff4d4f' }} /> : (getStatusStep(selectedOrder.status) >= 2 ? <CheckCircleFilled style={{ fontSize: '24px' }} /> : null)
                                         },
                                         { 
-                                            title: 'Vận chuyển', 
-                                            content: (selectedOrder.status === 'CANCELLED' && getStatusStep(selectedOrder.status) <= 2) ? 'Đã hủy' : (getStatusStep(selectedOrder.status) >= 2 ? 'Đã giao hàng' : 'Chưa giao hàng'), 
-                                            icon: (selectedOrder.status === 'CANCELLED' && getStatusStep(selectedOrder.status) <= 2) ? <CloseCircleOutlined style={{ fontSize: '24px', color: '#ff4d4f' }} /> : (getStatusStep(selectedOrder.status) >= 2 ? <CheckCircleOutlined style={{ fontSize: '24px' }} /> : <CheckCircleOutlined style={{ fontSize: '24px', opacity: 0.3 }} />)
+                                            title: <span style={{ color: '#000', fontWeight: 500 }}>Vận chuyển</span>, 
+                                            description: <span style={{ color: '#555' }}>{['PENDING', 'CONFIRMED'].includes(selectedOrder.status) ? 'Chờ giao hàng' : (['CANCELLED', 'FAILED'].includes(selectedOrder.status) ? 'Đã hủy' : 'Đang giao hàng')}</span>, 
+                                            icon: (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'FAILED') ? <CloseCircleFilled style={{ fontSize: '24px', color: '#ff4d4f' }} /> : (getStatusStep(selectedOrder.status) >= 3 ? <CheckCircleFilled style={{ fontSize: '24px' }} /> : null)
                                         },
                                         { 
-                                            title: 'Hoàn thành', 
-                                            content: (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'FAILED') && getStatusStep(selectedOrder.status) <= 3 ? (selectedOrder.status === 'CANCELLED' ? 'Đã hủy' : 'Giao hàng thất bại') : (getStatusStep(selectedOrder.status) >= 3 ? 'Đã hoàn thành' : 'Chưa hoàn thành'), 
-                                            icon: (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'FAILED') && getStatusStep(selectedOrder.status) <= 3 ? <CloseCircleOutlined style={{ fontSize: '24px', color: '#ff4d4f' }} /> : (getStatusStep(selectedOrder.status) >= 3 ? <CheckCircleOutlined style={{ fontSize: '24px' }} /> : <CheckCircleOutlined style={{ fontSize: '24px', opacity: 0.3 }} />)
+                                            title: <span style={{ color: '#000', fontWeight: 500 }}>Hoàn thành</span>, 
+                                            description: <span style={{ color: '#555' }}>{selectedOrder.status === 'COMPLETED' ? 'Đã hoàn thành' : (['CANCELLED', 'FAILED'].includes(selectedOrder.status) ? (selectedOrder.status === 'CANCELLED' ? 'Đã hủy' : 'Giao hàng thất bại') : 'Chờ nhận hàng')}</span>, 
+                                            icon: (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'FAILED') ? <CloseCircleFilled style={{ fontSize: '24px', color: '#ff4d4f' }} /> : (getStatusStep(selectedOrder.status) >= 4 ? <CheckCircleFilled style={{ fontSize: '24px' }} /> : null)
                                         }
                                     ]}
                             />

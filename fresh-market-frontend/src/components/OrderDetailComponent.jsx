@@ -3,6 +3,7 @@ import {
   StarOutlined,
   CheckCircleFilled,
   ClockCircleFilled,
+  CloseCircleFilled,
   SendOutlined,
   TagOutlined,
 } from "@ant-design/icons";
@@ -164,17 +165,18 @@ export default function OrderDetailComponent({
   const getCurrentStep = (status) => {
     switch (status) {
       case "PENDING":
-        return 0;
-      case "CONFIRMED":
         return 1;
-      case "SHIPPING":
+      case "CONFIRMED":
         return 2;
-      case "COMPLETED":
+      case "SHIPPING":
         return 3;
+      case "COMPLETED":
+        return 4;
       case "CANCELLED":
       case "FAILED":
+        return 1;
       default:
-        return -1;
+        return 0;
     }
   };
 
@@ -431,37 +433,40 @@ export default function OrderDetailComponent({
           </Space>
         }
       >
-        {/* Order progress tracker - only show for normal flow */}
-        {!["CANCELLED", "FAILED"].includes(order.status) && (
-          <div style={{ margin: "0 0 24px 0" }}>
-            <Steps
-              current={currentStep}
-              status={
-                ["CANCELLED", "FAILED"].includes(order.status)
-                  ? "error"
-                  : "process"
-              }
-              items={[
-                {
-                  title: "Đặt hàng",
-                  content: "Chờ xác nhận",
-                },
-                {
-                  title: "Xác nhận",
-                  content: "Đã xác nhận",
-                },
-                {
-                  title: "Vận chuyển",
-                  content: "Đang giao hàng",
-                },
-                {
-                  title: "Hoàn thành",
-                  content: "Đã giao hàng",
-                },
-              ]}
-            />
-          </div>
-        )}
+        {/* Order progress tracker */}
+        <div style={{ margin: "0 0 24px 0" }}>
+          <Steps
+            current={currentStep}
+            labelPlacement="vertical"
+            status={
+              ["CANCELLED", "FAILED"].includes(order.status)
+                ? "error"
+                : "process"
+            }
+            items={[
+              {
+                title: <span style={{ color: '#000', fontWeight: 500 }}>Đặt hàng</span>,
+                description: <span style={{ color: '#555' }}>Đặt hàng thành công</span>,
+                icon: (["CANCELLED", "FAILED", "PENDING", "CONFIRMED", "SHIPPING", "COMPLETED"].includes(order.status)) ? <CheckCircleFilled style={{ fontSize: 32 }} /> : null
+              },
+              {
+                title: <span style={{ color: '#000', fontWeight: 500 }}>Xác nhận</span>,
+                description: <span style={{ color: '#555' }}>{["PENDING"].includes(order.status) ? "Chờ xác nhận" : (["CANCELLED", "FAILED"].includes(order.status) ? "Đã hủy" : "Đã xác nhận")}</span>,
+                icon: (["CANCELLED", "FAILED"].includes(order.status)) ? <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 32 }} /> : (["CONFIRMED", "SHIPPING", "COMPLETED"].includes(order.status) ? <CheckCircleFilled style={{ fontSize: 32 }} /> : null)
+              },
+              {
+                title: <span style={{ color: '#000', fontWeight: 500 }}>Vận chuyển</span>,
+                description: <span style={{ color: '#555' }}>{["PENDING", "CONFIRMED"].includes(order.status) ? "Chờ giao hàng" : (["CANCELLED", "FAILED"].includes(order.status) ? "Đã hủy" : "Đang giao hàng")}</span>,
+                icon: (["CANCELLED", "FAILED"].includes(order.status)) ? <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 32 }} /> : (["SHIPPING", "COMPLETED"].includes(order.status) ? <CheckCircleFilled style={{ fontSize: 32 }} /> : null)
+              },
+              {
+                title: <span style={{ color: '#000', fontWeight: 500 }}>Hoàn thành</span>,
+                description: <span style={{ color: '#555' }}>{["COMPLETED"].includes(order.status) ? "Đã nhận hàng" : (["CANCELLED", "FAILED"].includes(order.status) ? (order.status === "CANCELLED" ? "Đã hủy" : "Giao hàng thất bại") : "Chờ nhận hàng")}</span>,
+                icon: (["CANCELLED", "FAILED"].includes(order.status)) ? <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 32 }} /> : (["COMPLETED"].includes(order.status) ? <CheckCircleFilled style={{ fontSize: 32 }} /> : null)
+              },
+            ]}
+          />
+        </div>
 
         <Row gutter={24}>
           {/* Customer Information */}

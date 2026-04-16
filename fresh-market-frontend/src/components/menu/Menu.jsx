@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getCategoryTree } from '../../api/category';
 import { IMAGE_URL_FRONTEND } from '../../api/auth';
-import icon1 from '../../assets/images/icon-1.png';
+const icon1 = '/images/icon-1.png';
 import './Menu.css';
 
 const Menu = ({ onHoverChange, headerHeight = 0, isMobileOpen, onClose }) => {
@@ -26,11 +26,11 @@ const Menu = ({ onHoverChange, headerHeight = 0, isMobileOpen, onClose }) => {
         if (data) {
           const formattedData = data.map(cat => ({
             title: cat.name,
-            icon: cat.imagePath ? `${IMAGE_URL_FRONTEND}/${cat.imagePath}` : 'src/assets/images/no_image_large.jpg',
+            icon: cat.imagePath ? `${IMAGE_URL_FRONTEND}/${cat.imagePath}` : '/images/no_image_large.jpg',
             path: `/collections/${cat.code}`,
             children: cat.children.map(subCat => ({
               title: subCat.name,
-              img: subCat.imagePath ? `${IMAGE_URL_FRONTEND}/${subCat.imagePath}` : 'src/assets/images/no_image_large.jpg',
+              img: subCat.imagePath ? `${IMAGE_URL_FRONTEND}/${subCat.imagePath}` : '/images/no_image_large.jpg',
               path: `/collections/${subCat.code}`,
               items: subCat.children.map(item => ({ name: item.name, code: item.code }))
             }))

@@ -23,12 +23,12 @@ import { debounce } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import CustomPagination from '../../components/CustomPagination/CustomPagination';
 
-// ── Service & Notice images ──────────────────────────────────────────────────
-import hcmNotice from '../../assets/images/hcm2.jpg';
-import serviceIcon1 from '../../assets/images/product_deliverly_1_ico.png';
-import serviceIcon2 from '../../assets/images/product_deliverly_2_ico.png';
-import serviceIcon3 from '../../assets/images/product_deliverly_3_ico.png';
-import serviceIcon4 from '../../assets/images/product_deliverly_4_ico.png';
+// ── Service & Notice image paths ─────────────────────────────────────────────
+const hcmNotice = '/images/hcm2.jpg';
+const serviceIcon1 = '/images/product_deliverly_1_ico.png';
+const serviceIcon2 = '/images/product_deliverly_2_ico.png';
+const serviceIcon3 = '/images/product_deliverly_3_ico.png';
+const serviceIcon4 = '/images/product_deliverly_4_ico.png';
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 const relatedProducts = Array.from({ length: 8 }, (_, i) => ({

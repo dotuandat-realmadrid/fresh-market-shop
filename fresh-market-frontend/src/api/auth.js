@@ -8,6 +8,7 @@ import { persistor } from "../store/store";
 import { getMyInfo } from "./user";
 
 export const API = import.meta.env.VITE_API_BASE_URL || `http://localhost:8088/fresh-market`;
+// export const API = `http://localhost:8088/fresh-market`;
 export const IMAGE_URL = `${API}/uploads`;
 export const IMAGE_URL_FRONTEND = `/uploads`;
 export const DEFAULT_IMAGE = "/images/no_image_large.jpg";

@@ -53,38 +53,38 @@ const ProductSection = ({ title, products, prevEl, setPrevEl, nextEl, setNextEl,
     </section>
 );
 
-// Import images
-import slide_1 from '../../assets/images/slide_1.jpg';
-import slide_2 from '../../assets/images/slide_2.jpg';
-import slide_3 from '../../assets/images/slide_3.jpg';
-import slide_4 from '../../assets/images/slide_4.jpg';
-import banner_home_2 from '../../assets/images/banner_home_2.png';
-import banner_home_3 from '../../assets/images/banner_home_3.png';
-import banner_home_4 from '../../assets/images/banner_home_4.png';
-import banner_home_5 from '../../assets/images/banner_home_5.png';
-import banner_home_6 from '../../assets/images/banner_home_6.png';
+// Image paths from public/images
+const slide_1 = '/images/slide_1.jpg';
+const slide_2 = '/images/slide_2.jpg';
+const slide_3 = '/images/slide_3.jpg';
+const slide_4 = '/images/slide_4.jpg';
+const banner_home_2 = '/images/banner_home_2.png';
+const banner_home_3 = '/images/banner_home_3.png';
+const banner_home_4 = '/images/banner_home_4.png';
+const banner_home_5 = '/images/banner_home_5.png';
+const banner_home_6 = '/images/banner_home_6.png';
 
-// Import category icons
-import menuIcon1 from '../../assets/images/img_item_category_home_1_medium.png';
-import menuIcon2 from '../../assets/images/img_item_category_home_3_medium.png';
-import menuIcon3 from '../../assets/images/img_item_category_home_4_medium.png';
-import menuIcon4 from '../../assets/images/img_item_category_home_5_medium.png';
-import menuIcon5 from '../../assets/images/img_item_category_home_6_medium.png';
-import menuIcon6 from '../../assets/images/img_item_category_home_7_medium.png';
-import menuIcon7 from '../../assets/images/img_item_category_home_8_medium.png';
-import menuIcon8 from '../../assets/images/img_item_category_home_9_medium.png';
-import menuIcon9 from '../../assets/images/img_item_category_home_10_medium.png';
-import menuIcon10 from '../../assets/images/img_item_category_home_11_medium.png';
-import menu2Icon1 from '../../assets/images/img_item_category_home_12_medium.png';
-import menu2Icon2 from '../../assets/images/img_item_category_home_13_medium.png';
-import menu2Icon3 from '../../assets/images/img_item_category_home_14_medium.png';
-import menu2Icon4 from '../../assets/images/img_item_category_home_15_medium.png';
-import menu2Icon5 from '../../assets/images/img_item_category_home_16_medium.png';
-import menu2Icon6 from '../../assets/images/img_item_category_home_17_medium.png';
-import menu2Icon7 from '../../assets/images/img_item_category_home_18_medium.png';
-import menu2Icon8 from '../../assets/images/img_item_category_home_19_medium.png';
-import menu2Icon9 from '../../assets/images/img_item_category_home_2_medium.png';
-import menu2Icon10 from '../../assets/images/img_item_category_home_20_medium.png';
+// Category icons paths
+const menuIcon1 = '/images/img_item_category_home_1_medium.png';
+const menuIcon2 = '/images/img_item_category_home_3_medium.png';
+const menuIcon3 = '/images/img_item_category_home_4_medium.png';
+const menuIcon4 = '/images/img_item_category_home_5_medium.png';
+const menuIcon5 = '/images/img_item_category_home_6_medium.png';
+const menuIcon6 = '/images/img_item_category_home_7_medium.png';
+const menuIcon7 = '/images/img_item_category_home_8_medium.png';
+const menuIcon8 = '/images/img_item_category_home_9_medium.png';
+const menuIcon9 = '/images/img_item_category_home_10_medium.png';
+const menuIcon10 = '/images/img_item_category_home_11_medium.png';
+const menu2Icon1 = '/images/img_item_category_home_12_medium.png';
+const menu2Icon2 = '/images/img_item_category_home_13_medium.png';
+const menu2Icon3 = '/images/img_item_category_home_14_medium.png';
+const menu2Icon4 = '/images/img_item_category_home_15_medium.png';
+const menu2Icon5 = '/images/img_item_category_home_16_medium.png';
+const menu2Icon6 = '/images/img_item_category_home_17_medium.png';
+const menu2Icon7 = '/images/img_item_category_home_18_medium.png';
+const menu2Icon8 = '/images/img_item_category_home_19_medium.png';
+const menu2Icon9 = '/images/img_item_category_home_2_medium.png';
+const menu2Icon10 = '/images/img_item_category_home_20_medium.png';
 
 const Home = () => {
     // Navigation states for multiple sliders
