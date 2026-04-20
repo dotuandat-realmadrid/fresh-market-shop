@@ -26,5 +26,13 @@ dist-ssr
 ### Environment variables ###
 .env
 
+# Ignore uploaded files
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Ignore images
+public/images/*
+!public/images/.gitkeep
+
+
+
