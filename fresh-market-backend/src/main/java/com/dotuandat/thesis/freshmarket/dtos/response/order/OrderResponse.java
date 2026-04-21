@@ -6,6 +6,7 @@ import com.dotuandat.thesis.freshmarket.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.io.Serializable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderResponse {
+public class OrderResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String id;
     OrderStatus status;
     OrderType orderType;

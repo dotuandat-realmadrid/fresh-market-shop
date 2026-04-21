@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
+
 import java.time.LocalDate;
 
 @Data
@@ -13,7 +15,8 @@ import java.time.LocalDate;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OutboundUserResponse {
+public class OutboundUserResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String email;
     String name;
     String phoneNumber;

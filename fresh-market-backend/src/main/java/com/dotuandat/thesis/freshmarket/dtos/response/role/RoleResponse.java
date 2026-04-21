@@ -4,6 +4,8 @@ import com.dotuandat.thesis.freshmarket.dtos.response.permission.PermissionRespo
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
+
 import java.util.List;
 
 @Data
@@ -11,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoleResponse {
+public class RoleResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String code;
     String description;
     List<PermissionResponse> permissions;

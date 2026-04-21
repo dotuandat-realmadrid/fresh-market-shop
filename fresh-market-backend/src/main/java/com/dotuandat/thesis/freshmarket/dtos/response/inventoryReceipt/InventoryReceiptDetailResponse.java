@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import java.io.Serializable;
 
 import java.util.Date;
 
@@ -14,7 +15,8 @@ import java.util.Date;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class InventoryReceiptDetailResponse {
+public class InventoryReceiptDetailResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String id;
     String productId;
     String productCode;

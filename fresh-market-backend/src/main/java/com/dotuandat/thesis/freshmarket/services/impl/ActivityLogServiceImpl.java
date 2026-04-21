@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     SimpMessagingTemplate messagingTemplate;
 
     @Override
+    @Transactional
     public ActivityLogResponse create(String username, String actionType, String description) {
         if (!StringUtils.hasText(username) || !StringUtils.hasText(actionType) || !StringUtils.hasText(description)) {
             log.error(
@@ -63,6 +65,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityLogResponse> findRecentActivities(
             LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         if (startDate == null || endDate == null || pageable == null) {

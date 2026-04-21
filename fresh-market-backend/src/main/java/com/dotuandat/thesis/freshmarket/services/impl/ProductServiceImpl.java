@@ -45,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> search(ProductSearchRequest request, Pageable pageable) {
         Specification<Product> spec = Specification.where(ProductSpecification.withId(request.getId()))
                 .and(ProductSpecification.withCategoryCodes(request.getCategoryCodes()))
@@ -68,12 +69,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map(productConverter::toResponse).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductResponse getByCode(String code) {
         return productConverter.toResponse(productRepository
                 .findByCodeAndIsActive(code, StatusConstant.ACTIVE)

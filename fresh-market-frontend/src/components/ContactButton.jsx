@@ -124,7 +124,7 @@ const ContactButton = () => {
           <div className="chatbox-header-content">
             <div className="header-avatar">
               <img
-                src="/logo.png"
+                src="/images/logo.png"
                 alt="Bot Logo"
                 onError={(e) => {
                   e.target.style.display = "none";
@@ -150,7 +150,7 @@ const ContactButton = () => {
                   {msg.role === "model" && (
                     <div className="avatar">
                       <img
-                        src="/logo.png"
+                        src="/images/logo.png"
                         alt="Bot Logo"
                         onError={(e) => {
                           e.target.style.display = "none";

@@ -31,6 +31,7 @@ public class CartServiceImpl implements CartService {
     CartConverter cartConverter;
 
     @Override
+    @Transactional(readOnly = true)
     public int getTotalItems(String userId) {
         return cartRepository
                 .findByUser_Id(userId)
@@ -40,6 +41,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CartResponse getCartByUser(String userId) {
         Cart cart = cartRepository.findByUser_Id(userId).orElse(null);
 

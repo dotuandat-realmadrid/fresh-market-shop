@@ -16,6 +16,8 @@ import com.dotuandat.thesis.freshmarket.services.SupplierTrashBinService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -37,6 +39,7 @@ public class SupplierServiceImpl implements SupplierService {
     ActivityLogService activityLogService;
 
     @Override
+    @Cacheable(value = "suppliers_all")
     public List<SupplierResponse> getAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "code");
 
@@ -46,6 +49,7 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    @Cacheable(value = "suppliers_search")
     public PageResponse<SupplierResponse> search(Pageable pageable) {
         try {
 
@@ -73,6 +77,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"suppliers_all", "suppliers_search", "suppliers_codes", "supplier_detail"}, allEntries = true)
     public SupplierResponse create(SupplierCreateRequest request) {
         if (supplierRepository.existsByCode(request.getCode())) throw new AppException(ErrorCode.SUPPLIER_EXISTED);
 
@@ -89,6 +94,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"suppliers_all", "suppliers_search", "suppliers_codes", "supplier_detail"}, allEntries = true)
     public SupplierResponse update(String code, SupplierUpdateRequest request) {
         Supplier supplier =
                 supplierRepository.findByCode(code).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));
@@ -106,6 +112,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"suppliers_all", "suppliers_search", "suppliers_codes", "supplier_detail"}, allEntries = true)
     public void delete(String code) {
         Supplier supplier =
                 supplierRepository.findByCode(code).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));
@@ -122,12 +129,16 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @Transactional(readOnly = true)
+    @Cacheable(value = "suppliers_codes")
     public List<String> findAllSupplierCodes() {
         return supplierRepository.findAllSupplierCodes();
     }
 
     @Override
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @Transactional(readOnly = true)
+    @Cacheable(value = "supplier_detail", key = "#code")
     public SupplierResponse findByCode(String code) {
         Supplier supplier = supplierRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));

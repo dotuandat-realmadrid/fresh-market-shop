@@ -5,13 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ActivityLogResponse {
+public class ActivityLogResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String username;
     private String actionType;

@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
@@ -49,6 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     Long REFRESHABLE_DURATION;
 
     @Override
+    @Transactional
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         User user = userRepository
                 .findByUsernameAndIsActive(request.getUsername(), StatusConstant.ACTIVE)
@@ -103,6 +105,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public RefreshResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         String token = request.getToken();
 

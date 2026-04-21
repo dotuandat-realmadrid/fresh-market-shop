@@ -16,7 +16,12 @@ RUN mvn clean package -DskipTests -B
 # ==============================
 # Stage 2: Runtime
 # ==============================
+# Stage 2: Run with JRE
 FROM eclipse-temurin:21-jre-alpine
+
+# Cấu hình múi giờ Việt Nam (UTC+7)
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Ho_Chi_Minh
 
 WORKDIR /app
 

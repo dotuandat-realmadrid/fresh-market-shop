@@ -12,6 +12,8 @@ import com.dotuandat.thesis.freshmarket.services.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class RoleServiceImpl implements RoleService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "roles_all")
     public List<RoleResponse> getAll() {
         return roleRepository.findAll().stream().map(roleConverter::toResponse).collect(Collectors.toList());
     }
@@ -36,6 +40,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @CacheEvict(value = "roles_all", allEntries = true)
     public RoleResponse createOrUpdate(RoleRequest request) {
         String id = request.getId();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -59,6 +64,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @CacheEvict(value = "roles_all", allEntries = true)
     public void delete(List<String> codes) {
         if (roleRepository.existsByCodeInAndUsersIsNotEmpty(codes)) {
             throw new AppException(ErrorCode.INVALID_DELETE_ROLE);

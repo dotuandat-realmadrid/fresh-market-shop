@@ -34,6 +34,7 @@ build/
 
 ### Environment files ###
 .env
+.env.docker
 
 ### Databases ###
 fresh-market.sql

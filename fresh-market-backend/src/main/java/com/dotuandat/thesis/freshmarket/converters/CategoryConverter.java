@@ -11,7 +11,6 @@ import com.dotuandat.thesis.freshmarket.repositories.CategoryRepository;
 import com.dotuandat.thesis.freshmarket.repositories.SupplierRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,20 +34,15 @@ public class CategoryConverter {
     public CategoryResponse toResponse(Category category) {
         CategoryResponse response = modelMapper.map(category, CategoryResponse.class);
 
-        List<String> parents = categoryRepository.findParentCodesByChildCode(category.getCode());
-        response.setParents(parents);
-
-        if (category.getChildren() != null) {
-            response.setChildren(
-                    category.getChildren().stream()
-                            .map(this::toResponse)
-                            .toList()
-            );
+        if (category.getParents() != null) {
+            response.setParents(category.getParents().stream().map(Category::getCode).toList());
         }
 
-        Sort sort = Sort.by(Sort.Direction.ASC, "code");
-        List<Supplier> suppliers = supplierRepository.findAllByCategories_Code(category.getCode(), sort);
-        response.setSuppliers(suppliers.stream().map(supplierConverter::toResponse).toList());
+        response.setChildren(new ArrayList<>());
+
+        if (category.getSuppliers() != null) {
+            response.setSuppliers(category.getSuppliers().stream().map(supplierConverter::toResponse).toList());
+        }
 
         return response;
     }
@@ -86,22 +80,21 @@ public class CategoryConverter {
     public CategoryResponse mapToTree(Category category) {
         CategoryResponse response = modelMapper.map(category, CategoryResponse.class);
 
-        // Set parentCodes
-        List<String> parents = categoryRepository.findParentCodesByChildCode(category.getCode());
-        response.setParents(parents);
+        if (category.getParents() != null) {
+            response.setParents(category.getParents().stream().map(Category::getCode).toList());
+        }
 
-        // Override children — gọi đệ quy qua mapToTree thay vì để ModelMapper tự map
-        if (category.getChildren() != null) {
+        if (category.getChildren() != null && !category.getChildren().isEmpty()) {
             response.setChildren(
                     category.getChildren().stream()
-                            .map(this::mapToTree)  // đệ quy -> mỗi child cũng được set parentCodes
+                            .map(this::mapToTree)
                             .toList()
             );
         }
 
-        Sort sort = Sort.by(Sort.Direction.ASC, "createdDate");
-        List<Supplier> suppliers = supplierRepository.findAllByCategories_Code(category.getCode(), sort);
-        response.setSuppliers(suppliers.stream().map(supplierConverter::toResponse).toList());
+        if (category.getSuppliers() != null) {
+            response.setSuppliers(category.getSuppliers().stream().map(supplierConverter::toResponse).toList());
+        }
 
         return response;
     }

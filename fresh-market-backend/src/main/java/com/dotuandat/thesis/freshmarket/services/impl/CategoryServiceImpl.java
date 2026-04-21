@@ -17,6 +17,8 @@ import com.dotuandat.thesis.freshmarket.services.FileService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -42,6 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @Cacheable(value = "categories_all")
     public List<CategoryResponse> getAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "code");
         return categoryRepository.findAllByIsActive(StatusConstant.ACTIVE, sort).stream()
@@ -51,6 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @Cacheable(value = "categories_search")
     public PageResponse<CategoryResponse> search(Pageable pageable) {
         try {
             Page<Category> categories = categoryRepository.findAllByIsActive(StatusConstant.ACTIVE, pageable);
@@ -72,6 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"categories_all", "categories_tree", "categories_search", "categories_tree_paged"}, allEntries = true)
     public CategoryResponse create(CategoryCreateRequest request) {
         if (categoryRepository.existsByCode(request.getCode()))
             throw new AppException(ErrorCode.CATEGORY_EXISTED);
@@ -89,6 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"categories_all", "categories_tree", "categories_search", "categories_tree_paged"}, allEntries = true)
     public CategoryResponse update(String code, CategoryUpdateRequest request) {
         Category existedCategory = categoryRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
@@ -106,6 +112,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"categories_all", "categories_tree", "categories_search", "categories_tree_paged"}, allEntries = true)
     public void delete(String code) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
@@ -127,6 +134,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponse findByCode(String code) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
@@ -136,6 +144,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"categories_all", "categories_tree", "categories_search", "categories_tree_paged"}, allEntries = true)
     public void saveCategoryImage(String code, MultipartFile file) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
@@ -155,6 +164,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('CUD_CATEGORY_SUPPLIER')")
+    @CacheEvict(value = {"categories_all", "categories_tree", "categories_search", "categories_tree_paged"}, allEntries = true)
     public void updateCategoryImage(String code, String keepImage, MultipartFile newImage) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
@@ -179,6 +189,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @Cacheable(value = "categories_tree")
     public List<CategoryResponse> getCategoryTree() {
         List<Category> roots = categoryRepository
                 .findByLevelAndIsActiveOrderByCreatedDateAsc(1, StatusConstant.ACTIVE);
@@ -189,6 +200,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @Cacheable(value = "categories_tree_paged")
     public PageResponse<CategoryResponse> getCategoryTreePaged(Pageable pageable, String code, String name, Integer level) {
         Page<Category> rootPage = categoryRepository.findRootsWithFilter(
                 StatusConstant.ACTIVE, level,

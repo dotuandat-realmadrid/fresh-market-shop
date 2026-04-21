@@ -40,17 +40,20 @@ public class DiscountServiceImpl implements DiscountService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
     public Discount getById(String id) {
         return discountRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_EXISTED));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Discount> getAll() {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdDate");
         return discountRepository.findAllByIsActive(StatusConstant.ACTIVE, sort);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<Discount> search(Pageable pageable) {
         try {
 

@@ -3,6 +3,7 @@ package com.dotuandat.thesis.freshmarket.dtos.response.order;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.io.Serializable;
 
 import java.util.List;
 
@@ -11,7 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderDetailResponse {
+public class OrderDetailResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String productId;
     String productCode;
     String productName;

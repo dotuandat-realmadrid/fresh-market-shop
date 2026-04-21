@@ -3,18 +3,21 @@ package com.dotuandat.thesis.freshmarket.services.impl;
 import com.dotuandat.thesis.freshmarket.dtos.response.report.*;
 import com.dotuandat.thesis.freshmarket.repositories.ReportRepository;
 import com.dotuandat.thesis.freshmarket.services.ReportService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
     ReportRepository reportRepository;
 

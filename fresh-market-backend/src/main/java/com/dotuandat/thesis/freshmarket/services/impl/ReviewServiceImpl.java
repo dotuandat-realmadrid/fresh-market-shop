@@ -56,6 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ReviewResponse> getByProductId(String productId, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findByProductIdAndIsActive(productId, StatusConstant.ACTIVE, pageable);
 
@@ -72,6 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(String id) {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));

@@ -49,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<OrderResponse> search(OrderSearchRequest request, Pageable pageable) {
         Specification<Order> specification = Specification.where(OrderSpecification.withId(request.getId()))
                 .and(OrderSpecification.withEmail(request.getEmail()))
@@ -127,12 +128,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getOneByOrderId(String orderId) {
         Order order = validatePermission(orderId);
         return orderConverter.toResponse(order);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getById(String orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
@@ -140,6 +143,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getByIdAndEmail(String id, String email) {
         return orderConverter.toResponse(orderRepository
                 .findByIdAndUser_Username(id, email)
@@ -147,6 +151,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<OrderResponse> getByUser(OrderStatus status, String userId, Pageable pageable) {
         // check valid permission
         String currentUsername =
@@ -187,6 +192,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('RUD_ORDER')")
     public PageResponse<OrderResponse> getAllByStatus(OrderStatus status, Pageable pageable) {
         Page<Order> orders = orderRepository.findAllByStatus(status, pageable);

@@ -33,6 +33,7 @@ public class WishListServiceImpl implements WishListService {
     private final ProductRepository productRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getWishListByUser(String userId, Pageable pageable) {
         Page<WishList> wishLists = wishListRepository.findByUserId(userId, pageable);
 

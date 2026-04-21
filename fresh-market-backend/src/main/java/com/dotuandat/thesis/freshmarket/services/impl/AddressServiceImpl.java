@@ -37,6 +37,7 @@ public class AddressServiceImpl implements AddressService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('RUD_ADDRESS') or #userId == authentication.principal.getClaim('userId')")
     public List<AddressResponse> getAllByUserId(String userId) {
         return addressRepository.findAllByUser_IdAndIsActive(userId, StatusConstant.ACTIVE).stream()
@@ -45,6 +46,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AddressResponse getAddressById(String addrressId) {
         return addressConverter.toResponse(addressRepository
                 .findById(addrressId)

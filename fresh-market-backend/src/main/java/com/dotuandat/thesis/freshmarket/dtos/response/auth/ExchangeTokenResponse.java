@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -11,7 +12,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ExchangeTokenResponse {
+public class ExchangeTokenResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String accessToken;
     Long expiresIn;
     String refreshToken;

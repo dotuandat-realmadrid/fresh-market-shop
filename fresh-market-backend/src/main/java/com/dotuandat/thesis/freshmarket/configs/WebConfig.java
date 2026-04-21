@@ -1,5 +1,5 @@
 package com.dotuandat.thesis.freshmarket.configs;
-	
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -16,14 +16,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadDir = Paths.get(storageDir);
-        String uploadPath = uploadDir.toFile().getAbsolutePath();
-        
-        if (!uploadPath.endsWith("/")) {
-            uploadPath += "/";
-        }
+        Path uploadDir = Paths.get(storageDir).toAbsolutePath();
+        String resourceLocation = uploadDir.toUri().toString();
 
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath);
+                .addResourceLocations(resourceLocation);
     }
 }

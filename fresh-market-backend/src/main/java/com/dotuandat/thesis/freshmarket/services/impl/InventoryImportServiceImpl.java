@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -69,6 +70,7 @@ public class InventoryImportServiceImpl implements InventoryImportService {
 
     @Override
     @Async
+    @Transactional(readOnly = true)
     public void importFromAI(int quantity) {
         if (quantity < 1 || quantity > 50) {
             throw new AppException(ErrorCode.MIN_QUANTITY);
@@ -105,7 +107,8 @@ public class InventoryImportServiceImpl implements InventoryImportService {
     // =========================================================
 
     @Async
-    private void asyncCreate(InventoryReceiptRequest request) {
+    @Transactional
+    public void asyncCreate(InventoryReceiptRequest request) {
         try {
             validateReceiptRequest(request);
             inventoryReceiptService.create(request);

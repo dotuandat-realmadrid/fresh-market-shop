@@ -4,6 +4,7 @@ import com.dotuandat.thesis.freshmarket.dtos.response.user.UserResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserTrashBinResponse {
+public class UserTrashBinResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String id;
     UserResponse user;
     LocalDateTime deletedDate;

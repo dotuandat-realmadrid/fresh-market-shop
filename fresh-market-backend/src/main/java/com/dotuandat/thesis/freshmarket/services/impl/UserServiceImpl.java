@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('RU_USER')")
     public PageResponse<UserResponse> search(UserSearchRequest request, Pageable pageable) {
         Specification<User> spec = Specification.where(UserSpecification.withId(request.getId()))
@@ -161,6 +162,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getMyInfo() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -172,6 +174,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('RU_USER')")
     public UserResponse getById(String id) {
         return userConverter.toResponse(

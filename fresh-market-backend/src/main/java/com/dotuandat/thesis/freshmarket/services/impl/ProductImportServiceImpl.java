@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -47,6 +48,7 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
+    @Transactional
     public void importCreateFromExcel(MultipartFile file) {
         List<Pair<ProductCreateRequest, List<String>>> requests = excelProdHelper.parseCreateExcel(file);
         for (Pair<ProductCreateRequest, List<String>> pair : requests) {
@@ -72,6 +74,7 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
+    @Transactional
     public void importUpdateFromExcel(MultipartFile file) {
         List<Pair<String, ProductUpdateRequest>> requests = excelProdHelper.parseUpdateExcel(file);
         for (Pair<String, ProductUpdateRequest> pair : requests) {
@@ -103,6 +106,7 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
+    @Transactional(readOnly = true)
     public void importCreateByAI(int quantity) {
         if (quantity < 1 || quantity > 50) {
             throw new AppException(ErrorCode.MIN_QUANTITY);
@@ -121,6 +125,7 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
+    @Transactional
     public void importCreateFromPdf(MultipartFile file) {
         try {
             List<Pair<ProductCreateRequest, List<String>>> requests =
@@ -151,6 +156,7 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
+    @Transactional
     public void importUpdateFromPdf(MultipartFile file) {
         try {
             List<Pair<String, ProductUpdateRequest>> requests =
@@ -166,6 +172,7 @@ public class ProductImportServiceImpl implements ProductImportService {
     // ==================== PRIVATE HELPERS ====================
 
     @Async
+    @Transactional
     public void asyncCreate(ProductCreateRequest request) {
         try {
             productService.create(request);
@@ -176,6 +183,7 @@ public class ProductImportServiceImpl implements ProductImportService {
     }
 
     @Async
+    @Transactional
     public void asyncUpdate(String code, ProductUpdateRequest request) {
         try {
             productService.updateImport(code, request);

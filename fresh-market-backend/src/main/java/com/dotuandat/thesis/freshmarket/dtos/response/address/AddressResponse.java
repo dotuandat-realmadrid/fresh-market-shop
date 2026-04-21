@@ -3,6 +3,7 @@ package com.dotuandat.thesis.freshmarket.dtos.response.address;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AddressResponse {
+public class AddressResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String id;
     String userId;
     String fullName;

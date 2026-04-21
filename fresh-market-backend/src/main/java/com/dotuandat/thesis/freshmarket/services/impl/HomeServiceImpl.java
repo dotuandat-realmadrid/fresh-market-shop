@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ public class HomeServiceImpl implements HomeService {
     ProductConverter productConverter;
 
     @Override
+    @Transactional(readOnly = true)
     public List<SaleStatistic> getSaleStatistics() {
         LocalDateTime now = LocalDateTime.now();
         return Arrays.asList(
@@ -112,6 +114,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TimeSeriesStatistic> getTimeSeriesStatistics(String period) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDate, endDate;
@@ -170,6 +173,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponse> getRecentRevenue(String filter) {
         List<Order> orders = null;
         switch (filter) {
@@ -187,6 +191,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductResponse> getTop5Products(String filter) {
         if (filter == null) {
             throw new IllegalArgumentException("Filter cannot be null. Valid options: today, thisMonth, thisYear");
@@ -253,6 +258,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductResponse> getLowStockProducts(int threshold) {
         // findLowStockProducts trả về List<Product> trực tiếp
         return productRepository.findLowStockProducts(threshold, PageRequest.of(0, 10))
@@ -262,6 +268,7 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductResponse> getExpiringProducts(String filter) {
         Date startDate;
         Date endDate;

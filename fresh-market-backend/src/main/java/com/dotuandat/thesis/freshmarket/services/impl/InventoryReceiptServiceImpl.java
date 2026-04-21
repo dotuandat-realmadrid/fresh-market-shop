@@ -52,6 +52,7 @@ public class InventoryReceiptServiceImpl implements InventoryReceiptService {
     ActivityLogService activityLogService;
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('CRU_RECEIPT')")
     public PageResponse<InventoryReceiptResponse> search(InventorySearchRequest request, Pageable pageable) {
         Specification<InventoryReceipt> specification = Specification.where(
@@ -75,6 +76,7 @@ public class InventoryReceiptServiceImpl implements InventoryReceiptService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('CRU_RECEIPT')")
     public PageResponse<InventoryReceiptResponse> getAllByStatus(InventoryStatus status, Pageable pageable) {
         Page<InventoryReceipt> receipts = receiptRepository.findAllByStatus(status, pageable);
@@ -93,6 +95,7 @@ public class InventoryReceiptServiceImpl implements InventoryReceiptService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('CRU_RECEIPT')")
     public InventoryReceiptResponse getById(String id) {
         InventoryReceipt receipt = receiptRepository
@@ -202,6 +205,7 @@ public class InventoryReceiptServiceImpl implements InventoryReceiptService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<InventoryReceiptResponse> getExpiringProducts(String filter) {
         // Xác định khoảng thời gian
         Date startDate, endDate;

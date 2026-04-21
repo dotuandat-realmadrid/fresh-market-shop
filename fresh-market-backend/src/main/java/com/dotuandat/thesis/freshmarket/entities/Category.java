@@ -2,6 +2,8 @@ package com.dotuandat.thesis.freshmarket.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -31,6 +33,7 @@ public class Category extends BaseEntity {
     // Nhiều cha -> nhiều con (ManyToMany thay vì ManyToOne)
     @JsonIgnore
     @ManyToMany
+    @Fetch(FetchMode.SUBSELECT)
     @JoinTable(
             name = "category_parent",
             joinColumns = @JoinColumn(name = "child_id"),
@@ -42,6 +45,7 @@ public class Category extends BaseEntity {
     // Danh sách category con
     @JsonIgnore
     @ManyToMany(mappedBy = "parents")
+    @Fetch(FetchMode.SUBSELECT)
     List<Category> children;
 
     @JsonIgnore
@@ -49,6 +53,7 @@ public class Category extends BaseEntity {
     List<Product> products;
 
     @ManyToMany
+    @Fetch(FetchMode.SUBSELECT)
     @JoinTable(
             name = "category_supplier",
             joinColumns = @JoinColumn(name = "category_id"),

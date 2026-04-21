@@ -7,12 +7,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class UserResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     String id;
     String username;
     String fullName;
