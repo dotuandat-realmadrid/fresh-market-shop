@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_GET_ENDPOINTS = {
         "/categories/**", "/roles/**", "/permissions/**", "/suppliers/**", "/products/**", "/reviews/product/**",
-        "/orders/check", "/orders/{id}", "/orders/{id}/invoice/pdf", "/home", "/auth/**", "/payment/**", "/ws/**", "/uploads/**", "/error"
+        "/orders/check", "/orders/{id}", "/orders/{id}/invoice/pdf", "/home", "/auth/**", "/payment/**", "/uploads/**", "/error"
     };
     
     private final String[] PUBLIC_POST_ENDPOINTS = {
@@ -45,6 +45,7 @@ public class SecurityConfig {
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()

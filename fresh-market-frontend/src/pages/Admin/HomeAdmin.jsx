@@ -11,7 +11,6 @@ import Chart from 'react-apexcharts';
 import { API, IMAGE_URL, DEFAULT_IMAGE } from '../../api/auth';
 import { getToken } from '../../services/localStorageService';
 import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { 
   getSalesStatistics, 
   getTimeSeriesStatistics, 
@@ -139,8 +138,9 @@ const HomeAdmin = () => {
 
   // --- Real-time Activity Logs via WebSocket ---
   useEffect(() => {
+    const wsUrl = API.replace(/^http/, 'ws');
     const client = new Client({
-      webSocketFactory: () => new SockJS(`${API}/ws`),
+      brokerURL: `${wsUrl}/ws`,
       connectHeaders: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -150,7 +150,7 @@ const HomeAdmin = () => {
     });
 
     client.onConnect = (frame) => {
-      console.log('Connected to WebSocket (SockJS)');
+      console.log('Connected to Native WebSocket');
       client.subscribe('/topic/activities', (stompMessage) => {
         const newActivity = JSON.parse(stompMessage.body);
         setActivities((prev) => [newActivity, ...prev].slice(0, 50));
