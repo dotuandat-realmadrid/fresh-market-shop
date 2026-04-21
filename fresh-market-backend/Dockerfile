@@ -25,8 +25,11 @@ ENV TZ=Asia/Ho_Chi_Minh
 
 WORKDIR /app
 
-# Tạo thư mục lưu ảnh upload (sẽ được mount qua volume)
+# Tạo thư mục lưu ảnh upload
 RUN mkdir -p /app/uploads
+
+# Copy toàn bộ ảnh có sẵn từ thư mục uploads trong Git vào container
+COPY uploads ./uploads
 
 # Copy JAR từ stage build
 COPY --from=builder /app/target/*.jar app.jar
