@@ -14,6 +14,8 @@ import {
   importProductsExcel, importProductsQR, 
   importProductsPDF, importProductsAI 
 } from '../api/product';
+import DownloadTemplateButton from './DownloadTemplateButton';
+
 
 const ProductImport = ({
   isExcelVisible, onExcelCancel,
@@ -211,9 +213,7 @@ const ProductImport = ({
             </ul>
         </div>
         
-        <MyButton icon={<DownloadOutlined />}>
-            Tải xuống file mẫu Excel
-        </MyButton>
+        <DownloadTemplateButton label="Tải xuống file mẫu Excel" />
 
         <div className="drop-area" onClick={() => document.getElementById('excel-upload').click()}>
             <input 
@@ -316,10 +316,7 @@ const ProductImport = ({
                 <li>Nhấn "Thêm mới" để tạo sản phẩm mới hoặc "Cập nhật" để chỉnh sửa sản phẩm hiện có</li>
             </ul>
         </div>
-
-        <MyButton className="btn-green-download">
-            <DownloadOutlined /> Tải xuống file mẫu QR
-        </MyButton>
+        <DownloadTemplateButton label="Tải xuống file mẫu QR" />
 
         <div className="drop-area" onClick={() => document.getElementById('qr-upload').click()}>
             <input 
@@ -372,10 +369,7 @@ const ProductImport = ({
                 <li>Chọn "Thêm mới" để tạo sản phẩm mới hoặc "Cập nhật" để chỉnh sửa sản phẩm hiện có</li>
             </ul>
         </div>
-
-        <MyButton className="btn-green-download">
-            <DownloadOutlined /> Tải xuống file mẫu PDF
-        </MyButton>
+        <DownloadTemplateButton label="Tải xuống file mẫu PDF" />
 
         <div className="drop-area" onClick={() => document.getElementById('pdf-upload').click()}>
             <input 

@@ -18,7 +18,9 @@ import {
   importInventoryPDF, 
   importInventoryAI 
 } from '../api/inventoryReceipt';
+import DownloadTemplateButton from './DownloadTemplateButton';
 import '../pages/Admin/ProductAdmin.css';
+
 
 const { Text } = Typography;
 
@@ -239,9 +241,7 @@ const InventoryImport = ({ onSuccess }) => {
             </ul>
         </div>
         
-        <MyButton className="btn-green-download">
-            <DownloadOutlined /> Tải xuống file mẫu Excel
-        </MyButton>
+        <DownloadTemplateButton label="Tải xuống file mẫu Excel" />
 
         <div className="drop-area" onClick={() => document.getElementById('inv-excel-upload').click()}>
             <input 
@@ -345,6 +345,8 @@ const InventoryImport = ({ onSuccess }) => {
             </ul>
         </div>
 
+        <DownloadTemplateButton label="Tải xuống file mẫu QR" />
+
         <div className="drop-area" onClick={() => document.getElementById('inv-qr-upload').click()}>
             <input 
                 type="file" id="inv-qr-upload" hidden 
@@ -396,9 +398,7 @@ const InventoryImport = ({ onSuccess }) => {
             </ul>
         </div>
 
-        <MyButton className="btn-green-download">
-            <DownloadOutlined /> Tải xuống file mẫu PDF
-        </MyButton>
+        <DownloadTemplateButton label="Tải xuống file mẫu PDF" />
 
         <div className="drop-area" onClick={() => document.getElementById('inv-pdf-upload').click()}>
             <input 
