@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,7 +47,6 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
-    @Transactional
     public void importCreateFromExcel(MultipartFile file) {
         List<Pair<ProductCreateRequest, List<String>>> requests = excelProdHelper.parseCreateExcel(file);
         for (Pair<ProductCreateRequest, List<String>> pair : requests) {
@@ -74,11 +72,17 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
-    @Transactional
     public void importUpdateFromExcel(MultipartFile file) {
         List<Pair<String, ProductUpdateRequest>> requests = excelProdHelper.parseUpdateExcel(file);
         for (Pair<String, ProductUpdateRequest> pair : requests) {
-            asyncUpdate(pair.getFirst(), pair.getSecond());
+            try {
+                productService.updateImport(pair.getFirst(), pair.getSecond());
+                log.info("Cập nhật sản phẩm {} thành công!", pair.getFirst());
+            } catch (AppException e) {
+                log.error("Lỗi khi cập nhật sản phẩm {}: {}", pair.getFirst(), e.getErrorCode().getMessage());
+            } catch (Exception e) {
+                log.error("Lỗi hệ thống khi cập nhật sản phẩm {}: {}", pair.getFirst(), e.getMessage());
+            }
         }
     }
 
@@ -89,7 +93,12 @@ public class ProductImportServiceImpl implements ProductImportService {
     public void importCreateFromQR(MultipartFile file, String qrContent, String source) {
         List<ProductCreateRequest> requests = qrProdHelper.parseCreateFromQR(file, qrContent);
         for (ProductCreateRequest request : requests) {
-            asyncCreate(request);
+            try {
+                productService.create(request);
+                log.info("Thêm sản phẩm {} thành công!", request.getCode());
+            } catch (AppException e) {
+                log.error("Lỗi khi thêm sản phẩm {}: {}", request.getCode(), e.getErrorCode().getMessage());
+            }
         }
     }
 
@@ -98,16 +107,19 @@ public class ProductImportServiceImpl implements ProductImportService {
     public void importUpdateFromQR(MultipartFile file, String qrContent, String source) {
         List<Pair<String, ProductUpdateRequest>> requests = qrProdHelper.parseUpdateFromQR(file, qrContent);
         for (Pair<String, ProductUpdateRequest> pair : requests) {
-            asyncUpdate(pair.getFirst(), pair.getSecond());
+            try {
+                productService.updateImport(pair.getFirst(), pair.getSecond());
+                log.info("Cập nhật sản phẩm {} thành công!", pair.getFirst());
+            } catch (AppException e) {
+                log.error("Lỗi khi cập nhật sản phẩm {}: {}", pair.getFirst(), e.getErrorCode().getMessage());
+            }
         }
     }
 
     // ==================== AI ====================
 
     @Override
-    @Async
-    @Transactional(readOnly = true)
-    public void importCreateByAI(int quantity) {
+    public String importCreateByAI(int quantity) {
         if (quantity < 1 || quantity > 50) {
             throw new AppException(ErrorCode.MIN_QUANTITY);
         }
@@ -115,17 +127,27 @@ public class ProductImportServiceImpl implements ProductImportService {
         List<String> validSupplierCodes = supplierRepository.findAllSupplierCodes();
 
         List<ProductCreateRequest> requests = aiProdHelper.generateProducts(quantity, validCategoryCodes, validSupplierCodes);
+        int successCount = 0;
         for (ProductCreateRequest request : requests) {
-            asyncCreate(request);
+            try {
+                productService.create(request);
+                successCount++;
+                log.info("Thêm sản phẩm {} thành công!", request.getCode());
+            } catch (AppException e) {
+                log.error("Lỗi khi thêm sản phẩm {}: {}", request.getCode(), e.getErrorCode().getMessage());
+            } catch (Exception e) {
+                log.error("Lỗi hệ thống khi thêm sản phẩm {}: {}", request.getCode(), e.getMessage());
+            }
         }
-        log.info("Đã sinh và tạo {} sản phẩm thành công bằng AI", quantity);
+        String message = String.format("Đã sinh và tạo thành công %d/%d sản phẩm bằng AI", successCount, quantity);
+        log.info(message);
+        return message;
     }
 
     // ==================== PDF ====================
 
     @Override
     @Async
-    @Transactional
     public void importCreateFromPdf(MultipartFile file) {
         try {
             List<Pair<ProductCreateRequest, List<String>>> requests =
@@ -156,13 +178,19 @@ public class ProductImportServiceImpl implements ProductImportService {
 
     @Override
     @Async
-    @Transactional
     public void importUpdateFromPdf(MultipartFile file) {
         try {
             List<Pair<String, ProductUpdateRequest>> requests =
                     pdfProdHelper.readProductsForUpdateFromPdf(file.getInputStream());
             for (Pair<String, ProductUpdateRequest> pair : requests) {
-                asyncUpdate(pair.getFirst(), pair.getSecond());
+                try {
+                    productService.updateImport(pair.getFirst(), pair.getSecond());
+                    log.info("Cập nhật sản phẩm {} thành công!", pair.getFirst());
+                } catch (AppException e) {
+                    log.error("Lỗi khi cập nhật sản phẩm {}: {}", pair.getFirst(), e.getErrorCode().getMessage());
+                } catch (Exception e) {
+                    log.error("Lỗi hệ thống khi cập nhật sản phẩm {}: {}", pair.getFirst(), e.getMessage());
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("Lỗi import PDF: " + e.getMessage());
@@ -170,26 +198,4 @@ public class ProductImportServiceImpl implements ProductImportService {
     }
 
     // ==================== PRIVATE HELPERS ====================
-
-    @Async
-    @Transactional
-    public void asyncCreate(ProductCreateRequest request) {
-        try {
-            productService.create(request);
-            log.info("Thêm sản phẩm {} thành công!", request.getCode());
-        } catch (AppException e) {
-            log.error("Lỗi khi thêm sản phẩm {}: {}", request.getCode(), e.getErrorCode().getMessage());
-        }
-    }
-
-    @Async
-    @Transactional
-    public void asyncUpdate(String code, ProductUpdateRequest request) {
-        try {
-            productService.updateImport(code, request);
-            log.info("Cập nhật sản phẩm {} thành công!", code);
-        } catch (AppException e) {
-            log.error("Lỗi khi cập nhật sản phẩm {}: {}", code, e.getErrorCode().getMessage());
-        }
-    }
 }

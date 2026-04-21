@@ -9,6 +9,9 @@ import {
 import { Link } from 'react-router-dom';
 import Chart from 'react-apexcharts';
 import { API, IMAGE_URL, DEFAULT_IMAGE } from '../../api/auth';
+import { getToken } from '../../services/localStorageService';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { 
   getSalesStatistics, 
   getTimeSeriesStatistics, 
@@ -136,37 +139,33 @@ const HomeAdmin = () => {
 
   // --- Real-time Activity Logs via WebSocket ---
   useEffect(() => {
-    // Sử dụng @stomp/stompjs kết nối qua WebSocket nguyên bản
-    import('@stomp/stompjs').then(({ Client }) => {
-      const client = new Client({
-        brokerURL: `${API.replace(/^http/, 'ws')}/ws`, 
-        reconnectDelay: 5000,
-        heartbeatIncoming: 4000,
-        heartbeatOutgoing: 4000,
-      });
-
-      client.onConnect = (frame) => {
-        console.log('Connected to WebSocket (Native)');
-        client.subscribe('/topic/activities', (stompMessage) => {
-          const newActivity = JSON.parse(stompMessage.body);
-          // Cập nhật state để hiển thị ngay trên UI
-          setActivities((prev) => [newActivity, ...prev].slice(0, 50));
-          
-          // Hiển thị thông báo góc màn hình
-          // message.success(`Có hoạt động mới: ${newActivity.description}`);
-        });
-      };
-
-      client.onStompError = (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-      };
-
-      client.activate();
-
-      return () => {
-        if (client) client.deactivate();
-      };
+    const client = new Client({
+      webSocketFactory: () => new SockJS(`${API}/ws`),
+      connectHeaders: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
     });
+
+    client.onConnect = (frame) => {
+      console.log('Connected to WebSocket (SockJS)');
+      client.subscribe('/topic/activities', (stompMessage) => {
+        const newActivity = JSON.parse(stompMessage.body);
+        setActivities((prev) => [newActivity, ...prev].slice(0, 50));
+      });
+    };
+
+    client.onStompError = (frame) => {
+      console.error('Broker reported error: ' + frame.headers['message']);
+    };
+
+    client.activate();
+
+    return () => {
+      if (client) client.deactivate();
+    };
   }, []);
 
   useEffect(() => {
@@ -273,6 +272,19 @@ const HomeAdmin = () => {
     if (diffMinutes < 60) return `${diffMinutes} phút`;
     if (diffHours < 24) return `${diffHours} giờ`;
     return `${diffDays} ngày`;
+  };
+
+  const RelativeTime = ({ timestamp }) => {
+    const [relTime, setRelTime] = useState(getRelativeTime(timestamp));
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setRelTime(getRelativeTime(timestamp));
+      }, 1000);
+      return () => clearInterval(interval);
+    }, [timestamp]);
+
+    return <>{relTime}</>;
   };
 
   // --- Table Columns ---
@@ -551,7 +563,9 @@ const HomeAdmin = () => {
                   
                   return (
                     <div key={act.id || index} className="activity-item d-flex align-items-start mb-3">
-                      <div className="activite-label text-muted" style={{ minWidth: 70, fontSize: 13 }}>{getRelativeTime(act.timestamp)}</div>
+                      <div className="activite-label text-muted" style={{ minWidth: 70, fontSize: 13 }}>
+                        <RelativeTime timestamp={act.timestamp} />
+                      </div>
                       <span className="activity-badge-dot" style={{ backgroundColor: dotColor }}></span>
                       <div className="activity-content flex-grow-1" style={{ fontSize: 14 }}>
                         {act.description} <Link to="#" className="fw-bold">{act.username}</Link>

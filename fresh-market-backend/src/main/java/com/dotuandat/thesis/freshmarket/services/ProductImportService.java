@@ -11,7 +11,7 @@ public interface ProductImportService {
 
     void importUpdateFromQR(MultipartFile file, String qrContent, String source);
 
-    void importCreateByAI(int quantity);
+    String importCreateByAI(int quantity);
 
     void importCreateFromPdf(MultipartFile file);
 

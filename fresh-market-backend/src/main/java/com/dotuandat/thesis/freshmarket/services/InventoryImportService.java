@@ -7,7 +7,7 @@ public interface InventoryImportService {
 
     void importFromQR(MultipartFile file, String qrContent, String source);
 
-    void importFromAI(int quantity);
+    String importFromAI(int quantity);
 
     void importFromPdf(MultipartFile file);
 }

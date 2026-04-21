@@ -60,8 +60,8 @@ const ProductImport = ({
     if (!aiQuantity) return message.warning("Vui lòng nhập số lượng");
     setLoading(true);
     try {
-      await importProductsAI(aiQuantity);
-      message.success(`Đã tạo ${aiQuantity} sản phẩm bằng AI`);
+      const response = await importProductsAI(aiQuantity);
+      message.success(response?.message || `Đã tạo ${aiQuantity} sản phẩm bằng AI`);
       onAICancel();
       setAiQuantity(null);
       if (onSuccess) onSuccess();

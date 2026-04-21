@@ -18,7 +18,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -69,9 +68,7 @@ public class InventoryImportServiceImpl implements InventoryImportService {
     }
 
     @Override
-    @Async
-    @Transactional(readOnly = true)
-    public void importFromAI(int quantity) {
+    public String importFromAI(int quantity) {
         if (quantity < 1 || quantity > 50) {
             throw new AppException(ErrorCode.MIN_QUANTITY);
         }
@@ -90,15 +87,27 @@ public class InventoryImportServiceImpl implements InventoryImportService {
             if (requests.isEmpty()) {
                 throw new RuntimeException("Không thể sinh dữ liệu phiếu nhập từ Gemini API");
             }
-            if (requests.size() < quantity) {
-                throw new RuntimeException("Gemini không sinh đủ số lượng phiếu nhập yêu cầu: " + quantity);
-            }
 
-            requests.subList(0, quantity).forEach(this::asyncCreate);
-            log.info("Đã sinh và tạo {} phiếu nhập thành công", quantity);
+            int successCount = 0;
+            int limit = Math.min(requests.size(), quantity);
+            for (int i = 0; i < limit; i++) {
+                try {
+                    InventoryReceiptRequest request = requests.get(i);
+                    validateReceiptRequest(request);
+                    inventoryReceiptService.create(request);
+                    successCount++;
+                    log.info("Thêm phiếu nhập kho cho sản phẩm {} thành công!",
+                            request.getDetails().getFirst().getProductCode());
+                } catch (Exception e) {
+                    log.error("Lỗi khi tạo phiếu nhập trong quá trình import AI: {}", e.getMessage());
+                }
+            }
+            String message = String.format("Đã sinh và tạo thành công %d/%d phiếu nhập kho bằng AI", successCount, quantity);
+            log.info(message);
+            return message;
         } catch (Exception e) {
-            log.error("Lỗi khi sinh phiếu nhập bằng AI: {}", e.getMessage());
-            throw new RuntimeException("Lỗi khi sinh phiếu nhập bằng AI: " + e.getMessage());
+            log.error("Lỗi khi vận hành sinh phiếu nhập bằng AI: {}", e.getMessage());
+            throw new RuntimeException("Lỗi khi vận hành sinh phiếu nhập bằng AI: " + e.getMessage());
         }
     }
 
@@ -107,7 +116,6 @@ public class InventoryImportServiceImpl implements InventoryImportService {
     // =========================================================
 
     @Async
-    @Transactional
     public void asyncCreate(InventoryReceiptRequest request) {
         try {
             validateReceiptRequest(request);

@@ -146,9 +146,9 @@ public class ProductController {
 
     @PostMapping("/import-ai")
     public ApiResponse<Void> importCreateByAI(@RequestParam int quantity) {
-        productImportService.importCreateByAI(quantity);
+        String message = productImportService.importCreateByAI(quantity);
         return ApiResponse.<Void>builder()
-                .message("Generated and created products successfully")
+                .message(message)
                 .build();
     }
 

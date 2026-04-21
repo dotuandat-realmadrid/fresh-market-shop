@@ -111,9 +111,9 @@ public class InventoryReceiptController {
 
     @PostMapping("/import-ai")
     public ApiResponse<Void> importCreateByAI(@RequestParam int quantity) {
-        inventoryImportService.importFromAI(quantity);
+        String message = inventoryImportService.importFromAI(quantity);
         return ApiResponse.<Void>builder()
-                .message("Generated and created products successfully")
+                .message(message)
                 .build();
     }
 

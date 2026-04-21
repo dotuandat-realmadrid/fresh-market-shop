@@ -33,8 +33,8 @@ public class AIInventoryHelper {
 
     @NonFinal
     @Value("${ai.gemini_3.1_flash_lite.apiUrl}")
-    // @Value("${ai.gemini_2.5_flash_lite.apiUrl}")
-    // @Value("${ai.gemini_2.5_flash.apiUrl}")
+//     @Value("${ai.gemini_2.5_flash_lite.apiUrl}")
+//     @Value("${ai.gemini_2.5_flash.apiUrl}")
     private String geminiApiUrl;
 
     // =========================================================

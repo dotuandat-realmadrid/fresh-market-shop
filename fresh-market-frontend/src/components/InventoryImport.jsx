@@ -67,8 +67,8 @@ const InventoryImport = ({ onSuccess }) => {
     if (!aiQuantity) return message.warning("Vui lòng nhập số lượng");
     setLoading(true);
     try {
-      await importInventoryAI(aiQuantity);
-      message.success(`Đã sinh ${aiQuantity} phiếu nhập bằng AI`);
+      const response = await importInventoryAI(aiQuantity);
+      message.success(response?.message || `Đã sinh ${aiQuantity} phiếu nhập bằng AI`);
       setIsAIOpen(false);
       setAiQuantity(1);
       if (onSuccess) onSuccess();
