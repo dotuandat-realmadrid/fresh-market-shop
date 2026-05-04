@@ -58,6 +58,7 @@ const slide_1 = '/images/slide_1.jpg';
 const slide_2 = '/images/slide_2.jpg';
 const slide_3 = '/images/slide_3.jpg';
 const slide_4 = '/images/slide_4.jpg';
+const slide_5 = '/images/slide_5.jpg';
 const banner_home_2 = '/images/banner_home_2.png';
 const banner_home_3 = '/images/banner_home_3.png';
 const banner_home_4 = '/images/banner_home_4.png';
@@ -227,10 +228,11 @@ const Home = () => {
                     autoplay={{ delay: 5000, disableOnInteraction: false }}
                     loop={true}
                 >
-                    <SwiperSlide><Link to="/collections/gio-hoa-qua-nhap-khau" className="hero-slide"><img src={slide_1} alt="Slide 1" /></Link></SwiperSlide>
+                    {/* <SwiperSlide><Link to="/collections/gio-hoa-qua-nhap-khau" className="hero-slide"><img src={slide_1} alt="Slide 1" /></Link></SwiperSlide>
                     <SwiperSlide><Link to="/collections/cham-soc-suc-khoe" className="hero-slide"><img src={slide_2} alt="Slide 2" /></Link></SwiperSlide>
                     <SwiperSlide><Link to="/collections/khuyen-mai" className="hero-slide"><img src={slide_3} alt="Slide 3" /></Link></SwiperSlide>
-                    <SwiperSlide><Link to="/collections/qua-tang-cay-xanh" className="hero-slide"><img src={slide_4} alt="Slide 4" /></Link></SwiperSlide>
+                    <SwiperSlide><Link to="/collections/qua-tang-cay-xanh" className="hero-slide"><img src={slide_4} alt="Slide 4" /></Link></SwiperSlide> */}
+                    <SwiperSlide><Link to="/collections/cherry" className="hero-slide"><img src={slide_5} alt="Slide 5" /></Link></SwiperSlide>
                 </Swiper>
                 <div ref={(node) => setHeroPrev(node)} className="custom-nav hero-prev"><FaChevronLeft /></div>
                 <div ref={(node) => setHeroNext(node)} className="custom-nav hero-next"><FaChevronRight /></div>

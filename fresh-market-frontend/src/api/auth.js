@@ -7,8 +7,8 @@ import { message } from "antd";
 import { persistor } from "../store/store";
 import { getMyInfo } from "./user";
 
-export const API = import.meta.env.VITE_API_BASE_URL || `http://localhost:8088/fresh-market`;
-// export const API = `http://localhost:8088/fresh-market`;
+// export const API = import.meta.env.VITE_API_BASE_URL || `http://localhost:8088/fresh-market`;
+export const API = `http://localhost:8088/fresh-market`;
 export const IMAGE_URL = `${API}/uploads`;
 export const DEFAULT_IMAGE = "/images/no_image_large.jpg";
 
@@ -66,7 +66,7 @@ export const logout = () => {
       persistor.purge(); // Dọn dẹp persisted state nếu cần
       dispatch({ type: LOGOUT }); // Dispatch action LOGOUT để reset trạng thái người dùng
     } catch (error) {
-      // message.error(error.message); // Hiển thị thông báo lỗi
+      message.error(error.message); // Hiển thị thông báo lỗi
     }
   };
 };
@@ -90,7 +90,7 @@ export const introspect = async (token) => {
       return result.result?.valid;
     })
     .catch((error) => {
-      // message.error(error.message);
+      message.error(error.message);
       return false;
     });
 };
@@ -116,6 +116,7 @@ export const refresh = async (token) => {
     })
     .catch(() => {
       removeToken();
+      message.error("Failed to refresh token.");
       return;
     });
 };
